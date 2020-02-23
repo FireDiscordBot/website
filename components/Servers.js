@@ -3,8 +3,8 @@ import React from "react";
 const Servers = ({ servers }) => {
     return (
         <div className={"row d-flex align-items-center justify-content-center"}>
-            {servers.map(server => (
-                <div className={"server-card"} onClick={() => window.open(server.vanity, "_blank")}>
+            {servers.map((server, i) => (
+                <div className={"server-card"} key={i} onClick={() => window.open(server.vanity, "_blank")}>
                     <div className={"server-header"}>
                         <img className={"server-splash"} src={`${server.splash}`} />
                         <img className={"server-icon"} src={`${server.icon}`} />

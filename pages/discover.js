@@ -10,21 +10,25 @@ import Footer from "../components/Footer";
 const Discover = props => {
     const [filter, setFilter] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [serversPerPage] = useState(6);
+    const [serversPerPage] = useState(12);
 
-    const filteredServers = props.servers.filter(guild => guild.name.trim().toLowerCase().includes(filter.trim().toLowerCase()));
-    
+    const filteredServers = props.servers.filter(guild =>
+        guild.name
+            .trim()
+            .toLowerCase()
+            .includes(filter.trim().toLowerCase())
+    );
+
     const indexOfLastServer = currentPage * serversPerPage;
     const indexOfFirstServer = indexOfLastServer - serversPerPage;
-    const currentServers = filteredServers.slice(indexOfFirstServer, indexOfLastServer)
+    const currentServers = filteredServers.slice(indexOfFirstServer, indexOfLastServer);
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    const paginate = pageNumber => setCurrentPage(pageNumber);
 
     return (
         <div>
             <Head title={"Discover"} />
             <Nav />
-
             <div id="content-section">
                 <div className="container text-left">
                     <h1>Public Servers</h1>
@@ -35,14 +39,22 @@ const Discover = props => {
                                 id="filter"
                                 className={"form-control"}
                                 placeholder="Search for Guild..."
-                                onChange={e => {setFilter(e.target.value); setCurrentPage(1)}}
+                                onChange={e => {
+                                    setFilter(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                             />
                         </div>
                     </div>
-                    <br/>
-                    <Servers servers={currentServers}/>
-                    <br/>
-                    <Pagination serversPerPage={serversPerPage} totalServers={filteredServers.length} paginate={paginate}/>
+                    <br />
+                    <Servers servers={currentServers} />
+                    <br />
+                    <Pagination
+                        serversPerPage={serversPerPage}
+                        totalServers={filteredServers.length}
+                        paginate={paginate}
+                        currentPage={currentPage}
+                    />
                 </div>
             </div>
             <Footer />
@@ -52,6 +64,7 @@ const Discover = props => {
 
 Discover.getInitialProps = async function() {
     const res = await fetch("https://api.gaminggeek.dev/discoverable");
+
     const data = await res.json();
     return {
         servers: data
