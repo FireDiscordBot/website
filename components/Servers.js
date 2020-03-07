@@ -54,13 +54,13 @@ const Servers = ({ servers }) => {
                         <div className={"server-member-info"}>
                             <div className={"server-member-count"}>
                                 <div className={"server-online-dot"}></div>
-                                <div className={"server-online-text"}>
+                                <div className={"server-online-text"} id={`${server.id}-online`}>
                                     <strong>{server.online}</strong>&nbsp;Online
                                 </div>
                             </div>
                             <div className={"server-member-count"}>
                                 <div className={"server-offline-dot"}></div>
-                                <div>
+                                <div id={`${server.id}-members`}>
                                     <strong>{server.members}</strong>&nbsp;Members
                                 </div>
                             </div>
