@@ -58,6 +58,7 @@ const Discover = props => {
                 </div>
             </div>
             <Footer />
+            <script async src="http://localhost:3000/main.js"></script>
         </div>
     );
 };
