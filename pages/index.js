@@ -25,10 +25,10 @@ const Home = () => {
                     <div className={"row"}>
                         <div className={"col-md bot-info-box"}>
                             <p>
-                                <span>Music</span>
+                                <span>Integrations</span>
                                 <br />
-                                Fire can join your voice channel and play some music from YouTube. With an intuitive
-                                music controller, it's easy to change the volume, skip song or even repeat a song!
+                                Fire has a few integrations that allow you to retreive content from external platforms such
+                                as Reddit, Hypixel and even the Google Assistant.
                             </p>
                         </div>
                         <div className={"col-md bot-info-box"}>
