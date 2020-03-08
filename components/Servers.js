@@ -48,7 +48,7 @@ const Servers = ({ servers }) => {
                                 <span>{server.name}</span>
                             </div>
                         </div>
-                        <div className={"server-description"} id={`$server.id}-desc`}>
+                        <div className={"server-description"} id={`${server.id}-desc`}>
                             <span>{server.description}</span>
                         </div>
                         <div className={"server-member-info"}>
