@@ -37,8 +37,8 @@ const Nav = () => (
                         </a>
                     </li>
                     <li className="nav-item" role="presentation" id="invite-btn">
-                        <a className="nav-link active" href="https://dash.gaminggeek.space">
-                            Dashboard
+                        <a className="nav-link active" href="https://discordapp.com/oauth2/authorize?client_id=444871677176709141&permissions=8&scope=bot">
+                            Invite
                         </a>
                     </li>
                 </ul>

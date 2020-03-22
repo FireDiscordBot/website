@@ -22,6 +22,12 @@ const Home = () => {
                         </div>
                     </div>
                     <br />
+                    <div className="nav-item" role="presentation" id="invite-btn" style={{width: "110px", margin: "0 auto"}}>
+                        <a className="nav-link active" href="https://discordapp.com/oauth2/authorize?client_id=444871677176709141&permissions=8&scope=bot">
+                            Invite Now
+                        </a>
+                    </div>
+                    <br />
                     <div className={"row"}>
                         <div className={"col-md bot-info-box"}>
                             <p>
@@ -47,17 +53,6 @@ const Home = () => {
                                 We know how hard moderation can be, so we try make things easy. With commands to mute,
                                 block (per-channel mute), kick and ban, moderation is a piece of cake!
                             </p>
-                        </div>
-                    </div>
-                    <br />
-                    <div className={"row d-flex justify-content-center align-items-center"}>
-                        <div className={"col-md"}>
-                            <iframe
-                                src={"https://api.gaminggeek.dev/discovery/564052798044504084"}
-                                style={{ height: "100%;", width: "257px;", minHeight: "308px !important;" }}
-                                allowtransparency="true"
-                                frameBorder={0}
-                            />
                         </div>
                     </div>
                 </div>
