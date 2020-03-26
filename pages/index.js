@@ -50,7 +50,7 @@ const Home = () => {
                             <p>
                                 <span>Moderation</span>
                                 <br />
-                                We know how hard moderation can be, so we try make things easy. With commands to mute,
+                                We know how hard moderation can be, so we try to make things easy. With commands to mute,
                                 block (per-channel mute), kick and ban, moderation is a piece of cake!
                             </p>
                         </div>
