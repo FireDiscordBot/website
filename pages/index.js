@@ -33,7 +33,7 @@ const Home = () => {
                             <p>
                                 <span>Integrations</span>
                                 <br />
-                                Fire has a few integrations that allow you to retreive content from external platforms such
+                                Fire has a few integrations that allow you to retrieve content from external platforms such
                                 as Reddit, Hypixel and even the Google Assistant.
                             </p>
                         </div>
@@ -41,7 +41,7 @@ const Home = () => {
                             <p>
                                 <span>Utilities</span>
                                 <br />
-                                Fire has many different utilities to help you get information quickly about many thing.
+                                Fire has many different utilities to help you get information quickly about many things.
                                 Some examples include auto-quotes when you send a message link or being able to fetch
                                 simple user info
                             </p>
