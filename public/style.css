@@ -56,6 +56,8 @@ body {
 
 .nav-link {
     color: white !important;
+    padding-right: 1rem !important;
+    padding-left: 1rem !important;
 }
 
 .noselect {
@@ -69,7 +71,7 @@ body {
 }
 
 #invite-btn {
-    background: #151515;
+    background: linear-gradient(25deg, #f04e33, #c52035);
     border-radius: 10px;
     opacity: 90%;
     text-align: center;
