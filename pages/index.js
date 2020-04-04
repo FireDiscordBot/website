@@ -16,7 +16,7 @@ const Home = () => {
                         <div className={"col-md-6"}>
                             <h1 className={"fire"}>Fire</h1>
                             <h3>
-                                A Discord bot for all your needs. With memes, music, moderation & more, Fire is the only
+                                A Discord bot for all your needs. With memes, utilities, moderation & more, Fire is the only
                                 bot you'll need.
                             </h3>
                         </div>
