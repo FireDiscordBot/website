@@ -8,7 +8,6 @@ const Servers = ({ servers }) => {
                     <img className={"server-splash"} src={`${server.splash}`} />
                     <div className={"server-shadow"}></div>
                     <img className={"server-icon"} src={`${server.icon}`} />
-                    <img className={"server-badge"} src={`${server.badge}`} />
                     <div className={"server-name"}>{server.name}</div>
                     <div className={"server-member-count"}>
                         <div className={"server-online-text"} id={`${server.id}-online`}>
