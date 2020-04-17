@@ -25,11 +25,11 @@ const Stats = props => {
                             </h4>
                             <h4>
                                 <span className={"stats-prefix"}>CPU:</span>{" "}
-                                {props.stats.CPU}
+                                {props.stats.cpu}
                             </h4>
                             <h4>
                                 <span className={"stats-prefix"}>RAM:</span>{" "}
-                                {props.stats.RAM}
+                                {props.stats.ram}
                             </h4>
                             <h4>
                                 <span className={"stats-prefix"}>Version:</span>{" "}
