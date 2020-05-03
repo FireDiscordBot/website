@@ -10,8 +10,8 @@ const Servers = ({ servers }) => {
                     <img className={"server-icon"} src={`${server.icon}`} />
                     <div className={"server-name"}>{server.name}</div>
                     <div className={"server-member-count"}>
-                        <div className={"server-online-text"} id={`${server.id}-online`}>
-                            {server.online}&nbsp;Online
+                        <div className={"server-members-text"} id={`${server.id}-members`}>
+                            {server.members}&nbsp;Members
                         </div>
                     </div>
                 </div>

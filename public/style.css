@@ -322,18 +322,18 @@ footer {
     color: #dcddde;
 }
 
-.server-online-text {
+.server-members-text {
     font-size: 0.7rem;
 }
 
-.server-online-text::before {
+.server-members-text::before {
     content: "";
     display: inline-block;
     border-radius: 50%;
     width: 8px;
     height: 8px;
     margin-right: 4px;
-    background-color: #43b581;
+    background-color: #b9bbbe;
 }
 
 .page-item.active .page-link {
