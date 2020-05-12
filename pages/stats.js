@@ -29,7 +29,7 @@ const Stats = props => {
                             </h4>
                             <h4>
                                 <span className={"stats-prefix"}>RAM:</span>{" "}
-                                {props.stats.ram}
+                                {props.stats.pram} ({props.stats.vram} virtual)
                             </h4>
                             <h4>
                                 <span className={"stats-prefix"}>Version:</span>{" "}
