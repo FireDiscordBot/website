@@ -39,8 +39,17 @@ const Head = props => (
           `,
             }}
           />
+        <script
+            src="https://cdn.polyfill.io/v2/polyfill.min.js"
+        ></script>
+        <script
+            src="https://unpkg.com/@webcomponents/webcomponentsjs@2.1.3/webcomponents-bundle.js"
+        ></script>
+        <script
+            src="https://unpkg.com/@statuspage/status-widget/dist/index.js"
+        ></script>
     </Heads>
-    
+
 );
 
 export default Head;

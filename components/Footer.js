@@ -9,6 +9,7 @@ const Footer = () => (
             </div>
         </div>
         <script src="https://fhrcp0477jwt.statuspage.io/embed/script.js"></script>
+        <statuspage-widget title="Status" appearance="badge" src="https://status.gaminggeek.dev"></statuspage-widget>
     </footer>
 );
 
