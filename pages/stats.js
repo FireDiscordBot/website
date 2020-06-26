@@ -4,6 +4,7 @@ import fetch from "isomorphic-unfetch";
 import Head from "../components/Head";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
+import Time from "../components/Time";
 
 
 const Stats = props => {
@@ -21,7 +22,7 @@ const Stats = props => {
                             </h3>{" "}
                             <h4>
                                 <span className={"stats-prefix"}>Uptime:</span>{" "}
-                                {props.stats.uptime}
+                                <Time date={props.stats.uptime} />
                             </h4>
                             <h4>
                                 <span className={"stats-prefix"}>CPU:</span>{" "}
@@ -29,7 +30,7 @@ const Stats = props => {
                             </h4>
                             <h4>
                                 <span className={"stats-prefix"}>RAM:</span>{" "}
-                                {props.stats.pram} ({props.stats.vram} virtual)
+                                {props.stats.ram}
                             </h4>
                             <h4>
                                 <span className={"stats-prefix"}>Version:</span>{" "}
