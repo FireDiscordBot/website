@@ -71,7 +71,6 @@ const Discover = props => {
                 </div>
             </div>
             <Footer />
-            <script async src="/main.js"></script>
         </div>
     );
 };
