@@ -220,8 +220,8 @@ const Commands = (props) => {
 };
 
 Commands.getInitialProps = async function () {
-  const res = await fetch("https://devapi.gaminggeek.dev/commands");
-  const res2 = await fetch("https://devapi.gaminggeek.dev/allcommands");
+  const res = await fetch("https://api.gaminggeek.dev/commands");
+  const res2 = await fetch("https://api.gaminggeek.dev/allcommands");
   const categories = await res.json();
   const commands = await res2.json();
 
