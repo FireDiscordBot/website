@@ -25,4 +25,4 @@ yarn-debug.log*
 yarn-error.log*
 package-lock.json
 
-/components/Servers copy.js
+.vscode
