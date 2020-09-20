@@ -31,8 +31,13 @@ const Nav = () => (
             </a>
           </li>
           <li className="nav-item" role="presentation">
-            <a className="nav-link" href="https://inv.wtf/geek">
+            <a className="nav-link" href="https://inv.wtf/fire">
               Support
+            </a>
+          </li>
+          <li className="nav-item" role="presentation">
+            <a className="nav-link" href="https://github.com/FireDiscordBot">
+              GitHub
             </a>
           </li>
           <li className="nav-item" role="presentation">

@@ -29,7 +29,7 @@ const Home = () => {
           >
             <a
               className="nav-link active"
-              href="https://discordapp.com/oauth2/authorize?client_id=444871677176709141&permissions=8&scope=bot"
+              href="https://inv.wtf/bot"
             >
               Invite Now
             </a>
