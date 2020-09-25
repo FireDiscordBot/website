@@ -105,7 +105,9 @@ const Discover = (props) => {
 };
 
 Discover.getInitialProps = async function () {
-  const res = await fetch("https://api.gaminggeek.dev/discoverable");
+  const res = await fetch("https://api.gaminggeek.dev/discoverable", {
+    headers: { "User-Agent": "Fire Website" },
+  });
 
   const data = await res.json();
   return {

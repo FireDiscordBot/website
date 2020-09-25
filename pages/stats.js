@@ -54,7 +54,9 @@ const Stats = (props) => {
 };
 
 Stats.getInitialProps = async function () {
-  const res = await fetch("https://api.gaminggeek.dev/stats");
+  const res = await fetch("https://api.gaminggeek.dev/stats", {
+    headers: { "User-Agent": "Fire Website" },
+  });
   const data = await res.json();
   return {
     stats: data,
