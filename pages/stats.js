@@ -38,10 +38,10 @@ const Stats = (props) => {
 						</div>
 						<div className="col-md-3 about-text">
 							<h4>
-								<span className={"stats-prefix"}>Guilds:</span> {props.stats.guilds}
+								<span className={"stats-prefix"}>Guilds:</span> {props.stats.guilds.toLocaleString()}
 							</h4>
 							<h4>
-								<span className={"stats-prefix"}>Users:</span> {props.stats.users}
+								<span className={"stats-prefix"}>Users:</span> {props.stats.users.toLocaleString()}
 							</h4>
 						</div>
 					</div>
@@ -94,12 +94,12 @@ const Stats = (props) => {
 								<br />
 								<span>
 									<span className="fire">Guilds: </span>
-									{cluster.guilds}
+									{cluster.guilds.toLocaleString()}
 								</span>
 								<br />
 								<span>
 									<span className="fire">Users: </span>
-									{cluster.users}
+									{cluster.users.toLocaleString()}
 								</span>
 								<br />
 								<span>
@@ -121,7 +121,6 @@ Stats.getInitialProps = async function () {
 		headers: { "User-Agent": "Fire Website" },
 	});
 	const data = await res.json();
-	console.log(data);
 	return {
 		stats: data,
 	};
