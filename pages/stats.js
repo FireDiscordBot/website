@@ -45,7 +45,6 @@ const Stats = (props) => {
 							</h4>
 						</div>
 					</div>
-					<br />
 					<div className="row about-text justify-content-center">
 						{props.stats.clusters.map((c) => (
 							<div

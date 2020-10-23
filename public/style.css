@@ -99,6 +99,12 @@ body {
 	}
 }
 
+@media (max-width: 864px) {
+	.modal-content {
+		width: 75% !important;
+	}
+}
+
 .category-note {
 	color: #aaa;
 }
@@ -201,6 +207,7 @@ table {
 	background-color: #151515;
 	padding: 15px;
 	border-radius: 10px;
+	margin: 10px;
 }
 
 .about-text strong {
@@ -556,9 +563,9 @@ a:hover {
 
 .modal-content {
 	background-color: #151515;
-	width: 35%;
+	width: 30%;
 	max-width: 640px;
-	height: 35%;
+	height: auto;
 	margin: auto;
 	padding: 15px;
 	border-radius: 10px;
