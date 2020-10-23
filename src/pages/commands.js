@@ -203,9 +203,11 @@ const Commands = (props) => {
 Commands.getInitialProps = async function () {
 	const res = await fetch("https://aether.gaminggeek.dev/commands", {
 		headers: { "User-Agent": "Fire Website" },
+		mode: 'no-cors'
 	});
 	const res2 = await fetch("https://aether.gaminggeek.dev/allcommands", {
 		headers: { "User-Agent": "Fire Website" },
+		mode: 'no-cors'
 	});
 	const categories = await res.json();
 	const commands = await res2.json();
