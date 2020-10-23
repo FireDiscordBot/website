@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import fetch from "isomorphic-unfetch";
 
 import Head from "../components/Head";
 import Nav from "../components/Nav";

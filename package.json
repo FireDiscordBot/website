@@ -10,16 +10,16 @@
     },
     "dependencies": {
         "@appbaseio/reactivesearch": "^3.7.2",
-        "@zeit/next-css": "^1.0.1",
         "cookie-parser": "^1.4.5",
         "cross-env": "^7.0.2",
         "express": "^4.17.1",
-        "isomorphic-unfetch": "^3.0.0",
         "next": "^9.4.4",
         "next-cookies": "^2.0.3",
-        "prop-types": "^15.7.2",
         "react": "16.13.1",
         "react-dom": "16.13.1",
         "timeago-react": "^3.0.0"
+    },
+    "devDependencies": {
+        "prop-types": "^15.7.2"
     }
 }

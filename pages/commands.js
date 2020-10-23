@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import fetch from "isomorphic-unfetch";
 
 import Head from "../components/Head";
 import Nav from "../components/Nav";
