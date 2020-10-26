@@ -1,19 +1,30 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import type {NextPage} from "next";
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
 import Head from "../components/Head";
-import type {Stats as StatsType} from "../types";
+import type {Stats} from "../types";
 import ClusterModal from "../components/ClusterModal";
 
 interface Props {
-  stats: StatsType
+  initialStats: Stats
 }
 
-const Stats: NextPage<Props> = ({stats}) => {
+const StatsPage: NextPage<Props> = ({initialStats}) => {
+  const [stats, setStats] = useState<Stats>(initialStats);
   const [clusterInfoId, setClusterInfoId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const ws = new WebSocket('wss://aether-ws.gaminggeek.dev/realtime-stats');
+    ws.onmessage = (msg) => {
+      const newStats: Stats = JSON.parse(msg.data);
+      setStats(newStats);
+    };
+
+    return () => ws.close();
+  }, []);
 
   let clusterModal = undefined;
 
@@ -34,7 +45,7 @@ const Stats: NextPage<Props> = ({stats}) => {
       <div id="content-section">
         <Container className="text-center">
           <Row className="justify-content-between">
-            <Col md={3}>
+            <Col md={4}>
               <div className="about-text">
                 <h4>
                   <span className="fire">CPU:</span> {stats.cpu}
@@ -44,7 +55,7 @@ const Stats: NextPage<Props> = ({stats}) => {
                 </h4>
               </div>
             </Col>
-            <Col md={3}>
+            <Col md={4}>
               <div className="about-text">
                 <h4>
                   <span className="fire">Clusters:</span> {stats.clusterCount}
@@ -54,7 +65,7 @@ const Stats: NextPage<Props> = ({stats}) => {
                 </h4>
               </div>
             </Col>
-            <Col md={3}>
+            <Col md={4}>
               <div className="about-text">
                 <h4>
                   <span className="fire">Guilds:</span> {stats.guilds.toLocaleString()}
@@ -96,18 +107,18 @@ const Stats: NextPage<Props> = ({stats}) => {
   );
 };
 
-Stats.getInitialProps = async () => {
+StatsPage.getInitialProps = async () => {
   const fetchOptions: RequestInit = {
     mode: 'cors',
     // Use custom user-agent only in server-side.
     headers: !process.browser ? {"User-Agent": "Fire Website"} : undefined
   }
   const response = await fetch("https://aether.gaminggeek.dev/stats", fetchOptions);
-  const stats: StatsType = await response.json();
+  const initialStats: Stats = await response.json();
 
   return {
-    stats,
+    initialStats,
   };
 };
 
-export default Stats;
+export default StatsPage;
