@@ -24,8 +24,9 @@ const StatsPage: NextPage<Props> = ({ initialStats }) => {
   };
 
   const findShard = (guild: string, shardCount: number) => {
-    // @ts-ignore
-    return (guild >> 22) % shardCount;
+    return parseInt(
+      ((BigInt(guild) >> BigInt(22)) % BigInt(shardCount)).toString()
+    );
   };
 
   useEffect(() => {
@@ -91,14 +92,14 @@ const StatsPage: NextPage<Props> = ({ initialStats }) => {
             </Col>
           </Row>
           <div style={{ padding: 10, borderRadius: 10 }}>
-              <input
-                type="text"
-                id="filter"
-                className="form-control"
-                style={{ padding: 10, borderRadius: 10 }}
-                placeholder="Enter a Server ID to find it's cluster..."
-                onChange={onChangeFilterField}
-              />
+            <input
+              type="text"
+              id="filter"
+              className="form-control"
+              style={{ padding: 10, borderRadius: 10 }}
+              placeholder="Enter a Server ID to find it's cluster..."
+              onChange={onChangeFilterField}
+            />
           </div>
           <Row>
             <Col xs={12}>
