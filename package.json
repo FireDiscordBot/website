@@ -18,8 +18,7 @@
         "next-cookies": "^2.0.3",
         "react": "17.0.1",
         "react-bootstrap": "^1.4.0",
-        "react-dom": "17.0.1",
-        "timeago-react": "^3.0.1"
+        "react-dom": "17.0.1"
     },
     "devDependencies": {
         "@types/node": "^14.14.5",
