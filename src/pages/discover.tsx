@@ -117,7 +117,7 @@ Discover.getInitialProps = async () => {
 		// Use custom user-agent only in server-side.
 		headers: !process.browser ? { "User-Agent": "Fire Website" } : undefined,
 	};
-	const response = await fetch("https://api.gaminggeek.dev/discoverable", fetchOptions);
+	const response = await fetch("https://aether.gaminggeek.dev/discoverable", fetchOptions);
 	const servers: Server[] = await response.json();
 
 	return { servers };
