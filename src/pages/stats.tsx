@@ -97,7 +97,7 @@ const StatsPage: NextPage<Props> = ({ initialStats }) => {
               id="filter"
               className="form-control"
               style={{ padding: 10, borderRadius: 10 }}
-              placeholder="Enter a Server ID to find it's cluster..."
+              placeholder="Enter a Server ID to find its cluster..."
               onChange={onChangeFilterField}
             />
           </div>
