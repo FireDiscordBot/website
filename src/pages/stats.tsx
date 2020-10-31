@@ -61,7 +61,7 @@ const StatsPage: NextPage<Props> = ({ initialStats }) => {
             <Col md={4}>
               <div className="about-text">
                 <h4>
-                  <span className="fire">CPU:</span> {stats.cpu}
+                  <span className="fire">CPU:</span> {stats.cpu}%
                 </h4>
                 <h4>
                   <span className="fire">RAM:</span> {stats.ram}

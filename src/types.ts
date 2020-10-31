@@ -32,7 +32,7 @@ export interface Category {
 export interface Cluster {
   id: number;
   uptime: string;
-  cpu: string;
+  cpu: number;
   ram: string;
   version: string;
   guilds: number;
@@ -55,11 +55,11 @@ export interface Shard {
 }
 
 export interface Stats {
-  clusters: Cluster[];
-  cpu: string;
+  cpu: number;
   ram: string;
   clusterCount: number;
   shardCount: number;
   guilds: number;
   users: number;
+  clusters: Cluster[];
 }

@@ -20,7 +20,7 @@ const OnlineCluster = (cluster: Cluster) => {
       </div>
       <div>
         <span className="fire">CPU: </span>
-        {cluster.cpu}
+        {cluster.cpu}%
       </div>
       <div>
         <span className="fire">RAM: </span>
