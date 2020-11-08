@@ -31,6 +31,8 @@ export interface Category {
 
 export interface Cluster {
   id: number;
+  name: string;
+  env: string;
   uptime: string;
   cpu: number;
   ram: string;
@@ -39,6 +41,7 @@ export interface Cluster {
   unavailableGuilds: number;
   users: number;
   commands: number;
+  events: number;
   shards: Shard[];
   error?: string;
   reason?: string;
@@ -57,6 +60,7 @@ export interface Shard {
 export interface Stats {
   cpu: number;
   ram: string;
+  totalRam: string;
   clusterCount: number;
   shardCount: number;
   guilds: number;

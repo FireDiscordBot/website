@@ -85,7 +85,11 @@ const ClusterModal = ({ show, onHide, cluster }: Props) => (
   <Modal show={show} onHide={onHide}>
     <Modal.Header>
       <Modal.Title className="w-100 text-center" as="h3">
-        Cluster <span className="fire">{cluster.id}</span>
+        {cluster.name ? (
+          <span className="fire">{cluster.name}</span>
+        ) : (
+          <span className="fire">Cluster {cluster.id}</span>
+        )}
       </Modal.Title>
     </Modal.Header>
     {cluster.error ? OfflineCluster(cluster) : OnlineCluster(cluster)}
