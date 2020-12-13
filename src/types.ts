@@ -4,7 +4,8 @@ export interface Server {
   icon: string;
   splash: string;
   vanity: string;
-  members: string;
+  members: number;
+  key?: number;
 }
 
 export interface Command {
