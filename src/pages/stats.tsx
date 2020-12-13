@@ -164,7 +164,22 @@ StatsPage.getInitialProps = async () => {
   const response = await fetch(
     "https://aether.gaminggeek.dev/stats",
     fetchOptions
-  );
+  ).catch(() => {
+    return {
+      json: () => {
+        return {
+          cpu: 0,
+          ram: "0 B",
+          totalRam: "0 B",
+          clusterCount: 0,
+          shardCount: 0,
+          guilds: 0,
+          users: 0,
+          clusters: [],
+        };
+      },
+    };
+  });
   const initialStats: Stats = await response.json();
 
   return {
