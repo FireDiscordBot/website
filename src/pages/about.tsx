@@ -18,7 +18,7 @@ const About = () => (
 							<strong>Website</strong> is made by <strong>Nystrex#6606</strong> and{" "}
 							<strong>bruno#1111</strong>
 							<br />
-							All rights reserved. &copy; 2020
+							All rights reserved. &copy; 2021
 						</div>
 					</Col>
 				</Row>
