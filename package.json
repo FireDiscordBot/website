@@ -1,0 +1,29 @@
+{
+  "name": "@firediscordbot/website",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "type-check": "tsc"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
+    "@stripe/stripe-js": "^1.11.0",
+    "next": "latest",
+    "next-auth": "^3.2.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "stripe": "^8.132.0"
+  },
+  "devDependencies": {
+    "@types/next-auth": "^3.1.24",
+    "@types/node": "^12.12.21",
+    "@types/react": "^16.9.16",
+    "@types/react-dom": "^16.9.4",
+    "typescript": "4.0"
+  },
+  "license": "MIT"
+}
