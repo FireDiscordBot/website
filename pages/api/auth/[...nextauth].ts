@@ -12,7 +12,7 @@ const discordProvider = Providers.Discord({
         const defaultAvatarNumber = parseInt(profile.discriminator) % 5
         return `https://cdn.discordapp.com/embed/avatars/${defaultAvatarNumber}.png`
       } else {
-        const format = profile.premium_type == 0 ? 'png' : 'gif'
+        const format = profile.avatar.startsWith("a_") ? 'gif' : 'png'
         return `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.${format}`
       }
     }
