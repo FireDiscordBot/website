@@ -1,8 +1,8 @@
-import React, { ReactNode } from 'react'
+import * as React from 'react'
 import NavBar from "./NavBar"
 
 type Props = {
-  children?: ReactNode
+  children?: React.ReactNode
 }
 
 const Layout = ({ children }: Props) => (

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import Link from 'next/link'
+import { signIn, signOut, useSession } from 'next-auth/client'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import IconButton from '@material-ui/core/IconButton'
@@ -11,7 +11,7 @@ import Menu from "@material-ui/core/Menu"
 import MenuItem from "@material-ui/core/MenuItem"
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import MenuIcon from '@material-ui/icons/Menu'
-import { signIn, signOut, useSession } from 'next-auth/client'
+import MenuItemLink from "./MenuItemLink"
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -71,12 +71,8 @@ const NavBar = () => {
           getContentAnchorEl={null}
           keepMounted
         >
-          <Link href="/user/account" passHref>
-            <MenuItem component="a">My account</MenuItem>
-          </Link>
-          <Link href="/user/dashboard" passHref>
-            <MenuItem component="a">Dashboard</MenuItem>
-          </Link>
+          <MenuItemLink href="/user/account">My account</MenuItemLink>
+          <MenuItemLink href="/user/dashboard">Dashboard</MenuItemLink>
           <MenuItem onClick={onClickLogout}>Logout</MenuItem>
         </Menu>
       </>

@@ -30,7 +30,7 @@ const Index = () => {
       <Container className={classes.banner}>
         <Grid container alignItems="center" justify="space-evenly">
           <Grid item xs={2} sm={3} md={4}>
-            <Image src="/logo-gr.svg" width={256} height={256} layout="responsive"/>
+            <Image src="/logo-gr.svg" width={256} height={256} layout="responsive" alt="Fire's logo"/>
           </Grid>
           <Grid item xs={12} sm={5} md={4}>
             <Typography variant="h5" align="justify">
