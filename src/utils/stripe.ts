@@ -1,7 +1,7 @@
 import Stripe from "stripe"
 
 const stripe = new Stripe.Stripe(process.env.STRIPE_API_KEY_SECRET!!, {
-  apiVersion: "2020-08-27"
+  apiVersion: "2020-08-27",
 })
 
 type CreateSubscriptionOptions = {
@@ -25,6 +25,6 @@ export const createSubscription = async (options: CreateSubscriptionOptions) => 
     ],
     success_url: options.successUrl,
     cancel_url: options.cancelUrl,
-    metadata: options.metadata
+    metadata: options.metadata,
   })
 }

@@ -1,29 +1,39 @@
 import * as React from 'react'
+import Link from 'next/link'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import IconButton from '@material-ui/core/IconButton'
 import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
+import Container from '@material-ui/core/Container'
+import Avatar from "@material-ui/core/Avatar"
+import Menu from "@material-ui/core/Menu"
+import MenuItem from "@material-ui/core/MenuItem"
+import { createStyles, makeStyles } from '@material-ui/core/styles'
 import MenuIcon from '@material-ui/icons/Menu'
-import {createStyles, makeStyles} from '@material-ui/core/styles'
-import {signIn, signOut, useSession} from 'next-auth/client'
+import { signIn, signOut, useSession } from 'next-auth/client'
 
 const useStyles = makeStyles(theme =>
   createStyles({
     root: {
-      flexGrow: 1,
+      background: 'transparent',
     },
     menuButton: {
       marginRight: theme.spacing(2),
     },
-    title: {
+    grow: {
       flexGrow: 1,
+    },
+    emptyToolbar: theme.mixins.toolbar,
+    avatarButton: {
+      padding: '6px',
     },
   }),
 )
 
 const NavBar = () => {
   const classes = useStyles()
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
   const [session, loading] = useSession()
 
   let authButton: React.ReactNode
@@ -31,11 +41,46 @@ const NavBar = () => {
   if (loading) {
     authButton = <Typography variant="body2">Loading...</Typography>
   } else if (session) {
-    const onClick = (e: React.MouseEvent) => {
+    const onClickAvatar = (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault()
+      setAnchorEl(e.currentTarget)
+    }
+    const onClickLogout = (e: React.MouseEvent) => {
       e.preventDefault()
       return signOut()
     }
-    authButton = <Button color="inherit" onClick={onClick}>Logout</Button>
+    const onCloseMenu = () => setAnchorEl(null)
+
+    authButton = (
+      <>
+        <IconButton onClick={onClickAvatar} className={classes.avatarButton}>
+          <Avatar src={session.user.image}/>
+        </IconButton>
+        <Menu
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            vertical: 'center',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          open={Boolean(anchorEl)}
+          onClose={onCloseMenu}
+          getContentAnchorEl={null}
+          keepMounted
+        >
+          <Link href="/user/account" passHref>
+            <MenuItem component="a">My account</MenuItem>
+          </Link>
+          <Link href="/user/dashboard" passHref>
+            <MenuItem component="a">Dashboard</MenuItem>
+          </Link>
+          <MenuItem onClick={onClickLogout}>Logout</MenuItem>
+        </Menu>
+      </>
+    )
   } else {
     const onClick = (e: React.MouseEvent) => {
       e.preventDefault()
@@ -45,17 +90,20 @@ const NavBar = () => {
   }
 
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-          <MenuIcon/>
-        </IconButton>
-        <Typography variant="h6" className={classes.title}>
-          Fire
-        </Typography>
-        {authButton}
-      </Toolbar>
-    </AppBar>
+    <>
+      <AppBar position="fixed" className={classes.root} elevation={0}>
+        <Container>
+          <Toolbar disableGutters>
+            <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+              <MenuIcon/>
+            </IconButton>
+            <div className={classes.grow}/>
+            {authButton}
+          </Toolbar>
+        </Container>
+      </AppBar>
+      <div className={classes.emptyToolbar}/>
+    </>
   )
 }
 

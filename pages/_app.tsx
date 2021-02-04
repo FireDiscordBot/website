@@ -1,13 +1,13 @@
 import * as React from 'react'
 import Head from 'next/head'
-import {AppProps} from 'next/app'
-import {Provider} from 'next-auth/client'
-import {ThemeProvider} from '@material-ui/core/styles'
+import { AppProps } from 'next/app'
+import { Provider } from 'next-auth/client'
+import { ThemeProvider } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import theme from '../src/theme'
 
 function MyApp(props: AppProps) {
-  const {Component, pageProps} = props
+  const { Component, pageProps } = props
 
   React.useEffect(() => {
     const jssStyles = document.querySelector("#jss-server-side")

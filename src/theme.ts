@@ -3,6 +3,7 @@ import { red, grey, orange } from '@material-ui/core/colors'
 
 const theme = createMuiTheme({
   palette: {
+    type: 'dark',
     primary: {
       main: red["700"],
     },
@@ -11,9 +12,6 @@ const theme = createMuiTheme({
     },
     error: {
       main: orange.A400,
-    },
-    background: {
-      default: '#fff',
     },
   },
 })

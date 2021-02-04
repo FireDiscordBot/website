@@ -1,6 +1,6 @@
 import * as React from 'react'
-import Document, {Html, Head, Main, NextScript} from 'next/document'
-import {ServerStyleSheets} from '@material-ui/core/styles'
+import Document, { Html, Head, Main, NextScript } from 'next/document'
+import { ServerStyleSheets } from '@material-ui/core/styles'
 import theme from '../src/theme'
 
 export default class MyDocument extends Document {
@@ -9,7 +9,7 @@ export default class MyDocument extends Document {
       <Html lang="en">
         <Head>
           <meta name="theme-color" content={theme.palette.primary.main}/>
-          <meta charSet="utf-8" />
+          <meta charSet="utf-8"/>
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
