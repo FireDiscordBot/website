@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme =>
       fontSize: theme.spacing(10),
     },
     chartsContainer: {
-      marginBottom: theme.spacing(2)
+      marginBottom: theme.spacing(2),
     },
     clusterGridItem: {
       display: 'flex',
@@ -40,14 +40,15 @@ const useStyles = makeStyles(theme =>
 
 type Props = {
   initialFireStats: FireStats;
+  initialSelectedClusterId: number | null;
 }
 
-const StatsPage = ({ initialFireStats }: Props) => {
+const StatsPage = ({ initialFireStats, initialSelectedClusterId }: Props) => {
   const classes = useStyles()
   const [fireStats, setFireStats] = React.useState<FireStats>(initialFireStats)
-  const [selectedClusterId, setSelectedClusterId] = React.useState<number | undefined>(undefined);
+  const [selectedClusterId, setSelectedClusterId] = React.useState<number | null>(initialSelectedClusterId);
 
-  const onCloseDialog = () => setSelectedClusterId(undefined)
+  const onCloseDialog = () => setSelectedClusterId(null)
 
   React.useEffect(() => {
     const ws = new WebSocket(fire.realtimeStatsUrl)
@@ -63,8 +64,9 @@ const StatsPage = ({ initialFireStats }: Props) => {
   }, [])
 
   let selectedClusterStats: ClusterStats | undefined
-  if (typeof selectedClusterId !== "undefined") {
+  if (Number.isInteger(selectedClusterId)) {
     selectedClusterStats = fireStats.clusters.find(cluster => cluster.id == selectedClusterId)
+    console.log('found stats', selectedClusterStats)
   }
 
   return (
@@ -141,10 +143,10 @@ const StatsPage = ({ initialFireStats }: Props) => {
           </Grid>
 
           {fireStats.clusters.map(cluster => (
-            <Grid item  className={classes.clusterGridItem}>
+            <Grid item className={classes.clusterGridItem} key={cluster.id}>
               <Card onClick={() => {
                 setSelectedClusterId(cluster.id)
-              }} > { /* TODO */}
+              }}> { /* TODO */}
                 <CardContent className={classes.cardContent}>
                   <Typography variant="body1">
                     {cluster.id}
@@ -156,7 +158,7 @@ const StatsPage = ({ initialFireStats }: Props) => {
         </Grid>
       </Container>
 
-      {typeof selectedClusterId !== "undefined" && <ClusterStatsDialog
+      {selectedClusterStats && <ClusterStatsDialog
         clusterStats={selectedClusterStats!!}
         open={true}
         onClose={onCloseDialog}
@@ -165,7 +167,13 @@ const StatsPage = ({ initialFireStats }: Props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
+type QueryParams = {
+  cluster: string;
+}
+
+export const getServerSideProps: GetServerSideProps<Props, QueryParams> = async (context) => {
+  const initialSelectedClusterId = typeof context.query?.cluster != 'undefined'
+    ? parseInt(context.query.cluster as string, 10) : null
   let initialFireStats: FireStats
 
   try {
@@ -191,6 +199,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
   return {
     props: {
       initialFireStats,
+      initialSelectedClusterId
     },
   }
 }

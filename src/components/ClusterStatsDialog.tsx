@@ -46,8 +46,6 @@ const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
 
   const onTitleClose = () => onClose && onClose({}, "backdropClick")
 
-  console.log(clusterStats.shards)
-
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md">
       <DialogTitle onClose={onTitleClose}>
