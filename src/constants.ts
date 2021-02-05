@@ -3,7 +3,7 @@ export const misc = {
 }
 
 export const discord = {
-  clientId: process.env.DISCORD_CLIENT_ID ?? "0",
+  clientId: process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID ?? "0",
   clientSecret: process.env.DISCORD_CLIENT_SECRET ?? "Not provided",
   get inviteUrl() {
     return `https://discord.com/oauth2/authorize?client_id=${this.clientId}&permissions=1007021303&scope=bot%20applications.commands`
