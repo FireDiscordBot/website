@@ -1,4 +1,5 @@
 import * as React from 'react'
+import NextLink from 'next/link'
 import { signIn, signOut, useSession } from 'next-auth/client'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -6,6 +7,7 @@ import IconButton from '@material-ui/core/IconButton'
 import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
 import Container from '@material-ui/core/Container'
+import Link from "@material-ui/core/Link"
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import MenuIcon from '@material-ui/icons/Menu'
 import AvatarButton from './AvatarButton'
@@ -66,6 +68,11 @@ const NavBar = () => {
             <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
               <MenuIcon/>
             </IconButton>
+            <NextLink href="/" passHref>
+              <Link variant="h6" color="inherit">
+                Fire
+              </Link>
+            </NextLink>
             <div className={classes.grow}/>
             {authButton}
           </Toolbar>

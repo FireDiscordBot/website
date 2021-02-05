@@ -1,5 +1,7 @@
-export const misc = {
-  githubUrl: "https://github.com/FireDiscordBot/bot"
+export const fire = {
+  githubUrl: "https://github.com/FireDiscordBot/bot",
+  aetherApiUrl: "https://aether.gaminggeek.dev",
+  realtimeStatsUrl: "wss://aether-ws.gaminggeek.dev/realtime-stats"
 }
 
 export const discord = {

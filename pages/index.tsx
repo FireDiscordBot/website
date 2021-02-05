@@ -9,7 +9,7 @@ import CardContent from '@material-ui/core/CardContent'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import GitHubIcon from '@material-ui/icons/GitHub'
 import Layout from '../src/components/Layout'
-import { discord, misc } from "../src/constants"
+import { discord, fire } from "../src/constants"
 
 type Feature = {
   title: string;
@@ -20,19 +20,23 @@ const FEATURES: Feature[] = [
   {
     title: "Integrations",
     text: `
-    Fire has a few integrations that allow you to retrieve content from external platforms such as Reddit and even 
-    the Google Assistant.
+    Fire has a few integrations that allow you to retrieve content from external platforms 
+    such as Reddit and even the Google Assistant.
     `.trimStart(),
   },
   {
     title: 'Utilities',
-    text: `Fire has many different utilities to help you get information quickly about many things. 
-    Some examples include auto-quotes when you send a message link or being able to fetch simple user info`.trimStart(),
+    text: `
+    Fire has many different utilities to help you get information quickly about many things. 
+    Some examples include auto-quotes when you send a message link or being able to fetch simple user info
+    `.trimStart(),
   },
   {
     title: 'Moderation',
-    text: `We know how hard moderation can be, so we try to make things easy. With commands to mute, 
-    block (per-channel mute), kick and ban, moderation is a piece of cake!`.trimStart(),
+    text: `
+    We know how hard moderation can be, so we try to make things easy. With commands to mute, 
+    block (per-channel mute), kick and ban, moderation is a piece of cake!
+    `.trimStart(),
   },
 ]
 
@@ -67,7 +71,7 @@ const useStyles = makeStyles(theme =>
   }),
 )
 
-const Index = () => {
+const IndexPage = () => {
   const classes = useStyles()
 
   return (
@@ -98,7 +102,7 @@ const Index = () => {
                 color="default"
                 className={classes.button}
                 startIcon={<GitHubIcon/>}
-                href={misc.githubUrl}
+                href={fire.githubUrl}
               >
                 GitHub
               </Button>
@@ -126,4 +130,4 @@ const Index = () => {
   )
 }
 
-export default Index
+export default IndexPage
