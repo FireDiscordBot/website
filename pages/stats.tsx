@@ -9,10 +9,11 @@ import Typography from "@material-ui/core/Typography"
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import PeopleIcon from '@material-ui/icons/People'
 import StorageIcon from '@material-ui/icons/Storage'
+import ClusterStatsDialog from "../src/components/ClusterStatsDialog"
 import CustomCircularProgress from "../src/components/CustomCircularProgress"
 import Layout from "../src/components/Layout"
 import { fire } from "../src/constants"
-import { FireStats } from "../src/interfaces/aether"
+import { ClusterStats, FireStats } from "../src/interfaces/aether"
 import { formatBytes, formatNumber } from "../src/utils/formatting"
 
 const useStyles = makeStyles(theme =>
@@ -28,6 +29,12 @@ const useStyles = makeStyles(theme =>
     icon: {
       fontSize: theme.spacing(10),
     },
+    chartsContainer: {
+      marginBottom: theme.spacing(2)
+    },
+    clusterGridItem: {
+      display: 'flex',
+    },
   }),
 )
 
@@ -38,6 +45,9 @@ type Props = {
 const StatsPage = ({ initialFireStats }: Props) => {
   const classes = useStyles()
   const [fireStats, setFireStats] = React.useState<FireStats>(initialFireStats)
+  const [selectedClusterId, setSelectedClusterId] = React.useState<number | undefined>(undefined);
+
+  const onCloseDialog = () => setSelectedClusterId(undefined)
 
   React.useEffect(() => {
     const ws = new WebSocket(fire.realtimeStatsUrl)
@@ -52,10 +62,15 @@ const StatsPage = ({ initialFireStats }: Props) => {
     return () => ws.close()
   }, [])
 
+  let selectedClusterStats: ClusterStats | undefined
+  if (typeof selectedClusterId !== "undefined") {
+    selectedClusterStats = fireStats.clusters.find(cluster => cluster.id == selectedClusterId)
+  }
+
   return (
     <Layout>
       <Container>
-        <Grid container spacing={4} justify="center">
+        <Grid container spacing={4} justify="center" className={classes.chartsContainer}>
           <Grid item xs={6} sm={5} md={3}>
             <Card>
               <CardContent classes={{ root: classes.cardContent }}>
@@ -69,7 +84,7 @@ const StatsPage = ({ initialFireStats }: Props) => {
                 <CustomCircularProgress
                   title="RAM"
                   value={fireStats.ramBytes}
-                  valueLabel={formatBytes(fireStats.ramBytes, { maximumFractionDigits: 1 })}
+                  valueLabel={formatBytes(fireStats.ramBytes, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                   max={fireStats.totalRamBytes}
                 />
               </CardContent>
@@ -118,7 +133,34 @@ const StatsPage = ({ initialFireStats }: Props) => {
             </Card>
           </Grid>
         </Grid>
+        <Grid container spacing={2} justify="center">
+          <Grid item xs={12}>
+            <Typography variant="h4" align="center" color="primary">
+              Clusters
+            </Typography>
+          </Grid>
+
+          {fireStats.clusters.map(cluster => (
+            <Grid item  className={classes.clusterGridItem}>
+              <Card onClick={() => {
+                setSelectedClusterId(cluster.id)
+              }} > { /* TODO */}
+                <CardContent className={classes.cardContent}>
+                  <Typography variant="body1">
+                    {cluster.id}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       </Container>
+
+      {typeof selectedClusterId !== "undefined" && <ClusterStatsDialog
+        clusterStats={selectedClusterStats!!}
+        open={true}
+        onClose={onCloseDialog}
+      />}
     </Layout>
   )
 }
@@ -129,7 +171,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
   try {
     const response = await fetch(`${fire.aetherApiUrl}/stats`, {
       mode: 'cors',
-      headers: !process.browser ? { "User-Agent": "Fire Website" } : undefined,
+      headers: { "User-Agent": "Fire Website" },
     })
     initialFireStats = await response.json()
   } catch (e) {
