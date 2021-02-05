@@ -1,11 +1,40 @@
 import * as React from "react"
 import Image from 'next/image'
-import { useSession } from 'next-auth/client'
 import Container from "@material-ui/core/Container"
 import Grid from "@material-ui/core/Grid"
 import Typography from "@material-ui/core/Typography"
+import Button from "@material-ui/core/Button"
+import Card from '@material-ui/core/Card'
+import CardContent from '@material-ui/core/CardContent'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
+import GitHubIcon from '@material-ui/icons/GitHub'
 import Layout from '../src/components/Layout'
+import { discord, misc } from "../src/constants"
+
+type Feature = {
+  title: string;
+  text: string;
+}
+
+const FEATURES: Feature[] = [
+  {
+    title: "Integrations",
+    text: `
+    Fire has a few integrations that allow you to retrieve content from external platforms such as Reddit and even 
+    the Google Assistant.
+    `.trimStart(),
+  },
+  {
+    title: 'Utilities',
+    text: `Fire has many different utilities to help you get information quickly about many things. 
+    Some examples include auto-quotes when you send a message link or being able to fetch simple user info`.trimStart(),
+  },
+  {
+    title: 'Moderation',
+    text: `We know how hard moderation can be, so we try to make things easy. With commands to mute, 
+    block (per-channel mute), kick and ban, moderation is a piece of cake!`.trimStart(),
+  },
+]
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -13,31 +42,84 @@ const useStyles = makeStyles(theme =>
       paddingTop: theme.spacing(4),
       paddingBottom: theme.spacing(4),
       [theme.breakpoints.up('sm')]: {
-        paddingTop: theme.spacing(16),
+        paddingTop: theme.spacing(12),
         paddingBottom: theme.spacing(16),
       },
+    },
+    logoGridItem: {
+      marginBottom: theme.spacing(3),
+      [theme.breakpoints.up('sm')]: {
+        marginBottom: theme.spacing(0),
+      },
+    },
+    buttonsGridItem: {
+      marginTop: theme.spacing(2),
+      [theme.breakpoints.up('md')]: {
+        marginTop: theme.spacing(0),
+      },
+    },
+    button: {
+      margin: theme.spacing(0, 1),
+    },
+    featureCard: {
+      height: '100%',
     },
   }),
 )
 
 const Index = () => {
   const classes = useStyles()
-  const [session] = useSession()
-  console.log(session)
 
   return (
     <Layout>
-      <Container className={classes.banner}>
-        <Grid container alignItems="center" justify="space-evenly">
-          <Grid item xs={2} sm={3} md={4}>
+      <Container>
+        <Grid container alignItems="stretch" justify="space-evenly" className={classes.banner}>
+          <Grid item xs={2} sm={4} md={3} className={classes.logoGridItem}>
             <Image src="/logo-gr.svg" width={256} height={256} layout="responsive" alt="Fire's logo"/>
           </Grid>
-          <Grid item xs={12} sm={5} md={4}>
-            <Typography variant="h5" align="justify">
-              A Discord bot for all your needs. With memes, utilities, moderation and more. Fire is the only bot you
-              will need.
-            </Typography>
+          <Grid item xs={12} sm={5} md={5} container alignItems="center" direction="column" justify="space-evenly">
+            <Grid item>
+              <Typography variant="h5" align="center">
+                A Discord bot for all your needs. With memes, utilities, moderation and more. Fire is the only bot you
+                will need.
+              </Typography>
+            </Grid>
+            <Grid item className={classes.buttonsGridItem}>
+              <Button
+                variant="contained"
+                color="primary"
+                className={classes.button}
+                href={discord.inviteUrl}
+              >
+                Invite
+              </Button>
+              <Button
+                variant="outlined"
+                color="default"
+                className={classes.button}
+                startIcon={<GitHubIcon/>}
+                href={misc.githubUrl}
+              >
+                GitHub
+              </Button>
+            </Grid>
           </Grid>
+        </Grid>
+        <Grid container spacing={4} justify="center">
+          {FEATURES.map((feature, index) => (
+            <Grid item md={4} key={index}>
+              <Card className={classes.featureCard}>
+                <CardContent>
+                  <Typography variant="h4" color="textSecondary" gutterBottom>
+                    {feature.title}
+                  </Typography>
+                  <Typography variant="body1" component="p">
+                    {feature.text}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
         </Grid>
       </Container>
     </Layout>

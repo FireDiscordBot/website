@@ -1,4 +1,4 @@
-import { DiscordGuild } from "../interfaces/discord"
+import { DiscordApiUser, DiscordGuild } from "../interfaces/discord"
 
 const MANAGE_GUILD = 0x00000020
 
@@ -13,4 +13,14 @@ export const fetchManageableGuilds = async (accessToken: string): Promise<Discor
   return guilds.filter(guild => {
     return (guild.permissions & MANAGE_GUILD) == MANAGE_GUILD
   })
+}
+
+export const getUserImage = (user: DiscordApiUser) => {
+  if (user.avatar === null) {
+    const defaultAvatarNumber = parseInt(user.discriminator) % 5
+    return `https://cdn.discordapp.com/embed/avatars/${defaultAvatarNumber}.png`
+  } else {
+    const format = user.avatar.startsWith("a_") ? 'gif' : 'png'
+    return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${format}`
+  }
 }

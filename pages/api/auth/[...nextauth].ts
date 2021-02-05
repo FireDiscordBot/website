@@ -1,32 +1,22 @@
-import {NextApiRequest, NextApiResponse} from "next"
-import NextAuth, {InitOptions} from 'next-auth'
+import { NextApiRequest, NextApiResponse } from "next"
+import NextAuth, { InitOptions } from 'next-auth'
 import Providers from "next-auth/providers"
-import type {AuthSession, AuthToken, AuthUser} from "../../../src/interfaces/auth"
-import type {DiscordApiUser} from "../../../src/interfaces/discord"
+import type { AuthSession, AuthToken, AuthUser } from "../../../src/interfaces/auth"
+import type { DiscordApiUser } from "../../../src/interfaces/discord"
+import { getUserImage } from "../../../src/utils/discord"
+import { discord } from "../../../src/constants"
 
 const discordProvider = Providers.Discord({
   scope: 'identify email guilds',
-  profile: (profile: DiscordApiUser): AuthUser => {
-    function getImageUrl(profile: DiscordApiUser) {
-      if (profile.avatar === null) {
-        const defaultAvatarNumber = parseInt(profile.discriminator) % 5
-        return `https://cdn.discordapp.com/embed/avatars/${defaultAvatarNumber}.png`
-      } else {
-        const format = profile.avatar.startsWith("a_") ? 'gif' : 'png'
-        return `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.${format}`
-      }
-    }
-
-    return {
-      id: profile.id,
-      name: profile.username,
-      discriminator: profile.discriminator,
-      image: getImageUrl(profile),
-      email: profile.email
-    }
-  },
-  clientId: process.env.DISCORD_CLIENT_ID!!,
-  clientSecret: process.env.DISCORD_CLIENT_SECRET!!,
+  profile: (profile: DiscordApiUser): AuthUser => ({
+    id: profile.id,
+    name: profile.username,
+    discriminator: profile.discriminator,
+    image: getUserImage(profile),
+    email: profile.email,
+  }),
+  clientId: discord.clientId,
+  clientSecret: discord.clientSecret,
 })
 
 const nextAuthConfig: InitOptions = {
@@ -48,7 +38,7 @@ const nextAuthConfig: InitOptions = {
       session.user.id = token.sub ?? ""
       session.user.discriminator = token.discriminator
       return session
-    }
+    },
   },
 }
 
