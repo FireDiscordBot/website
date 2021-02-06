@@ -1,3 +1,4 @@
+import clsx from "clsx"
 import * as React from 'react'
 import NextLink from 'next/link'
 import { signIn, signOut, useSession } from 'next-auth/client'
@@ -7,6 +8,7 @@ import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
 import Container from '@material-ui/core/Container'
 import Link from "@material-ui/core/Link"
+import useScrollTrigger from '@material-ui/core/useScrollTrigger'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import AvatarButton from './AvatarButton'
 import UserAvatarMenu from "./UserAvatarMenu"
@@ -14,7 +16,11 @@ import UserAvatarMenu from "./UserAvatarMenu"
 const useStyles = makeStyles(theme =>
   createStyles({
     root: {
-      background: 'transparent',
+      backgroundColor: 'transparent',
+      transition: theme.transitions.create(["background-color", "box-shadow"]),
+    },
+    scrolled: {
+      backgroundColor: theme.palette.background.default,
     },
     menuButton: {
       marginRight: theme.spacing(2),
@@ -34,6 +40,10 @@ const useStyles = makeStyles(theme =>
 
 const NavBar = () => {
   const classes = useStyles()
+  const scrollTrigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 0,
+  })
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
   const [session, loading] = useSession()
 
@@ -66,7 +76,10 @@ const NavBar = () => {
 
   return (
     <>
-      <AppBar position="fixed" className={classes.root} elevation={0}>
+      <AppBar position="fixed" className={clsx(
+        classes.root,
+        { [classes.scrolled]: scrollTrigger },
+      )} elevation={scrollTrigger ? 4 : 0}>
         <Container>
           <Toolbar disableGutters>
             <NextLink href="/" passHref>
