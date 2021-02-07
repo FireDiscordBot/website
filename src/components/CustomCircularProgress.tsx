@@ -19,7 +19,7 @@ const useStyles = makeStyles(() =>
   }),
 )
 
-type Props = CircularProgressProps & {
+export type Props = CircularProgressProps & {
   title: string;
   value: number;
   valueLabel?: string;

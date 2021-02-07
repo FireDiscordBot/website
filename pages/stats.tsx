@@ -1,27 +1,29 @@
-import { GetServerSideProps } from "next"
 import * as React from 'react'
+import { GetServerSideProps } from "next"
 import Container from "@material-ui/core/Container"
 import Grid from "@material-ui/core/Grid"
 import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
-import Box from "@material-ui/core/Box"
 import Typography from "@material-ui/core/Typography"
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import PeopleIcon from '@material-ui/icons/People'
 import StorageIcon from '@material-ui/icons/Storage'
 import ClusterStatsDialog from "../src/components/ClusterStatsDialog"
-import CustomCircularProgress from "../src/components/CustomCircularProgress"
 import Layout from "../src/components/Layout"
 import { fire } from "../src/constants"
 import { ClusterStats, FireStats } from "../src/interfaces/aether"
 import { formatBytes, formatNumber } from "../src/utils/formatting"
+import ClusterCard from "../src/components/ClusterCard"
+import CircularProgressCard from "../src/components/CircularProgressCard"
 
 const useStyles = makeStyles(theme =>
   createStyles({
     cardContent: {
-      "&:last-child": {
-        paddingBottom: theme.spacing(2),
-      },
+      display: 'flex',
+      alignItems: 'center',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      height: 'inherit',
     },
     fullHeight: {
       height: '100%',
@@ -46,9 +48,10 @@ type Props = {
 const StatsPage = ({ initialFireStats, initialSelectedClusterId }: Props) => {
   const classes = useStyles()
   const [fireStats, setFireStats] = React.useState<FireStats>(initialFireStats)
-  const [selectedClusterId, setSelectedClusterId] = React.useState<number | null>(initialSelectedClusterId);
+  const [selectedClusterId, setSelectedClusterId] = React.useState<number | null>(initialSelectedClusterId)
 
-  const onCloseDialog = () => setSelectedClusterId(null)
+  const onClickClusterCard = (id: number) => setSelectedClusterId(id)
+  const onCloseClusterDialog = () => setSelectedClusterId(null)
 
   React.useEffect(() => {
     const ws = new WebSocket(fire.realtimeStatsUrl)
@@ -64,9 +67,8 @@ const StatsPage = ({ initialFireStats, initialSelectedClusterId }: Props) => {
   }, [])
 
   let selectedClusterStats: ClusterStats | undefined
-  if (Number.isInteger(selectedClusterId)) {
+  if (selectedClusterId != null) {
     selectedClusterStats = fireStats.clusters.find(cluster => cluster.id == selectedClusterId)
-    console.log('found stats', selectedClusterStats)
   }
 
   return (
@@ -74,63 +76,39 @@ const StatsPage = ({ initialFireStats, initialSelectedClusterId }: Props) => {
       <Container>
         <Grid container spacing={4} justify="center" className={classes.chartsContainer}>
           <Grid item xs={6} sm={5} md={3}>
-            <Card>
-              <CardContent classes={{ root: classes.cardContent }}>
-                <CustomCircularProgress title="CPU" value={fireStats.cpu}/>
-              </CardContent>
-            </Card>
+            <CircularProgressCard title="CPU" value={fireStats.cpu}/>
           </Grid>
           <Grid item xs={6} sm={5} md={3}>
-            <Card>
-              <CardContent classes={{ root: classes.cardContent }}>
-                <CustomCircularProgress
-                  title="RAM"
-                  value={fireStats.ramBytes}
-                  valueLabel={formatBytes(fireStats.ramBytes, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
-                  max={fireStats.totalRamBytes}
-                />
+            <CircularProgressCard
+              title="RAM"
+              value={fireStats.ramBytes}
+              valueLabel={formatBytes(fireStats.ramBytes, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+              max={fireStats.totalRamBytes}
+            />
+          </Grid>
+          <Grid item xs={6} sm={5} md={3}>
+            <Card className={classes.fullHeight}>
+              <CardContent className={classes.cardContent}>
+                <StorageIcon className={classes.icon} color="primary"/>
+                <Typography variant="h5" color="textPrimary">
+                  {formatNumber(fireStats.guilds)}
+                </Typography>
+                <Typography variant="body1" color="textSecondary">
+                  Guilds
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={6} sm={5} md={3}>
             <Card className={classes.fullHeight}>
-              <CardContent className={classes.fullHeight}>
-                <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  flexDirection="column"
-                  className={classes.fullHeight}
-                >
-                  <StorageIcon className={classes.icon} color="primary"/>
-                  <Typography variant="h5" color="textPrimary">
-                    {formatNumber(fireStats.guilds)}
-                  </Typography>
-                  <Typography variant="body1" color="textSecondary">
-                    Guilds
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={6} sm={5} md={3}>
-            <Card className={classes.fullHeight}>
-              <CardContent className={classes.fullHeight}>
-                <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  flexDirection="column"
-                  className={classes.fullHeight}
-                >
-                  <PeopleIcon className={classes.icon} color="primary"/>
-                  <Typography variant="h5" color="textPrimary">
-                    {formatNumber(fireStats.users)}
-                  </Typography>
-                  <Typography variant="body1" color="textSecondary">
-                    Users
-                  </Typography>
-                </Box>
+              <CardContent className={classes.cardContent}>
+                <PeopleIcon className={classes.icon} color="primary"/>
+                <Typography variant="h5" color="textPrimary">
+                  {formatNumber(fireStats.users)}
+                </Typography>
+                <Typography variant="body1" color="textSecondary">
+                  Users
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -143,35 +121,23 @@ const StatsPage = ({ initialFireStats, initialSelectedClusterId }: Props) => {
           </Grid>
 
           {fireStats.clusters.map(cluster => (
-            <Grid item className={classes.clusterGridItem} key={cluster.id}>
-              <Card onClick={() => {
-                setSelectedClusterId(cluster.id)
-              }}> { /* TODO */}
-                <CardContent className={classes.cardContent}>
-                  <Typography variant="body1">
-                    {cluster.id}
-                  </Typography>
-                </CardContent>
-              </Card>
+            <Grid item key={cluster.id}>
+              <ClusterCard cluster={cluster} onClick={onClickClusterCard}/>
             </Grid>
           ))}
         </Grid>
       </Container>
 
-      {selectedClusterStats && <ClusterStatsDialog
-        clusterStats={selectedClusterStats!!}
+      {typeof selectedClusterStats != 'undefined' && <ClusterStatsDialog
+        clusterStats={selectedClusterStats}
         open={true}
-        onClose={onCloseDialog}
+        onClose={onCloseClusterDialog}
       />}
     </Layout>
   )
 }
 
-type QueryParams = {
-  cluster: string;
-}
-
-export const getServerSideProps: GetServerSideProps<Props, QueryParams> = async (context) => {
+export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
   const initialSelectedClusterId = typeof context.query?.cluster != 'undefined'
     ? parseInt(context.query.cluster as string, 10) : null
   let initialFireStats: FireStats
@@ -199,7 +165,7 @@ export const getServerSideProps: GetServerSideProps<Props, QueryParams> = async 
   return {
     props: {
       initialFireStats,
-      initialSelectedClusterId
+      initialSelectedClusterId,
     },
   }
 }
