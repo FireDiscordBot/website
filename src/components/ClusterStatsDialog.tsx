@@ -39,6 +39,10 @@ const useStyles = makeStyles(theme =>
       justifyContent: 'center',
       height: 'inherit',
     },
+    dialogCardContent: {
+      backgroundColor: theme.palette.background.default,
+      borderBottom: 'none'
+    },
     fullHeight: {
       height: '100%',
     },
@@ -66,7 +70,7 @@ const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
       <DialogTitle onClose={onClose}>
         Cluster {clusterStats.id} ({clusterStats.name})
       </DialogTitle>
-      <DialogContent dividers>
+      <DialogContent dividers className={classes.dialogCardContent}>
         <Grid container spacing={2} justify="center" className={classes.chartsContainer}>
           <Grid item xs={6} sm={5} md={3}>
             <CircularProgressCard title="CPU" value={clusterStats.cpu}/>
