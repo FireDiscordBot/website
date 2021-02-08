@@ -10,9 +10,9 @@ import Grid from "@material-ui/core/Grid"
 import useMediaQuery from "@material-ui/core/useMediaQuery"
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles"
 import { fire } from "../src/constants"
-import { Category } from '../src/interfaces/aether'
-import Layout from "../src/components/Layout"
-import CommandAccordion from "../src/components/CommandAccordion"
+import { Category } from '@/interfaces/aether'
+import Layout from "@/components/Layout"
+import CommandAccordion from "@/components/CommandAccordion"
 
 const useStyles = makeStyles(theme =>
   createStyles({

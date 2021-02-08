@@ -1,7 +1,7 @@
-import clsx from "clsx"
 import * as React from 'react'
 import NextLink from 'next/link'
 import { signIn, signOut, useSession } from 'next-auth/client'
+import clsx from "clsx"
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'

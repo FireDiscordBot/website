@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import NextAuth, { InitOptions } from 'next-auth'
 import Providers from "next-auth/providers"
-import type { AuthSession, AuthToken, AuthUser } from "../../../src/interfaces/auth"
-import type { DiscordApiUser } from "../../../src/interfaces/discord"
-import { getUserImage } from "../../../src/utils/discord"
+import type { AuthSession, AuthToken, AuthUser } from "@/interfaces/auth"
+import type { DiscordApiUser } from "@/interfaces/discord"
+import { getUserImage } from "@/utils/discord"
 import { discord } from "../../../src/constants"
 
 const discordProvider = Providers.Discord({

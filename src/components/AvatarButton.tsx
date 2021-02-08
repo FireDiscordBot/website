@@ -2,7 +2,7 @@ import * as React from "react"
 import Avatar from "@material-ui/core/Avatar"
 import IconButton, { IconButtonProps } from "@material-ui/core/IconButton"
 import { createStyles, makeStyles } from '@material-ui/core/styles'
-import { AuthUser } from "../interfaces/auth"
+import { AuthUser } from "@/interfaces/auth"
 
 const useStyles = makeStyles(theme =>
   createStyles({

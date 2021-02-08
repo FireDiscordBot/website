@@ -8,13 +8,13 @@ import Typography from "@material-ui/core/Typography"
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import PeopleIcon from '@material-ui/icons/People'
 import StorageIcon from '@material-ui/icons/Storage'
-import ClusterStatsDialog from "../src/components/ClusterStatsDialog"
-import Layout from "../src/components/Layout"
+import ClusterStatsDialog from "@/components/ClusterStatsDialog"
+import Layout from "@/components/Layout"
 import { fire } from "../src/constants"
-import { ClusterStats, FireStats } from "../src/interfaces/aether"
-import { formatBytes, formatNumber } from "../src/utils/formatting"
-import ClusterCard from "../src/components/ClusterCard"
-import CircularProgressCard from "../src/components/CircularProgressCard"
+import { ClusterStats, FireStats } from "@/interfaces/aether"
+import { formatBytes, formatNumber } from "@/utils/formatting"
+import ClusterCard from "@/components/ClusterCard"
+import CircularProgressCard from "@/components/CircularProgressCard"
 
 const useStyles = makeStyles(theme =>
   createStyles({

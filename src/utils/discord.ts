@@ -1,4 +1,4 @@
-import { DiscordApiUser, DiscordGuild } from "../interfaces/discord"
+import { DiscordApiUser, DiscordGuild } from "@/interfaces/discord"
 
 const MANAGE_GUILD = 0x00000020
 

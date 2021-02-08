@@ -9,8 +9,8 @@ import Grid from "@material-ui/core/Grid"
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import PeopleIcon from "@material-ui/icons/People"
 import StorageIcon from "@material-ui/icons/Storage"
-import { ClusterStats } from "../interfaces/aether"
-import { formatBytes, formatNumber } from "../utils/formatting"
+import { ClusterStats } from "@/interfaces/aether"
+import { formatBytes, formatNumber } from "@/utils/formatting"
 import DialogTitle from "./DialogTitle"
 import CircularProgressCard from "./CircularProgressCard"
 

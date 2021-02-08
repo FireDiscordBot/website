@@ -8,7 +8,7 @@ import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import GitHubIcon from '@material-ui/icons/GitHub'
-import Layout from '../src/components/Layout'
+import Layout from '@/components/Layout'
 import { discord, fire } from "../src/constants"
 
 type Feature = {
@@ -27,8 +27,8 @@ const FEATURES: Feature[] = [
   {
     title: 'Utilities',
     text: `
-    Fire has many different utilities to help you get information quickly about many things. 
-    Some examples include auto-quotes when you send a message link or being able to fetch simple user info
+    Fire has many different utilities to help you get information quickly about many things.
+    An example is auto-quotes when you send a message link.
     `.trimStart(),
   },
   {
@@ -47,20 +47,14 @@ const useStyles = makeStyles(theme =>
       paddingBottom: theme.spacing(4),
       [theme.breakpoints.up('sm')]: {
         paddingTop: theme.spacing(12),
-        paddingBottom: theme.spacing(16),
+        paddingBottom: theme.spacing(8),
       },
     },
     logoGridItem: {
       marginBottom: theme.spacing(3),
-      [theme.breakpoints.up('sm')]: {
-        marginBottom: theme.spacing(0),
-      },
     },
     buttonsGridItem: {
-      marginTop: theme.spacing(2),
-      [theme.breakpoints.up('md')]: {
-        marginTop: theme.spacing(0),
-      },
+      marginTop: theme.spacing(3),
     },
     button: {
       margin: theme.spacing(0, 1),
@@ -78,17 +72,17 @@ const IndexPage = () => {
     <Layout>
       <Container>
         <Grid container alignItems="stretch" justify="space-evenly" className={classes.banner}>
-          <Grid item xs={2} sm={4} md={3} className={classes.logoGridItem}>
+          <Grid item xs={3} md={2} className={classes.logoGridItem}>
             <Image src="/logo-gr.svg" width={256} height={256} layout="responsive" alt="Fire's logo"/>
           </Grid>
-          <Grid item xs={12} sm={5} md={5} container alignItems="center" direction="column" justify="space-evenly">
-            <Grid item>
+          <Grid item xs={12} container alignItems="center" direction="column" justify="space-evenly">
+            <Grid item xs={12} sm={7} md={5}>
               <Typography variant="h5" align="center">
                 A Discord bot for all your needs. With memes, utilities, moderation and more. Fire is the only bot you
                 will need.
               </Typography>
             </Grid>
-            <Grid item className={classes.buttonsGridItem}>
+            <Grid item xs={12} className={classes.buttonsGridItem}>
               <Button
                 variant="contained"
                 color="primary"
