@@ -43,3 +43,25 @@ export type FireStats = {
   events: number;
   clusters: ClusterStats[]
 }
+
+export type Command = {
+  name: string;
+  description: string;
+  usage: string;
+  aliases: string;
+  category?: string;
+}
+
+export type CategoryFlag = {
+  name: string;
+  description: string;
+  usage: string;
+}
+
+export type Category = {
+  id: number;
+  name: string;
+  commands: Command[];
+  flags?: CategoryFlag[];
+  Note?: string;
+}

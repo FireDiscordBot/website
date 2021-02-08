@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme =>
     },
     buttons: {
       margin: theme.spacing(0, 2),
-      '& button:not(:last-child)': {
+      '& a:not(:last-child)': {
         marginRight: theme.spacing(1),
       },
     },
@@ -89,6 +89,11 @@ const NavBar = () => {
             </NextLink>
             <div className={classes.grow}/>
             <div className={classes.buttons}>
+              <NextLink href="/commands" passHref>
+                <Button variant="text">
+                  Commands
+                </Button>
+              </NextLink>
               <NextLink href="/stats" passHref>
                 <Button variant="text">
                   Stats
