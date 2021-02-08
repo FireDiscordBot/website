@@ -55,6 +55,8 @@ const useStyles = makeStyles(theme =>
     },
     buttonsGridItem: {
       marginTop: theme.spacing(3),
+      display: 'flex',
+      justifyContent: 'center'
     },
     button: {
       margin: theme.spacing(0, 1),
@@ -71,11 +73,11 @@ const IndexPage = () => {
   return (
     <Layout>
       <Container>
-        <Grid container alignItems="stretch" justify="space-evenly" className={classes.banner}>
+        <Grid container justify="center" className={classes.banner}>
           <Grid item xs={3} md={2} className={classes.logoGridItem}>
             <Image src="/logo-gr.svg" width={256} height={256} layout="responsive" alt="Fire's logo"/>
           </Grid>
-          <Grid item xs={12} container alignItems="center" direction="column" justify="space-evenly">
+          <Grid item xs={12} container justify="center">
             <Grid item xs={12} sm={7} md={5}>
               <Typography variant="h5" align="center">
                 A Discord bot for all your needs. With memes, utilities, moderation and more. Fire is the only bot you
