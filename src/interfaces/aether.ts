@@ -65,3 +65,13 @@ export type Category = {
   flags?: CategoryFlag[];
   Note?: string;
 }
+
+export type DiscoverableGuild = {
+  name: string;
+  id: string;
+  icon: string;
+  splash: string;
+  vanity: string;
+  members: number;
+  key?: number;
+}

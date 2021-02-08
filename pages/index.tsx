@@ -79,7 +79,7 @@ const IndexPage = () => {
           </Grid>
           <Grid item xs={12} container justify="center">
             <Grid item xs={12} sm={7} md={5}>
-              <Typography variant="h5" align="center">
+              <Typography variant="h5" component="h2" align="center">
                 A Discord bot for all your needs. With memes, utilities, moderation and more. Fire is the only bot you
                 will need.
               </Typography>

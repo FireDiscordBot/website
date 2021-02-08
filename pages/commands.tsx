@@ -66,9 +66,9 @@ const CommandsPage = ({ categories, prefix }: Props) => {
           <Grid item xs={12} md={10}>
             {categories.map((category, index) => (
               selectedCategoryIndex == index && (
-                <Box p={3} width="100%">
+                <Box p={3} width="100%" key={index}>
                   {category.commands.map((command, index) => (
-                    <CommandAccordion command={command} prefix={prefix ?? "$"} key={index}/>
+                    <CommandAccordion command={command} prefix={prefix ?? fire.defaultPrefix} key={index}/>
                   ))}
                 </Box>
               )
@@ -96,7 +96,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
   return {
     props: {
       categories,
-      prefix: context.query.prefix as string ?? null
+      prefix: context.query.prefix as string ?? null,
     },
   }
 }

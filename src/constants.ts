@@ -1,4 +1,5 @@
 export const fire = {
+  defaultPrefix: "$",
   githubUrl: "https://github.com/FireDiscordBot/bot",
   aetherApiUrl: "https://aether.gaminggeek.dev",
   realtimeStatsUrl: "wss://aether-ws.gaminggeek.dev/realtime-stats"

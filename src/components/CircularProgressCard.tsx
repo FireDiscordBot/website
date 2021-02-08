@@ -15,12 +15,6 @@ const useStyles = makeStyles(theme =>
     fullHeight: {
       height: '100%',
     },
-    icon: {
-      fontSize: theme.spacing(10),
-    },
-    chartsContainer: {
-      marginBottom: theme.spacing(2),
-    },
   }),
 )
 

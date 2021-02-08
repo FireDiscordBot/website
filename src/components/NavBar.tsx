@@ -89,6 +89,11 @@ const NavBar = () => {
             </NextLink>
             <div className={classes.grow}/>
             <div className={classes.buttons}>
+              <NextLink href="/discover" passHref>
+                <Button variant="text">
+                  Discover
+                </Button>
+              </NextLink>
               <NextLink href="/commands" passHref>
                 <Button variant="text">
                   Commands
