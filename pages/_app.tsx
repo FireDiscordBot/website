@@ -6,8 +6,14 @@ import { ThemeProvider } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import theme from '../src/theme'
 
+import "../src/nprogress.css"
+
 function MyApp(props: AppProps) {
   const { Component, pageProps } = props
+
+  if (typeof window !== 'undefined') {
+    import("@/utils/nprogressLoader")
+  }
 
   React.useEffect(() => {
     const jssStyles = document.querySelector("#jss-server-side")
