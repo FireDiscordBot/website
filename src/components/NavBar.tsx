@@ -1,22 +1,24 @@
-import * as React from 'react'
-import NextLink from 'next/link'
-import { signIn, signOut, useSession } from 'next-auth/client'
+import * as React from "react"
+import { useRouter } from "next/router"
+import NextLink from "next/link"
+import NextImage from "next/image"
+import { signIn, signOut, useSession } from "next-auth/client"
 import clsx from "clsx"
-import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import Typography from '@material-ui/core/Typography'
-import Button from '@material-ui/core/Button'
-import Container from '@material-ui/core/Container'
+import AppBar from "@material-ui/core/AppBar"
+import Toolbar from "@material-ui/core/Toolbar"
+import Typography from "@material-ui/core/Typography"
+import Button from "@material-ui/core/Button"
+import Container from "@material-ui/core/Container"
 import Link from "@material-ui/core/Link"
-import useScrollTrigger from '@material-ui/core/useScrollTrigger'
-import { createStyles, makeStyles } from '@material-ui/core/styles'
-import AvatarButton from './AvatarButton'
+import useScrollTrigger from "@material-ui/core/useScrollTrigger"
+import { createStyles, makeStyles } from "@material-ui/core/styles"
+import AvatarButton from "./AvatarButton"
 import UserAvatarMenu from "./UserAvatarMenu"
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     root: {
-      backgroundColor: 'transparent',
+      backgroundColor: "transparent",
       transition: theme.transitions.create(["background-color", "box-shadow"]),
     },
     scrolled: {
@@ -30,22 +32,39 @@ const useStyles = makeStyles(theme =>
     },
     buttons: {
       margin: theme.spacing(0, 2),
-      '& a:not(:last-child)': {
+      "& a:not(:last-child)": {
         marginRight: theme.spacing(1),
       },
     },
     emptyToolbar: theme.mixins.toolbar,
+    logo: {
+      cursor: "pointer",
+    },
   }),
 )
 
 const NavBar = () => {
   const classes = useStyles()
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
   const scrollTrigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 0,
   })
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
+  const router = useRouter()
   const [session, loading] = useSession()
+
+  let homePageLink: React.ReactNode
+  if (router.route == "/") {
+    homePageLink = (
+      <Link variant="h6" color="inherit">
+        Fire
+      </Link>
+    )
+  } else {
+    homePageLink = (
+      <NextImage src="/logo-gr.svg" width={40} height={40} layout="intrinsic" className={classes.logo} priority />
+    )
+  }
 
   let authButton: React.ReactNode
 
@@ -62,54 +81,58 @@ const NavBar = () => {
     }
     const onCloseMenu = () => setAnchorEl(null)
 
-    authButton = <>
-      <AvatarButton disableRipple user={session.user} onClick={onClickAvatar}/>
-      <UserAvatarMenu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={onCloseMenu} onClickLogout={onClickLogout}/>
-    </>
+    authButton = (
+      <>
+        <AvatarButton disableRipple user={session.user} onClick={onClickAvatar} />
+        <UserAvatarMenu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={onCloseMenu}
+          onClickLogout={onClickLogout}
+        />
+      </>
+    )
   } else {
     const onClick = (e: React.MouseEvent) => {
       e.preventDefault()
-      return signIn('discord')
+      return signIn("discord")
     }
-    authButton = <Button color="inherit" onClick={onClick}>Login with Discord</Button>
+    authButton = (
+      <Button color="inherit" onClick={onClick}>
+        Login with Discord
+      </Button>
+    )
   }
 
   return (
     <>
-      <AppBar position="fixed" className={clsx(
-        classes.root,
-        { [classes.scrolled]: scrollTrigger },
-      )} elevation={scrollTrigger ? 4 : 0}>
+      <AppBar
+        position="fixed"
+        className={clsx(classes.root, { [classes.scrolled]: scrollTrigger })}
+        elevation={scrollTrigger ? 4 : 0}
+      >
         <Container>
           <Toolbar disableGutters>
             <NextLink href="/" passHref>
-              <Link variant="h6" color="inherit">
-                Fire
-              </Link>
+              {homePageLink}
             </NextLink>
-            <div className={classes.grow}/>
+            <div className={classes.grow} />
             <div className={classes.buttons}>
               <NextLink href="/discover" passHref>
-                <Button variant="text">
-                  Discover
-                </Button>
+                <Button variant="text">Discover</Button>
               </NextLink>
               <NextLink href="/commands" passHref>
-                <Button variant="text">
-                  Commands
-                </Button>
+                <Button variant="text">Commands</Button>
               </NextLink>
               <NextLink href="/stats" passHref>
-                <Button variant="text">
-                  Stats
-                </Button>
+                <Button variant="text">Stats</Button>
               </NextLink>
             </div>
             {authButton}
           </Toolbar>
         </Container>
       </AppBar>
-      <div className={classes.emptyToolbar}/>
+      <div className={classes.emptyToolbar} />
     </>
   )
 }

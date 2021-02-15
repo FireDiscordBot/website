@@ -1,19 +1,19 @@
 import * as React from "react"
-import Image from 'next/image'
+import Image from "next/image"
 import Container from "@material-ui/core/Container"
 import Grid from "@material-ui/core/Grid"
 import Typography from "@material-ui/core/Typography"
 import Button from "@material-ui/core/Button"
-import Card from '@material-ui/core/Card'
-import CardContent from '@material-ui/core/CardContent'
-import { createStyles, makeStyles } from '@material-ui/core/styles'
-import GitHubIcon from '@material-ui/icons/GitHub'
-import Layout from '@/components/Layout'
-import { discord, fire } from "../src/constants"
+import Card from "@material-ui/core/Card"
+import CardContent from "@material-ui/core/CardContent"
+import { createStyles, makeStyles } from "@material-ui/core/styles"
+import GitHubIcon from "@material-ui/icons/GitHub"
+import Default from "@/layouts/default"
+import { discord, fire } from "@/constants"
 
 type Feature = {
-  title: string;
-  text: string;
+  title: string
+  text: string
 }
 
 const FEATURES: Feature[] = [
@@ -25,14 +25,14 @@ const FEATURES: Feature[] = [
     `.trimStart(),
   },
   {
-    title: 'Utilities',
+    title: "Utilities",
     text: `
     Fire has many different utilities to help you get information quickly about many things.
     An example is auto-quotes when you send a message link.
     `.trimStart(),
   },
   {
-    title: 'Moderation',
+    title: "Moderation",
     text: `
     We know how hard moderation can be, so we try to make things easy. With commands to mute, 
     block (per-channel mute), kick and ban, moderation is a piece of cake!
@@ -40,12 +40,12 @@ const FEATURES: Feature[] = [
   },
 ]
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     banner: {
       paddingTop: theme.spacing(4),
       paddingBottom: theme.spacing(4),
-      [theme.breakpoints.up('sm')]: {
+      [theme.breakpoints.up("sm")]: {
         paddingTop: theme.spacing(12),
         paddingBottom: theme.spacing(8),
       },
@@ -55,14 +55,14 @@ const useStyles = makeStyles(theme =>
     },
     buttonsGridItem: {
       marginTop: theme.spacing(3),
-      display: 'flex',
-      justifyContent: 'center'
+      display: "flex",
+      justifyContent: "center",
     },
     button: {
       margin: theme.spacing(0, 1),
     },
     featureCard: {
-      height: '100%',
+      height: "100%",
     },
   }),
 )
@@ -71,11 +71,11 @@ const IndexPage = () => {
   const classes = useStyles()
 
   return (
-    <Layout>
+    <Default>
       <Container>
         <Grid container justify="center" className={classes.banner}>
           <Grid item xs={3} md={2} className={classes.logoGridItem}>
-            <Image src="/logo-gr.svg" width={256} height={256} layout="responsive" alt="Fire's logo"/>
+            <Image src="/logo-gr.svg" width={256} height={256} layout="responsive" alt="Fire's logo" />
           </Grid>
           <Grid item xs={12} container justify="center">
             <Grid item xs={12} sm={7} md={5}>
@@ -85,19 +85,14 @@ const IndexPage = () => {
               </Typography>
             </Grid>
             <Grid item xs={12} className={classes.buttonsGridItem}>
-              <Button
-                variant="contained"
-                color="primary"
-                className={classes.button}
-                href={discord.inviteUrl}
-              >
+              <Button variant="contained" color="primary" className={classes.button} href={discord.inviteUrl}>
                 Invite
               </Button>
               <Button
                 variant="outlined"
                 color="default"
                 className={classes.button}
-                startIcon={<GitHubIcon/>}
+                startIcon={<GitHubIcon />}
                 href={fire.githubUrl}
               >
                 GitHub
@@ -122,7 +117,7 @@ const IndexPage = () => {
           ))}
         </Grid>
       </Container>
-    </Layout>
+    </Default>
   )
 }
 

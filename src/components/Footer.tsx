@@ -1,19 +1,19 @@
-import * as React from 'react'
+import * as React from "react"
 import Container from "@material-ui/core/Container"
 import Typography from "@material-ui/core/Typography"
-import { createStyles, makeStyles } from '@material-ui/core/styles'
+import { createStyles, makeStyles } from "@material-ui/core/styles"
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     footer: {
       padding: theme.spacing(2, 0),
-      marginTop: 'auto',
+      marginTop: "auto",
       backgroundColor: theme.palette.grey[900],
     },
     container: {
-      display: 'flex',
-      justifyContent: 'center'
-    }
+      display: "flex",
+      justifyContent: "center",
+    },
   }),
 )
 

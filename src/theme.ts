@@ -1,9 +1,9 @@
-import { createMuiTheme } from '@material-ui/core/styles'
-import { red, grey, orange } from '@material-ui/core/colors'
+import { createMuiTheme } from "@material-ui/core/styles"
+import { red, grey, orange } from "@material-ui/core/colors"
 
 const theme = createMuiTheme({
   palette: {
-    type: 'dark',
+    type: "dark",
     primary: {
       main: red["700"],
     },

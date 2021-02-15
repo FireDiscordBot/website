@@ -1,11 +1,10 @@
 import * as React from "react"
 import CardContent from "@material-ui/core/CardContent"
-import CustomCircularProgress from "./CustomCircularProgress"
 import Card from "@material-ui/core/Card"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
-import { Props } from './CustomCircularProgress'
+import CustomCircularProgress, { Props } from "./CustomCircularProgress"
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     cardContent: {
       "&:last-child": {
@@ -13,7 +12,7 @@ const useStyles = makeStyles(theme =>
       },
     },
     fullHeight: {
-      height: '100%',
+      height: "100%",
     },
   }),
 )
@@ -23,7 +22,7 @@ const CircularProgressCard = (props: Props) => {
   return (
     <Card className={classes.fullHeight}>
       <CardContent classes={{ root: classes.cardContent }}>
-        <CustomCircularProgress {...props}/>
+        <CustomCircularProgress {...props} />
       </CardContent>
     </Card>
   )

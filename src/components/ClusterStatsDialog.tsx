@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from "react"
 import Dialog from "@material-ui/core/Dialog"
 import DialogContent from "@material-ui/core/DialogContent"
 import Typography from "@material-ui/core/Typography"
@@ -6,7 +6,7 @@ import Box from "@material-ui/core/Box"
 import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
 import Grid from "@material-ui/core/Grid"
-import { createStyles, makeStyles } from '@material-ui/core/styles'
+import { createStyles, makeStyles } from "@material-ui/core/styles"
 import PeopleIcon from "@material-ui/icons/People"
 import StorageIcon from "@material-ui/icons/Storage"
 import { ClusterStats } from "@/interfaces/aether"
@@ -15,8 +15,8 @@ import DialogTitle from "./DialogTitle"
 import CircularProgressCard from "./CircularProgressCard"
 
 type StatLineProps = {
-  title: string;
-  value: string;
+  title: string
+  value: string
 }
 
 const StatLine = ({ title, value }: StatLineProps) => (
@@ -24,27 +24,25 @@ const StatLine = ({ title, value }: StatLineProps) => (
     <Typography variant="body1" color="textSecondary">
       {title}:&nbsp;
     </Typography>
-    <Typography variant="body1">
-      {value}
-    </Typography>
+    <Typography variant="body1">{value}</Typography>
   </Box>
 )
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     cardContent: {
-      display: 'flex',
-      alignItems: 'center',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      height: 'inherit',
+      display: "flex",
+      alignItems: "center",
+      flexDirection: "column",
+      justifyContent: "center",
+      height: "inherit",
     },
     dialogCardContent: {
       backgroundColor: theme.palette.background.default,
-      borderBottom: 'none'
+      borderBottom: "none",
     },
     fullHeight: {
-      height: '100%',
+      height: "100%",
     },
     icon: {
       fontSize: theme.spacing(10),
@@ -56,9 +54,9 @@ const useStyles = makeStyles(theme =>
 )
 
 type Props = {
-  open?: boolean;
-  onClose: () => void;
-  clusterStats: ClusterStats;
+  open?: boolean
+  onClose: () => void
+  clusterStats: ClusterStats
 }
 
 const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
@@ -73,7 +71,7 @@ const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
       <DialogContent dividers className={classes.dialogCardContent}>
         <Grid container spacing={2} justify="center" className={classes.chartsContainer}>
           <Grid item xs={6} sm={5} md={3}>
-            <CircularProgressCard title="CPU" value={clusterStats.cpu}/>
+            <CircularProgressCard title="CPU" value={clusterStats.cpu} />
           </Grid>
           <Grid item xs={6} sm={5} md={3}>
             <CircularProgressCard
@@ -89,7 +87,7 @@ const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
           <Grid item xs={6} sm={5} md={3}>
             <Card className={classes.fullHeight}>
               <CardContent className={classes.cardContent}>
-                <StorageIcon className={classes.icon} color="primary"/>
+                <StorageIcon className={classes.icon} color="primary" />
                 <Typography variant="h5" color="textPrimary">
                   {formatNumber(clusterStats.guilds)}
                 </Typography>
@@ -102,7 +100,7 @@ const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
           <Grid item xs={6} sm={5} md={3}>
             <Card className={classes.fullHeight}>
               <CardContent className={classes.cardContent}>
-                <PeopleIcon className={classes.icon} color="primary"/>
+                <PeopleIcon className={classes.icon} color="primary" />
                 <Typography variant="h5" color="textPrimary">
                   {formatNumber(clusterStats.users)}
                 </Typography>
@@ -116,19 +114,19 @@ const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
 
         <Grid container>
           <Grid item xs={12} sm={6}>
-            <StatLine title="Environment" value={clusterStats.env.toUpperCase()}/>
-            <StatLine title="Version" value={`${clusterStats.version} (${clusterStats.versions})`}/>
-            <StatLine title="Uptime" value={clusterStats.uptime}/>
-            <StatLine title="Ping" value={formatNumber(clusterStats.restPing)}/>
+            <StatLine title="Environment" value={clusterStats.env.toUpperCase()} />
+            <StatLine title="Version" value={`${clusterStats.version} (${clusterStats.versions})`} />
+            <StatLine title="Uptime" value={clusterStats.uptime} />
+            <StatLine title="Ping" value={formatNumber(clusterStats.restPing)} />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <StatLine title="Commands" value={formatNumber(clusterStats.commands)}/>
-            <StatLine title="Unavailable Guilds" value={formatNumber(clusterStats.unavailableGuilds)}/>
-            <StatLine title="Events" value={formatNumber(clusterStats.events)}/>
+            <StatLine title="Commands" value={formatNumber(clusterStats.commands)} />
+            <StatLine title="Unavailable Guilds" value={formatNumber(clusterStats.unavailableGuilds)} />
+            <StatLine title="Events" value={formatNumber(clusterStats.events)} />
           </Grid>
         </Grid>
 
-        { /* TODO: add shards */}
+        {/* TODO: add shards */}
       </DialogContent>
     </Dialog>
   )

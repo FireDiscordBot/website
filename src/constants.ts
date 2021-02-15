@@ -1,8 +1,24 @@
+import { Plan } from "@/interfaces/fire"
+
 export const fire = {
   defaultPrefix: "$",
   githubUrl: "https://github.com/FireDiscordBot/bot",
   aetherApiUrl: "https://aether.gaminggeek.dev",
-  realtimeStatsUrl: "wss://aether-ws.gaminggeek.dev/realtime-stats"
+  realtimeStatsUrl: "wss://aether-ws.gaminggeek.dev/realtime-stats",
+  plans: <Plan[]>[
+    {
+      name: "Premium - 1 Server",
+      priceId: "price_1HVPBgAIj8KliTBvqsHfGvaG",
+    },
+    {
+      name: "Premium - 3 Servers",
+      priceId: "price_1HVPBdAIj8KliTBvtdtg1OLn",
+    },
+    {
+      name: "Premium - 5 Servers",
+      priceId: "price_1HVPBYAIj8KliTBvsCU0k8ms",
+    },
+  ],
 }
 
 export const discord = {

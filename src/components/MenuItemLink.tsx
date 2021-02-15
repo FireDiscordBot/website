@@ -1,52 +1,45 @@
 import * as React from "react"
-import Link, { LinkProps } from 'next/link'
+import NextLink, { LinkProps } from "next/link"
 import MenuItem from "@material-ui/core/MenuItem"
+import { AnyObject } from "@/types"
 
-const ListItemLink = React.forwardRef<any, React.PropsWithChildren<{}>>(({ children, ...otherProps }, ref) => (
+const ListItemLink: React.ForwardRefRenderFunction<never, React.PropsWithChildren<AnyObject>> = (
+  { children, ...otherProps },
+  ref,
+) => (
   <li>
-    <a {...otherProps} ref={ref}>{children}</a>
+    <a {...otherProps} ref={ref}>
+      {children}
+    </a>
   </li>
-))
+)
+
+const ForwardedListItemLink = React.forwardRef<never, React.PropsWithChildren<AnyObject>>(ListItemLink)
 
 type LinkAndChildrenProps = React.PropsWithChildren<LinkProps>
 
-const ForwardLink = React.forwardRef<any, LinkAndChildrenProps>((
-  {
-    href,
-    as,
-    replace,
-    scroll,
-    shallow,
-    prefetch,
-    locale,
-    passHref,
-    children,
-    ...otherProps
-  },
+const Link: React.ForwardRefRenderFunction<never, LinkAndChildrenProps> = (
+  { href, as, replace, scroll, shallow, prefetch, locale, passHref, children, ...otherProps },
   ref,
 ) => {
-  const linkProps: LinkProps = {
-    href,
-    as,
-    replace,
-    scroll,
-    shallow,
-    prefetch,
-    locale,
-    passHref: passHref ?? true,
-  }
+  const linkProps: LinkProps = { href, as, replace, scroll, shallow, prefetch, locale, passHref: passHref ?? true }
   return (
-    <Link {...linkProps}>
-      <ListItemLink {...otherProps} ref={ref}>{children}</ListItemLink>
-    </Link>
+    <NextLink {...linkProps}>
+      <ForwardedListItemLink {...otherProps} ref={ref}>
+        {children}
+      </ForwardedListItemLink>
+    </NextLink>
   )
-})
+}
 
-const MenuItemLink = React.forwardRef<any, LinkAndChildrenProps>(({ children, ...linkProps }, ref) => (
-  <MenuItem {...linkProps} component={ForwardLink} innerRef={ref}>
+const ForwardedLink = React.forwardRef<never, LinkAndChildrenProps>(Link)
+
+const MenuItemLink: React.ForwardRefRenderFunction<never, LinkAndChildrenProps> = ({ children, ...linkProps }, ref) => (
+  <MenuItem {...linkProps} component={ForwardedLink} innerRef={ref}>
     {children}
   </MenuItem>
-))
+)
 
-export default MenuItemLink
+const ForwardedMenuItemLink = React.forwardRef<never, LinkAndChildrenProps>(MenuItemLink)
 
+export default ForwardedMenuItemLink

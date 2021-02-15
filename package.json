@@ -6,7 +6,11 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "fix:lint": "eslint src --fix",
+    "fix:prettier": "prettier \"src/**/*.ts(x)?\" --write",
+    "test:lint": "eslint src",
+    "test:prettier": "prettier \"src/**/*.ts(x)?\" --list-different"
   },
   "dependencies": {
     "@material-ui/core": "^4.11.3",
@@ -26,6 +30,14 @@
     "@types/nprogress": "^0.2.0",
     "@types/react": "^16.9.16",
     "@types/react-dom": "^16.9.4",
+    "@typescript-eslint/eslint-plugin": "^4.15.0",
+    "@typescript-eslint/parser": "^4.15.0",
+    "eslint": "^7.19.0",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react": "^7.22.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "prettier": "^2.2.1",
     "typescript": "4.0"
   },
   "license": "MIT"

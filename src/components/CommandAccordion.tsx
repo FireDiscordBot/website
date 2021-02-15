@@ -7,43 +7,45 @@ import { createStyles, makeStyles } from "@material-ui/core/styles"
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
 import { Command } from "@/interfaces/aether"
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     heading: {
       fontSize: theme.typography.pxToRem(15),
-      flexBasis: '33.33%',
+      flexBasis: "33.33%",
       flexShrink: 0,
     },
     secondaryHeading: {
       fontSize: theme.typography.pxToRem(15),
     },
     details: {
-      display: 'flex',
-      flexDirection: 'column'
-    }
+      display: "flex",
+      flexDirection: "column",
+    },
   }),
 )
 
 type Props = {
-  command: Command;
-  prefix: string;
+  command: Command
+  prefix: string
 }
 
 const CommandAccordion = ({ command, prefix }: Props) => {
   const classes = useStyles()
   return (
     <Accordion>
-      <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
-        <Typography className={classes.heading} color="textPrimary">{command.name}</Typography>
-        <Typography className={classes.secondaryHeading} color="textSecondary">{command.description}</Typography>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Typography className={classes.heading} color="textPrimary">
+          {command.name}
+        </Typography>
+        <Typography className={classes.secondaryHeading} color="textSecondary">
+          {command.description}
+        </Typography>
       </AccordionSummary>
       <AccordionDetails className={classes.details}>
         <Typography variant="body1" gutterBottom>
           Usage: {command.usage.replace("{prefix}", prefix)}
         </Typography>
-        <Typography variant="body1">
-          Aliases: {command.aliases.length == 0 ? "None" : command.aliases}
-        </Typography>
+        <Typography variant="body1">Aliases: {command.aliases.length == 0 ? "None" : command.aliases}</Typography>
       </AccordionDetails>
     </Accordion>
   )

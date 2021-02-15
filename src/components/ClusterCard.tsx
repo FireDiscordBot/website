@@ -6,8 +6,8 @@ import CardActionArea from "@material-ui/core/CardActionArea"
 import { ClusterStats } from "@/interfaces/aether"
 
 type Props = {
-  cluster: ClusterStats;
-  onClick: (id: number) => void;
+  cluster: ClusterStats
+  onClick: (id: number) => void
 }
 
 const ClusterCard = ({ cluster, onClick }: Props) => {
@@ -16,10 +16,8 @@ const ClusterCard = ({ cluster, onClick }: Props) => {
   return (
     <Card>
       <CardActionArea onClick={onClickCard}>
-        <CardContent >
-          <Typography variant="body1">
-            {cluster.id}
-          </Typography>
+        <CardContent>
+          <Typography variant="body1">{cluster.id}</Typography>
         </CardContent>
       </CardActionArea>
     </Card>

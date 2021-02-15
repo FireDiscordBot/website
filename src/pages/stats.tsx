@@ -1,32 +1,34 @@
-import * as React from 'react'
-import { GetServerSideProps } from "next"
+import { useRouter } from "next/router"
+import * as React from "react"
+import { GetStaticProps } from "next"
 import Container from "@material-ui/core/Container"
 import Grid from "@material-ui/core/Grid"
 import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
 import Typography from "@material-ui/core/Typography"
-import { createStyles, makeStyles } from '@material-ui/core/styles'
-import PeopleIcon from '@material-ui/icons/People'
-import StorageIcon from '@material-ui/icons/Storage'
+import { createStyles, makeStyles } from "@material-ui/core/styles"
+import PeopleIcon from "@material-ui/icons/People"
+import StorageIcon from "@material-ui/icons/Storage"
 import ClusterStatsDialog from "@/components/ClusterStatsDialog"
-import Layout from "@/components/Layout"
-import { fire } from "../src/constants"
+import Default from "@/layouts/default"
+import { fire } from "@/constants"
 import { ClusterStats, FireStats } from "@/interfaces/aether"
 import { formatBytes, formatNumber } from "@/utils/formatting"
 import ClusterCard from "@/components/ClusterCard"
 import CircularProgressCard from "@/components/CircularProgressCard"
+import useWebsocket from "@/hooks/use-websocket"
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     cardContent: {
-      display: 'flex',
-      alignItems: 'center',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      height: 'inherit',
+      display: "flex",
+      alignItems: "center",
+      flexDirection: "column",
+      justifyContent: "center",
+      height: "inherit",
     },
     fullHeight: {
-      height: '100%',
+      height: "100%",
     },
     icon: {
       fontSize: theme.spacing(10),
@@ -35,48 +37,61 @@ const useStyles = makeStyles(theme =>
       marginBottom: theme.spacing(2),
     },
     clusterGridItem: {
-      display: 'flex',
+      display: "flex",
     },
   }),
 )
 
 type Props = {
-  initialFireStats: FireStats;
-  initialSelectedClusterId: number | null;
+  initialFireStats: FireStats
 }
 
-const StatsPage = ({ initialFireStats, initialSelectedClusterId }: Props) => {
+const StatsPage = ({ initialFireStats }: Props) => {
   const classes = useStyles()
-  const [fireStats, setFireStats] = React.useState<FireStats>(initialFireStats)
-  const [selectedClusterId, setSelectedClusterId] = React.useState<number | null>(initialSelectedClusterId)
+  const router = useRouter()
 
-  const onClickClusterCard = (id: number) => setSelectedClusterId(id)
-  const onCloseClusterDialog = () => setSelectedClusterId(null)
+  const [lastWsMessage] = useWebsocket(fire.realtimeStatsUrl)
+  const [fireStats, setFireStats] = React.useState<FireStats>(initialFireStats)
+  const [selectedClusterStats, setSelectedClusterStats] = React.useState<ClusterStats | undefined>(undefined)
+
+  const findClusterStats = React.useCallback(
+    (id: number) => {
+      return fireStats.clusters.find((cluster) => cluster.id === id)
+    },
+    [fireStats.clusters],
+  )
+  const onClickClusterCard = (id: number) => setSelectedClusterStats(findClusterStats(id))
+  const onCloseClusterDialog = () => setSelectedClusterStats(undefined)
 
   React.useEffect(() => {
-    const ws = new WebSocket(fire.realtimeStatsUrl)
-    ws.onmessage = message => {
+    if (lastWsMessage != null) {
       try {
-        setFireStats(JSON.parse(message.data))
+        setFireStats(JSON.parse(lastWsMessage.data))
       } catch (e) {
         console.error("Error trying to parse response from real time stats socket.", e)
       }
     }
+  }, [lastWsMessage])
 
-    return () => ws.close()
-  }, [])
+  React.useEffect(() => {
+    if (typeof router.query.cluster === "string") {
+      const clusterId = parseInt(router.query.cluster, 10)
+      setSelectedClusterStats(findClusterStats(clusterId))
+    }
+  }, [findClusterStats, router.query])
 
-  let selectedClusterStats: ClusterStats | undefined
-  if (selectedClusterId != null) {
-    selectedClusterStats = fireStats.clusters.find(cluster => cluster.id == selectedClusterId)
-  }
+  React.useEffect(() => {
+    if (selectedClusterStats) {
+      setSelectedClusterStats(findClusterStats(selectedClusterStats.id))
+    }
+  }, [findClusterStats, fireStats, selectedClusterStats])
 
   return (
-    <Layout>
+    <Default>
       <Container>
         <Grid container spacing={4} justify="center" className={classes.chartsContainer}>
           <Grid item xs={6} sm={5} md={3}>
-            <CircularProgressCard title="CPU" value={fireStats.cpu}/>
+            <CircularProgressCard title="CPU" value={fireStats.cpu} />
           </Grid>
           <Grid item xs={6} sm={5} md={3}>
             <CircularProgressCard
@@ -89,7 +104,7 @@ const StatsPage = ({ initialFireStats, initialSelectedClusterId }: Props) => {
           <Grid item xs={6} sm={5} md={3}>
             <Card className={classes.fullHeight}>
               <CardContent className={classes.cardContent}>
-                <StorageIcon className={classes.icon} color="primary"/>
+                <StorageIcon className={classes.icon} color="primary" />
                 <Typography variant="h5" color="textPrimary">
                   {formatNumber(fireStats.guilds)}
                 </Typography>
@@ -102,7 +117,7 @@ const StatsPage = ({ initialFireStats, initialSelectedClusterId }: Props) => {
           <Grid item xs={6} sm={5} md={3}>
             <Card className={classes.fullHeight}>
               <CardContent className={classes.cardContent}>
-                <PeopleIcon className={classes.icon} color="primary"/>
+                <PeopleIcon className={classes.icon} color="primary" />
                 <Typography variant="h5" color="textPrimary">
                   {formatNumber(fireStats.users)}
                 </Typography>
@@ -120,31 +135,27 @@ const StatsPage = ({ initialFireStats, initialSelectedClusterId }: Props) => {
             </Typography>
           </Grid>
 
-          {fireStats.clusters.map(cluster => (
+          {fireStats.clusters.map((cluster) => (
             <Grid item key={cluster.id}>
-              <ClusterCard cluster={cluster} onClick={onClickClusterCard}/>
+              <ClusterCard cluster={cluster} onClick={onClickClusterCard} />
             </Grid>
           ))}
         </Grid>
       </Container>
 
-      {typeof selectedClusterStats != 'undefined' && <ClusterStatsDialog
-        clusterStats={selectedClusterStats}
-        open={true}
-        onClose={onCloseClusterDialog}
-      />}
-    </Layout>
+      {typeof selectedClusterStats != "undefined" && (
+        <ClusterStatsDialog clusterStats={selectedClusterStats} open={true} onClose={onCloseClusterDialog} />
+      )}
+    </Default>
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
-  const initialSelectedClusterId = typeof context.query?.cluster != 'undefined'
-    ? parseInt(context.query.cluster as string, 10) : null
+export const getStaticProps: GetStaticProps<Props> = async () => {
   let initialFireStats: FireStats
 
   try {
     const response = await fetch(`${fire.aetherApiUrl}/stats`, {
-      mode: 'cors',
+      mode: "cors",
       headers: { "User-Agent": "Fire Website" },
     })
     initialFireStats = await response.json()
@@ -165,8 +176,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
   return {
     props: {
       initialFireStats,
-      initialSelectedClusterId,
     },
+    revalidate: 120,
   }
 }
 

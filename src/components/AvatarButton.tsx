@@ -1,44 +1,47 @@
 import * as React from "react"
 import Avatar from "@material-ui/core/Avatar"
 import IconButton, { IconButtonProps } from "@material-ui/core/IconButton"
-import { createStyles, makeStyles } from '@material-ui/core/styles'
+import { createStyles, makeStyles } from "@material-ui/core/styles"
 import { AuthUser } from "@/interfaces/auth"
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     root: {
       padding: theme.spacing(1),
     },
     avatarRoot: {
       boxShadow: theme.shadows[2],
-      '&:hover': {
+      "&:hover": {
         boxShadow: theme.shadows[4],
-        '@media (hover: none)': {
+        "@media (hover: none)": {
           boxShadow: theme.shadows[2],
         },
       },
-      '&$focusVisible': {
+      "&$focusVisible": {
         boxShadow: theme.shadows[6],
       },
-      '&:active': {
+      "&:active": {
         boxShadow: theme.shadows[8],
       },
-      '&$disabled': {
+      "&$disabled": {
         boxShadow: theme.shadows[0],
       },
-    }
+    },
   }),
 )
 
-type Props = IconButtonProps<'button', { user: AuthUser }>
+type Props = IconButtonProps<"button", { user: AuthUser }>
 
 const AvatarButton = ({ user, ...otherProps }: Props) => {
   const classes = useStyles()
   return (
     <IconButton {...otherProps} className={classes.root}>
-      <Avatar src={user.image} classes={{
-        root: classes.avatarRoot,
-      }}/>
+      <Avatar
+        src={user.image}
+        classes={{
+          root: classes.avatarRoot,
+        }}
+      />
     </IconButton>
   )
 }

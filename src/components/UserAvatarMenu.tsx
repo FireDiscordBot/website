@@ -1,19 +1,19 @@
-import * as React from 'react'
+import * as React from "react"
 import Menu, { MenuProps } from "@material-ui/core/Menu"
 import MenuItem, { MenuItemProps } from "@material-ui/core/MenuItem"
 import MenuItemLink from "./MenuItemLink"
 
-type Props = MenuProps & { onClickLogout: MenuItemProps['onClick'] }
+type Props = MenuProps & { onClickLogout: MenuItemProps["onClick"] }
 
 const UserAvatarMenu = ({ onClickLogout, ...props }: Props) => (
   <Menu
     anchorOrigin={{
-      vertical: 'center',
-      horizontal: 'center',
+      vertical: "center",
+      horizontal: "center",
     }}
     transformOrigin={{
-      vertical: 'top',
-      horizontal: 'right',
+      vertical: "top",
+      horizontal: "right",
     }}
     getContentAnchorEl={null}
     keepMounted

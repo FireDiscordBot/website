@@ -9,27 +9,27 @@ import { createStyles, makeStyles } from "@material-ui/core/styles"
 import { DiscoverableGuild } from "@/interfaces/aether"
 import { formatNumber } from "@/utils/formatting"
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     fullHeight: {
-      height: '100%',
+      height: "100%",
     },
     media: {
-      height: '200px',
+      height: "200px",
     },
     content: {
-      display: 'flex',
-      alignItems: 'center'
+      display: "flex",
+      alignItems: "center",
     },
     cardText: {
       marginLeft: theme.spacing(2),
-      overflow: 'hidden'
-    }
+      overflow: "hidden",
+    },
   }),
 )
 
 type Props = {
-  guild: DiscoverableGuild;
+  guild: DiscoverableGuild
 }
 
 const DiscoverableGuildCard = ({ guild }: Props) => {
@@ -37,11 +37,7 @@ const DiscoverableGuildCard = ({ guild }: Props) => {
   return (
     <Card className={classes.fullHeight}>
       <CardActionArea href={guild.vanity}>
-        <CardMedia
-          className={classes.media}
-          image={guild.splash}
-          title={guild.name}
-        />
+        <CardMedia className={classes.media} image={guild.splash} title={guild.name} />
         <CardContent className={classes.content}>
           <Avatar src={guild.icon} />
           <div className={classes.cardText}>
