@@ -1,3 +1,5 @@
+import { DiscordGuild } from "@/interfaces/discord"
+
 export type ShardStats = {
   id: number
   wsPing: number
@@ -74,4 +76,8 @@ export type DiscoverableGuild = {
   vanity: string
   members: number
   key?: number
+}
+
+export type UserGuild = DiscordGuild & {
+  premium: boolean
 }

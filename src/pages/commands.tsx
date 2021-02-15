@@ -1,6 +1,7 @@
 import * as React from "react"
 import clsx from "clsx"
-import { GetServerSideProps } from "next"
+import { useRouter } from "next/router"
+import { GetStaticProps } from "next"
 import Paper from "@material-ui/core/Paper"
 import Container from "@material-ui/core/Container"
 import Tabs from "@material-ui/core/Tabs"
@@ -11,7 +12,7 @@ import useMediaQuery from "@material-ui/core/useMediaQuery"
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles"
 import { fire } from "@/constants"
 import { Category } from "@/interfaces/aether"
-import Default from "../layouts/default"
+import Default from "@/layouts/default"
 import CommandAccordion from "@/components/CommandAccordion"
 
 const useStyles = makeStyles((theme) =>
@@ -30,17 +31,29 @@ const useStyles = makeStyles((theme) =>
 
 type Props = {
   categories: Category[]
-  prefix?: string
 }
 
-const CommandsPage = ({ categories, prefix }: Props) => {
+const CommandsPage = ({ categories }: Props) => {
   const classes = useStyles()
+  const router = useRouter()
+
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"))
+  const [prefix, setPrefix] = React.useState(fire.defaultPrefix)
   const [selectedCategoryIndex, setSelectedCategoryIndex] = React.useState<number>(0)
 
   const onChangeSelectedTab = (_event: React.ChangeEvent<unknown>, index: number) => {
     setSelectedCategoryIndex(index)
   }
+
+  React.useEffect(() => {
+    if (typeof router.query.prefix === "string") {
+      setPrefix(router.query.prefix)
+    }
+    if (typeof router.query.category === "string") {
+      const categoryIndex = parseInt(router.query.category, 10)
+      setSelectedCategoryIndex(categoryIndex)
+    }
+  }, [router.query])
 
   return (
     <Default>
@@ -69,7 +82,7 @@ const CommandsPage = ({ categories, prefix }: Props) => {
                 selectedCategoryIndex == index && (
                   <Box p={3} width="100%" key={index}>
                     {category.commands.map((command, index) => (
-                      <CommandAccordion command={command} prefix={prefix ?? fire.defaultPrefix} key={index} />
+                      <CommandAccordion command={command} prefix={prefix} key={index} />
                     ))}
                   </Box>
                 ),
@@ -81,7 +94,7 @@ const CommandsPage = ({ categories, prefix }: Props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
+export const getStaticProps: GetStaticProps<Props> = async () => {
   let categories: Category[]
 
   try {
@@ -97,8 +110,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
   return {
     props: {
       categories,
-      prefix: (context.query.prefix as string) ?? null,
     },
+    revalidate: 1800,
   }
 }
 

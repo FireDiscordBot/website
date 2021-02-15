@@ -62,7 +62,9 @@ const NavBar = () => {
     )
   } else {
     homePageLink = (
-      <NextImage src="/logo-gr.svg" width={40} height={40} layout="intrinsic" className={classes.logo} priority />
+      <a>
+        <NextImage src="/logo-gr.svg" width={40} height={40} layout="intrinsic" className={classes.logo} priority />
+      </a>
     )
   }
 

@@ -1,4 +1,8 @@
 export type Plan = {
+  id: string
   name: string
-  priceId: string
+  images: string[]
+  amount: number
+  currency: string
+  servers: number
 }

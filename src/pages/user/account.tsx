@@ -1,4 +1,6 @@
 import * as React from "react"
+import Link from "next/link"
+import Box from "@material-ui/core/Box"
 import Paper from "@material-ui/core/Paper"
 import Button from "@material-ui/core/Button"
 import Avatar from "@material-ui/core/Avatar"
@@ -15,19 +17,9 @@ import { parseFlags } from "@/utils/discord"
 
 const useStyles = makeStyles((theme) =>
   createStyles({
-    paper: {
-      padding: theme.spacing(2),
-      display: "flex",
-      marginBottom: theme.spacing(2),
-    },
     avatar: {
       width: "80px",
       height: "80px",
-    },
-    details: {
-      margin: theme.spacing("auto", 0, "auto", 2),
-      display: "flex",
-      flexDirection: "column",
     },
     bold: {
       fontWeight: 700,
@@ -58,19 +50,21 @@ const AccountPage = () => {
         General info
       </Typography>
 
-      <Paper className={classes.paper}>
-        <Avatar src={session.user.image} className={classes.avatar} />
-        <div className={classes.details}>
-          <div>
-            <Typography variant="body1" component="span" className={classes.bold}>
-              {session.user.name}
-            </Typography>
-            <Typography variant="body1" color="textSecondary" component="span">
-              #{session.user.discriminator}
-            </Typography>
-          </div>
-          <div className={classes.flags}>{flagsElements}</div>
-        </div>
+      <Paper>
+        <Box padding={2} display="flex" mb={2}>
+          <Avatar src={session.user.image} className={classes.avatar} />
+          <Box display="flex" flexDirection="column" mr={0} ml={2} mt="auto" mb="auto">
+            <div>
+              <Typography variant="body1" component="span" className={classes.bold}>
+                {session.user.name}
+              </Typography>
+              <Typography variant="body1" color="textSecondary" component="span">
+                #{session.user.discriminator}
+              </Typography>
+            </div>
+            <div className={classes.flags}>{flagsElements}</div>
+          </Box>
+        </Box>
       </Paper>
 
       <Typography variant="h4" gutterBottom>
@@ -82,7 +76,9 @@ const AccountPage = () => {
           <Typography variant="h5">Default</Typography>
         </CardContent>
         <CardActions>
-          <Button color="primary">Be premium</Button>
+          <Link href="/user/premium" passHref>
+            <Button color="primary">Plans Page</Button>
+          </Link>
         </CardActions>
       </Card>
     </UserPageLayout>
