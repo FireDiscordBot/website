@@ -62,17 +62,17 @@ export const flags: DiscordFlag[] = [
   {
     key: "houseBravery",
     value: 1 << 6,
-    name: "House Bravery",
+    name: "HypeSquad Bravery",
   },
   {
     key: "houseBrilliance",
     value: 1 << 7,
-    name: "House Brilliance",
+    name: "HypeSquad Brilliance",
   },
   {
     key: "houseBalance",
     value: 1 << 8,
-    name: "House Balance",
+    name: "HypeSquad Balance",
   },
   {
     key: "earlySupporter",
