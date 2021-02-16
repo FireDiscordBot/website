@@ -1,5 +1,5 @@
 import * as React from "react"
-import { GetServerSideProps } from "next"
+import { GetStaticProps } from "next"
 import Container from "@material-ui/core/Container"
 import Grid from "@material-ui/core/Grid"
 import Default from "@/layouts/default"
@@ -26,7 +26,7 @@ const DiscoverPage = ({ guilds }: Props) => (
   </Default>
 )
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
+export const getStaticProps: GetStaticProps<Props> = async () => {
   let guilds: DiscoverableGuild[]
 
   try {
@@ -43,6 +43,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
     props: {
       guilds,
     },
+    revalidate: 300,
   }
 }
 
