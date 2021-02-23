@@ -21,6 +21,7 @@
     "http-status-codes": "^2.1.4",
     "next": "latest",
     "next-auth": "^3.2.0",
+    "next-seo": "^4.20.0",
     "nprogress": "^0.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

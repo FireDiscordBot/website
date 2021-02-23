@@ -9,7 +9,7 @@ import CardContent from "@material-ui/core/CardContent"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
 import GitHubIcon from "@material-ui/icons/GitHub"
 
-import Default from "@/layouts/default"
+import DefaultLayout from "@/layouts/default"
 import { discord, fire } from "@/constants"
 
 type Feature = {
@@ -72,7 +72,7 @@ const IndexPage = () => {
   const classes = useStyles()
 
   return (
-    <Default>
+    <DefaultLayout>
       <Container>
         <Grid container justify="center" className={classes.banner}>
           <Grid item xs={3} md={2} className={classes.logoGridItem}>
@@ -118,7 +118,7 @@ const IndexPage = () => {
           ))}
         </Grid>
       </Container>
-    </Default>
+    </DefaultLayout>
   )
 }
 

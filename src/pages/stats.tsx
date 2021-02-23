@@ -89,7 +89,7 @@ const StatsPage = ({ initialFireStats }: Props) => {
   }, [findClusterStats, fireStats, selectedClusterStats])
 
   return (
-    <Default>
+    <Default title="Stats">
       <Container>
         <Grid container spacing={4} justify="center" className={classes.chartsContainer}>
           <Grid item xs={6} sm={5} md={3}>

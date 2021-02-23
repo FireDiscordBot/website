@@ -1,3 +1,5 @@
+import { DefaultSeoProps } from "next-seo"
+
 export const fire = {
   defaultPrefix: "$",
   githubUrl: "https://github.com/FireDiscordBot/bot",
@@ -16,4 +18,22 @@ export const discord = {
 export const stripe = {
   publicKey: process.env.NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY ?? "Not provided",
   secretKey: process.env.STRIPE_API_SECRET_KEY ?? "Not provided",
+}
+
+export const defaultSeoConfig: DefaultSeoProps = {
+  titleTemplate: "%s | Fire",
+  defaultTitle: "Fire",
+  description:
+    "A Discord bot for all your needs. With memes, utilities, moderation and more. Fire is the only bot you will need.",
+  twitter: {
+    site: "@FireDiscordBot",
+    cardType: "",
+  },
+  openGraph: {
+    type: "website",
+    url: "https://fire.gaminggeek.dev/",
+    title: "Fire",
+    description:
+      "A Discord bot for all your needs. With memes, utilities, moderation and more. Fire is the only bot you will need.",
+  },
 }

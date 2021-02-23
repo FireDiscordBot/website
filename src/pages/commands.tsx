@@ -14,7 +14,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles"
 import fetcher from "@/utils/fetcher"
 import { fire } from "@/constants"
 import { Category } from "@/interfaces/aether"
-import Default from "@/layouts/default"
+import DefaultLayout from "@/layouts/default"
 import CommandAccordion from "@/components/CommandAccordion"
 
 const useStyles = makeStyles((theme) =>
@@ -58,7 +58,7 @@ const CommandsPage = ({ categories }: Props) => {
   }, [router.query])
 
   return (
-    <Default>
+    <DefaultLayout title="Commands">
       <Container>
         <Grid container>
           <Grid item xs={12} md={2}>
@@ -92,7 +92,7 @@ const CommandsPage = ({ categories }: Props) => {
           </Grid>
         </Grid>
       </Container>
-    </Default>
+    </DefaultLayout>
   )
 }
 

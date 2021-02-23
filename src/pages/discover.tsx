@@ -4,7 +4,7 @@ import Container from "@material-ui/core/Container"
 import Grid from "@material-ui/core/Grid"
 
 import fetcher from "@/utils/fetcher"
-import Default from "@/layouts/default"
+import DefaultLayout from "@/layouts/default"
 import DiscoverableGuildCard from "@/components/DiscoverableGuildCard"
 import { DiscoverableGuild } from "@/interfaces/aether"
 import { fire } from "@/constants"
@@ -15,7 +15,7 @@ type Props = {
 
 // TODO: implement pagination or infinite scrolling
 const DiscoverPage = ({ guilds }: Props) => (
-  <Default>
+  <DefaultLayout title="Discover">
     <Container>
       <Grid container spacing={4}>
         {guilds.map((guild, index) => (
@@ -25,7 +25,7 @@ const DiscoverPage = ({ guilds }: Props) => (
         ))}
       </Grid>
     </Container>
-  </Default>
+  </DefaultLayout>
 )
 
 export const getStaticProps: GetStaticProps<Props> = async () => {

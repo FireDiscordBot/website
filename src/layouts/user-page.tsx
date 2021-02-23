@@ -1,6 +1,7 @@
 import * as React from "react"
 import { NextRouter, useRouter } from "next/router"
 import NextLink from "next/link"
+import { NextSeoProps } from "next-seo"
 import Container from "@material-ui/core/Container"
 import Grid from "@material-ui/core/Grid"
 import Paper from "@material-ui/core/Paper"
@@ -23,15 +24,15 @@ const ListItemLink = ({
   )
 }
 
-type Props = {
+type Props = NextSeoProps & {
   children: React.ReactNode
 }
 
-const UserPageLayout = ({ children }: Props) => {
+const UserPageLayout = ({ children, ...restProps }: Props) => {
   const router = useRouter()
 
   return (
-    <DefaultLayout>
+    <DefaultLayout {...restProps}>
       <Container>
         <Grid container spacing={4}>
           <Grid item xs={12} sm={3} md={2}>

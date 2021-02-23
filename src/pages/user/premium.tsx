@@ -134,7 +134,7 @@ const PremiumPage = () => {
   const onCloseErrorSnackbar = () => setErrorMessage(null)
 
   return (
-    <UserPage>
+    <UserPage title="Premium" noindex nofollow>
       <Typography variant="h4" gutterBottom>
         Your plan
       </Typography>

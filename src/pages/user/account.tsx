@@ -55,7 +55,7 @@ const AccountPage = () => {
   const flagsElements = flags.map((flag, index) => <DiscordFlagImage flag={flag} key={index} />)
 
   return (
-    <UserPageLayout>
+    <UserPageLayout title="Account" noindex nofollow>
       <Typography variant="h4" gutterBottom>
         General info
       </Typography>
