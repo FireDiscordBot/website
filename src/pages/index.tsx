@@ -8,6 +8,7 @@ import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
 import GitHubIcon from "@material-ui/icons/GitHub"
+
 import Default from "@/layouts/default"
 import { discord, fire } from "@/constants"
 

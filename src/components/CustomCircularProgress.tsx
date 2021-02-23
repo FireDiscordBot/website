@@ -4,6 +4,7 @@ import CircularProgress, { CircularProgressProps } from "@material-ui/core/Circu
 import Typography from "@material-ui/core/Typography"
 import Box from "@material-ui/core/Box"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
+
 import { formatNumber } from "@/utils/formatting"
 
 const useStyles = makeStyles(() =>

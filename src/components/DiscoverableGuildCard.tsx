@@ -6,6 +6,7 @@ import CardMedia from "@material-ui/core/CardMedia"
 import Typography from "@material-ui/core/Typography"
 import Avatar from "@material-ui/core/Avatar"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
+
 import { DiscoverableGuild } from "@/interfaces/aether"
 import { formatNumber } from "@/utils/formatting"
 

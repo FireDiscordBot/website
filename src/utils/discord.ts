@@ -1,14 +1,15 @@
+import { UserGuild } from "@/interfaces/aether"
 import { DiscordApiUser, DiscordGuild, DiscordFlag, flags } from "@/interfaces/discord"
+import fetcher from "@/utils/fetcher"
 
 const MANAGE_GUILD = 0x00000020
 
 export const fetchManageableGuilds = async (accessToken: string): Promise<DiscordGuild[]> => {
-  const response = await fetch("https://discord.com/api/users/@me/guilds", {
+  const guilds: DiscordGuild[] = await fetcher("https://discord.com/api/users/@me/guilds", {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
   })
-  const guilds: DiscordGuild[] = await response.json()
 
   return guilds.filter((guild) => {
     return (guild.permissions & MANAGE_GUILD) == MANAGE_GUILD
@@ -22,6 +23,24 @@ export const getUserImage = (user: DiscordApiUser) => {
   } else {
     const format = user.avatar.startsWith("a_") ? "gif" : "png"
     return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${format}`
+  }
+}
+
+export const getGuildIcon = (guild: UserGuild) => {
+  if (guild.icon == null) {
+    return {
+      type: "text",
+      value: guild.name
+        .split(" ")
+        .map((word) => word[0])
+        .join(""),
+    }
+  }
+
+  const format = guild.icon.startsWith("a_") ? "gif" : "png"
+  return {
+    type: "image",
+    value: `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.${format}`,
   }
 }
 

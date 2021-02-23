@@ -1,9 +1,12 @@
 import * as React from "react"
 import Head from "next/head"
 import { AppProps } from "next/app"
-import { Provider } from "next-auth/client"
+import { SWRConfig } from "swr"
+import { Provider as SessionProvider } from "next-auth/client"
 import { ThemeProvider } from "@material-ui/core/styles"
 import CssBaseline from "@material-ui/core/CssBaseline"
+
+import fetcher from "@/utils/fetcher"
 import theme from "@/theme"
 import { isBrowser } from "@/utils/is-browser"
 
@@ -28,10 +31,12 @@ function MyApp(props: AppProps) {
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
       <ThemeProvider theme={theme}>
-        <Provider session={pageProps.session}>
-          <CssBaseline />
-          <Component {...pageProps} />
-        </Provider>
+        <SWRConfig value={{ fetcher: fetcher }}>
+          <SessionProvider session={pageProps.session}>
+            <CssBaseline />
+            <Component {...pageProps} />
+          </SessionProvider>
+        </SWRConfig>
       </ThemeProvider>
     </>
   )

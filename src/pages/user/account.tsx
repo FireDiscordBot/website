@@ -9,10 +9,14 @@ import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
 import CardActions from "@material-ui/core/CardActions"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
+import Skeleton from "@material-ui/lab/Skeleton"
+
+import SimpleSnackbar from "@/components/SimpleSnackbar"
 import UserPageLayout from "@/layouts/user-page"
 import Loading from "@/components/loading"
 import DiscordFlagImage from "@/components/DiscordFlagImage"
 import useSession from "@/hooks/use-session"
+import useCurrentSubscription from "@/hooks/use-current-subscription"
 import { parseFlags } from "@/utils/discord"
 
 const useStyles = makeStyles((theme) =>
@@ -36,6 +40,12 @@ const useStyles = makeStyles((theme) =>
 const AccountPage = () => {
   const classes = useStyles()
   const [session, loading] = useSession({ redirectTo: "/" })
+  const { subscription, isLoading, error } = useCurrentSubscription(session != null && !loading)
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
+
+  React.useEffect(() => {
+    setErrorMessage(error?.message)
+  }, [error])
 
   if (!session || loading) {
     return <Loading />
@@ -73,14 +83,24 @@ const AccountPage = () => {
 
       <Card>
         <CardContent>
-          <Typography variant="h5">Default</Typography>
+          <Typography variant="h5">
+            {isLoading ? <Skeleton /> : subscription ? subscription.name : "Default"}
+          </Typography>
         </CardContent>
         <CardActions>
           <Link href="/user/premium" passHref>
-            <Button color="primary">Plans Page</Button>
+            <Button color="primary">Fire premium page</Button>
           </Link>
         </CardActions>
       </Card>
+
+      <SimpleSnackbar
+        message={errorMessage}
+        severity="error"
+        horizontal="right"
+        vertical="top"
+        autoHideDuration={5000}
+      />
     </UserPageLayout>
   )
 }

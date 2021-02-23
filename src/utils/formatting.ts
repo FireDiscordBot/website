@@ -1,3 +1,5 @@
+export const capitalize = (string: string) => string.charAt(0).toUpperCase() + string.slice(1)
+
 export const formatNumber = (
   number: number,
   options: Intl.NumberFormatOptions = {
@@ -6,6 +8,9 @@ export const formatNumber = (
   },
   locale?: string | string[],
 ) => number.toLocaleString(locale, options)
+
+export const formatDateTime = (date: Date, options: Intl.DateTimeFormatOptions = {}, locale?: string | string[]) =>
+  date.toLocaleString(locale, options)
 
 // From: https://stackoverflow.com/a/18650828/9402849
 export const formatBytes = (bytes: number, options?: Intl.NumberFormatOptions, locale?: string | string[]) => {

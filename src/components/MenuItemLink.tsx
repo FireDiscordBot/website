@@ -1,6 +1,7 @@
 import * as React from "react"
 import NextLink, { LinkProps } from "next/link"
 import MenuItem from "@material-ui/core/MenuItem"
+
 import { AnyObject } from "@/types"
 
 const ListItemLink: React.ForwardRefRenderFunction<never, React.PropsWithChildren<AnyObject>> = (

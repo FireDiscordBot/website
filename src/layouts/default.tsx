@@ -1,6 +1,7 @@
 import * as React from "react"
 import Box from "@material-ui/core/Box"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
+
 import NavBar from "@/components/NavBar"
 import Footer from "@/components/Footer"
 

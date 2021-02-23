@@ -10,6 +10,8 @@ import Box from "@material-ui/core/Box"
 import Grid from "@material-ui/core/Grid"
 import useMediaQuery from "@material-ui/core/useMediaQuery"
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles"
+
+import fetcher from "@/utils/fetcher"
 import { fire } from "@/constants"
 import { Category } from "@/interfaces/aether"
 import Default from "@/layouts/default"
@@ -98,11 +100,10 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
   let categories: Category[]
 
   try {
-    const response = await fetch(`${fire.aetherApiUrl}/commands`, {
+    categories = await fetcher(`${fire.aetherApiUrl}/commands`, {
       mode: "cors",
       headers: { "User-Agent": "Fire Website" },
     })
-    categories = await response.json()
   } catch (e) {
     categories = []
   }

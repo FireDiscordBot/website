@@ -1,66 +1,96 @@
-import { NextApiHandler, NextApiRequest, NextApiResponse } from "next"
-import { getSession } from "next-auth/client"
-import { AuthSession } from "@/interfaces/auth"
-import { createStripeSession, fetchCustomerId } from "@/lib/aether"
+import { StatusCodes } from "http-status-codes"
+import { Stripe } from "stripe"
+
 import stripe from "@/api/server-stripe"
+import { createStripeCheckoutSession, fetchCustomerId } from "@/lib/aether"
+import { AuthenticatedApiHandler, GetSubscriptionResponse, PostSubscriptionResponse } from "@/types"
+import { error, withSession } from "@/utils/api-handler-utils"
 
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
-type NextApiHandlerWithSession<T = unknown> = (
-  session: AuthSession,
-  req: NextApiRequest,
-  res: NextApiResponse<T>,
-) => void | Promise<void>
-
-const get: NextApiHandlerWithSession = async (session, _req, res) => {
-  const customerId = await fetchCustomerId(session.accessToken!)
-  const subscriptionsList = await stripe.subscriptions.list({
-    customer: customerId,
-  })
-
-  const subscriptions = subscriptionsList.data.map((subscription) => ({
-    id: subscription.id,
-    name: subscription.items.data[0].plan.nickname,
-  }))
-
-  res.json(subscriptions)
+const subscriptionComparator = (first: Stripe.Subscription, second: Stripe.Subscription) => {
+  const getStatusWeight = (status: Stripe.Subscription.Status) => {
+    switch (status) {
+      case "active":
+        return 1
+      case "trialing":
+        return 2
+      default:
+        return 3
+    }
+  }
+  return getStatusWeight(first.status) - getStatusWeight(second.status)
 }
 
-const post: NextApiHandlerWithSession = async (session, req, res) => {
+const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _req, res) => {
+  const customerId = await fetchCustomerId(session.accessToken)
+  const response = await stripe.subscriptions.list({
+    customer: customerId,
+    expand: ["data.plan.product"],
+  })
+
+  const subscriptions = response.data.sort(subscriptionComparator)
+  const hasSubscription = subscriptions.some((subscription) => ["trialing", "active"].includes(subscription.status))
+
+  // if (1 > 0) {
+  //   error(res, StatusCodes.BAD_GATEWAY)
+  //   return
+  // }
+
+  if (!hasSubscription) {
+    res.json({
+      hasSubscription: false,
+    })
+    return
+  }
+
+  const subscription = subscriptions[0]
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const product: Stripe.Product = subscription.plan.product
+
+  res.json({
+    hasSubscription: true,
+    subscription: {
+      id: subscription.id,
+      name: product.name,
+      status: subscription.status,
+      servers: parseInt(product.metadata.servers ?? "0", 10),
+      start: subscription.start_date * 1000,
+      periodStart: subscription.current_period_start * 1000,
+      periodEnd: subscription.current_period_end * 1000,
+      trialEnd: subscription.trial_end ? subscription.trial_end * 1000 : null,
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    },
+  })
+}
+
+const post: AuthenticatedApiHandler<PostSubscriptionResponse> = async (session, req, res) => {
   if (typeof req.query.servers != "string") {
-    res.status(500)
+    error(res, StatusCodes.BAD_REQUEST)
     return
   }
 
   const servers = parseInt(req.query.servers)
 
   if (![1, 3, 5].includes(servers)) {
-    res.status(500)
+    error(res, StatusCodes.BAD_REQUEST)
     return
   }
 
-  const sessionId = await createStripeSession(session.accessToken!, servers)
+  const stripeSessionId = await createStripeCheckoutSession(session.accessToken, servers)
 
-  res.json({ sessionId })
+  res.json({ sessionId: stripeSessionId })
 }
 
-const handler: NextApiHandler = async (req, res) => {
-  const session = await getSession({ req })
-  if (!session?.accessToken) {
-    res.status(401)
-    return
-  }
-
+const handler: AuthenticatedApiHandler<GetSubscriptionResponse | PostSubscriptionResponse> = (session, req, res) => {
   switch (req.method) {
     case "GET":
-      get(session, req, res)
-      break
+      return get(session, req, res)
     case "POST":
-      post(session, req, res)
-      break
+      return post(session, req, res)
     default:
+      error(res, StatusCodes.METHOD_NOT_ALLOWED)
       break
   }
 }
 
-export default handler
+export default withSession(handler)

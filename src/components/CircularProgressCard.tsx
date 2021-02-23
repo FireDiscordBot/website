@@ -2,6 +2,7 @@ import * as React from "react"
 import CardContent from "@material-ui/core/CardContent"
 import Card from "@material-ui/core/Card"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
+
 import CustomCircularProgress, { Props } from "./CustomCircularProgress"
 
 const useStyles = makeStyles((theme) =>

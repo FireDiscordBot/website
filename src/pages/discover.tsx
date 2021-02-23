@@ -2,6 +2,8 @@ import * as React from "react"
 import { GetStaticProps } from "next"
 import Container from "@material-ui/core/Container"
 import Grid from "@material-ui/core/Grid"
+
+import fetcher from "@/utils/fetcher"
 import Default from "@/layouts/default"
 import DiscoverableGuildCard from "@/components/DiscoverableGuildCard"
 import { DiscoverableGuild } from "@/interfaces/aether"
@@ -30,11 +32,10 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
   let guilds: DiscoverableGuild[]
 
   try {
-    const response = await fetch(`${fire.aetherApiUrl}/discoverable`, {
+    guilds = await fetcher(`${fire.aetherApiUrl}/discoverable`, {
       mode: "cors",
       headers: { "User-Agent": "Fire Website" },
     })
-    guilds = await response.json()
   } catch (e) {
     guilds = []
   }

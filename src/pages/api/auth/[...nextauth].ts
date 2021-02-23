@@ -1,6 +1,7 @@
-import { NextApiRequest, NextApiResponse } from "next"
+import { NextApiHandler } from "next"
 import NextAuth, { InitOptions } from "next-auth"
 import Providers from "next-auth/providers"
+
 import type { AuthSession, AuthToken, AuthUser } from "@/interfaces/auth"
 import type { DiscordApiUser } from "@/interfaces/discord"
 import { getUserImage } from "@/utils/discord"
@@ -46,8 +47,14 @@ const nextAuthConfig: InitOptions = {
       return session
     },
   },
+  jwt: {
+    encryption: true,
+    secret: process.env.JWT_SECRET, // openssl rand -base64 64
+    signingKey: process.env.JWT_SIGNING_KEY, // npx node-jose-tools newkey -s 256 -t oct -a HS512
+    encryptionKey: process.env.JWT_ENCRYPTION_KEY, // npx node-jose-tools newkey -s 256 -t oct -a A256GCM -u enc
+  },
 }
 
-const handler = (req: NextApiRequest, res: NextApiResponse) => NextAuth(req, res, nextAuthConfig)
+const handler: NextApiHandler = (req, res) => NextAuth(req, res, nextAuthConfig)
 
 export default handler

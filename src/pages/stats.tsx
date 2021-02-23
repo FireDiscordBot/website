@@ -9,6 +9,8 @@ import Typography from "@material-ui/core/Typography"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
 import PeopleIcon from "@material-ui/icons/People"
 import StorageIcon from "@material-ui/icons/Storage"
+
+import fetcher from "@/utils/fetcher"
 import ClusterStatsDialog from "@/components/ClusterStatsDialog"
 import Default from "@/layouts/default"
 import { fire } from "@/constants"
@@ -154,11 +156,10 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
   let initialFireStats: FireStats
 
   try {
-    const response = await fetch(`${fire.aetherApiUrl}/stats`, {
+    initialFireStats = await fetcher(`${fire.aetherApiUrl}/stats`, {
       mode: "cors",
       headers: { "User-Agent": "Fire Website" },
     })
-    initialFireStats = await response.json()
   } catch (e) {
     initialFireStats = {
       cpu: 0,

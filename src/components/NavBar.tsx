@@ -12,6 +12,7 @@ import Container from "@material-ui/core/Container"
 import Link from "@material-ui/core/Link"
 import useScrollTrigger from "@material-ui/core/useScrollTrigger"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
+
 import AvatarButton from "./AvatarButton"
 import UserAvatarMenu from "./UserAvatarMenu"
 

@@ -1,6 +1,7 @@
 import * as React from "react"
 import Image from "next/image"
 import Tooltip from "@material-ui/core/Tooltip"
+
 import { DiscordFlag } from "@/interfaces/discord"
 
 type Props = {
