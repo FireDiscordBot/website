@@ -4,10 +4,9 @@ import useSWR, { mutate } from "swr"
 import Grid from "@material-ui/core/Grid"
 import Box from "@material-ui/core/Box"
 import Typography from "@material-ui/core/Typography"
-import LinearProgress from "@material-ui/core/LinearProgress"
 
 import { openUrl } from "@/utils/open-url"
-import { discord } from "@/constants"
+import { discord, stripe as stripeConstants } from "@/constants"
 import fetcher, { createErrorResponse } from "@/utils/fetcher"
 import { PostSubscriptionResponse } from "@/types"
 import SimpleSnackbar from "@/components/SimpleSnackbar"
@@ -21,11 +20,11 @@ import useCurrentSubscription from "@/hooks/use-current-subscription"
 import useSession from "@/hooks/use-session"
 import { UserGuild } from "@/interfaces/aether"
 
-if (!process.env.NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY) {
+if (!stripeConstants.publicKey) {
   throw Error("Env variable NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY not defined")
 }
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY)
+const stripePromise = loadStripe(stripeConstants.publicKey)
 
 const PremiumPage = () => {
   const [session, loading] = useSession({ redirectTo: "/" })
@@ -128,7 +127,7 @@ const PremiumPage = () => {
 
   const onClosePlansDialog = () => setPlansDialogOpen(false)
 
-  const onCloseErrorSnackbar = () => setErrorMessage(null)
+  const onFinishCloseAnimation = () => setErrorMessage(null)
 
   return (
     <UserPage title="Premium" noindex nofollow>
@@ -149,11 +148,12 @@ const PremiumPage = () => {
       </Typography>
 
       <Grid container spacing={2}>
-        {isValidating && (
-          <Grid item xs={12}>
-            <LinearProgress variant="query" />
-          </Grid>
-        )}
+        {isValidating &&
+          [...Array(8)].map((_, index) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+              <UserGuildCard onClickToggle={onClickToggle} />
+            </Grid>
+          ))}
         {!isValidating &&
           guilds?.map((guild, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
@@ -175,7 +175,7 @@ const PremiumPage = () => {
         horizontal="right"
         vertical="top"
         autoHideDuration={3000}
-        onClose={onCloseErrorSnackbar}
+        onFinishCloseAnimation={onFinishCloseAnimation}
       />
     </UserPage>
   )

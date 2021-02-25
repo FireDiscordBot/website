@@ -1,3 +1,4 @@
+import Skeleton from "@material-ui/lab/Skeleton"
 import * as React from "react"
 import clsx from "clsx"
 import { green } from "@material-ui/core/colors"
@@ -39,18 +40,27 @@ const useStyles = makeStyles((theme) =>
 )
 
 type Props = {
-  guild: UserGuild
+  guild?: UserGuild
   onClickToggle: (guild: UserGuild) => void
 }
 
 const UserGuildCard = ({ guild, onClickToggle }: Props) => {
   const classes = useStyles()
   const avatar = React.useMemo(() => {
+    if (!guild) {
+      return (
+        <Skeleton animation="wave">
+          <Avatar />
+        </Skeleton>
+      )
+    }
+
     const guildIcon = getGuildIcon(guild)
     return guildIcon.type == "text" ? <Avatar>{guildIcon.value}</Avatar> : <Avatar src={guildIcon.value} />
   }, [guild])
 
   const onClick = (event: React.MouseEvent) => {
+    if (!guild) return
     event.preventDefault()
     onClickToggle(guild)
   }
@@ -58,21 +68,23 @@ const UserGuildCard = ({ guild, onClickToggle }: Props) => {
   return (
     <Card
       className={clsx(classes.card, {
-        [classes.premiumCard]: guild.premium,
+        [classes.premiumCard]: guild?.premium ?? false,
       })}
     >
       <CardContent className={classes.content}>
         {avatar}
         <div className={classes.cardText}>
           <Typography variant="h6" component="h2" noWrap>
-            {guild.name}
+            {guild ? guild.name : <Skeleton width={50} animation="wave" />}
           </Typography>
-          <Typography variant="caption">Premium: {guild.premium ? "Yes" : "No"}</Typography>
+          <Typography variant="caption">
+            {guild ? `Premium: ${guild.premium ? "Yes" : "No"}` : <Skeleton width={50} animation="wave" />}
+          </Typography>
         </div>
       </CardContent>
       <CardActions className={classes.actions}>
         <Button color="default" size="small" onClick={onClick}>
-          Toggle
+          {guild ? "Toggle" : <Skeleton width={40} animation="wave" />}
         </Button>
       </CardActions>
     </Card>

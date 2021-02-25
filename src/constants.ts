@@ -3,6 +3,7 @@ import { DefaultSeoProps } from "next-seo"
 export const fire = {
   defaultPrefix: "$",
   requiredPermissions: "1007021303",
+  requiredScopes: "bot applications.commands",
   githubUrl: "https://github.com/FireDiscordBot/bot",
   aetherApiUrl: process.env.NEXT_PUBLIC_AETHER_API_URL ?? "Not provided",
   realtimeStatsUrl: process.env.NEXT_PUBLIC_AETHER_WS_API_URL ?? "Not provided",
@@ -15,15 +16,15 @@ export const discord = {
     return (
       `https://discord.com/oauth2/authorize?client_id=${this.clientId}` +
       `&permissions=${fire.requiredPermissions}` +
-      "&scope=bot%20applications.commands" +
+      `&scope=${encodeURIComponent(fire.requiredScopes)}` +
       (guildId ? `&guild_id=${guildId}` : "")
     )
   },
 }
 
 export const stripe = {
-  publicKey: process.env.NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY ?? "Not provided",
-  secretKey: process.env.STRIPE_API_SECRET_KEY ?? "Not provided",
+  publicKey: process.env.NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY,
+  secretKey: process.env.STRIPE_API_SECRET_KEY,
 }
 
 export const defaultSeoConfig: DefaultSeoProps = {

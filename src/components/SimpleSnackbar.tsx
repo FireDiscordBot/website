@@ -8,26 +8,31 @@ type Props = {
   severity?: Color
   horizontal?: SnackbarOrigin["horizontal"]
   vertical?: SnackbarOrigin["vertical"]
-  onClose?: () => void
+  onFinishCloseAnimation?: () => void
 }
 
-const SimpleSnackbar = ({ message, severity, autoHideDuration, horizontal, vertical, onClose }: Props) => {
+const SimpleSnackbar = ({
+  message,
+  severity,
+  autoHideDuration,
+  horizontal,
+  vertical,
+  onFinishCloseAnimation,
+}: Props) => {
   const [open, setOpen] = React.useState(false)
 
   React.useEffect(() => {
-    setOpen(!!message)
+    setOpen(message != null)
   }, [message])
 
   const handleClose = (_: React.SyntheticEvent, reason?: SnackbarCloseReason) => {
-    if (reason != "clickaway") {
-      setOpen(false)
-      onClose && onClose()
-    }
+    if (reason != "clickaway") setOpen(false)
   }
 
   return (
     <Snackbar
       onClose={handleClose}
+      onExited={onFinishCloseAnimation}
       open={open}
       autoHideDuration={autoHideDuration}
       message={!severity ? message : undefined}
