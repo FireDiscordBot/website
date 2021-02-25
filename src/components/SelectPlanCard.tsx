@@ -34,7 +34,13 @@ const SelectPlanCard = ({ open, onClose, onClickPlan, loadPlans }: Props) => {
               <ListItemAvatar>
                 <Avatar src={plan.images[0]} />
               </ListItemAvatar>
-              <ListItemText primary={plan.name} secondary={`${plan.currency} ${formatNumber(plan.amount / 100)}`} />
+              <ListItemText
+                primary={plan.name}
+                secondary={`${formatNumber(plan.amount / 100, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })} ${plan.currency.toUpperCase()}`}
+              />
             </ListItem>
           )
         })}
