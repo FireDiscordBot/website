@@ -1,7 +1,6 @@
 import * as React from "react"
 import Link from "next/link"
 import Box from "@material-ui/core/Box"
-import Paper from "@material-ui/core/Paper"
 import Button from "@material-ui/core/Button"
 import Avatar from "@material-ui/core/Avatar"
 import Typography from "@material-ui/core/Typography"
@@ -11,6 +10,8 @@ import CardActions from "@material-ui/core/CardActions"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
 import Skeleton from "@material-ui/lab/Skeleton"
 
+import fetcher, { createErrorResponse } from "@/utils/fetcher"
+import { PostCollectData } from "@/types"
 import SimpleSnackbar from "@/components/SimpleSnackbar"
 import UserPageLayout from "@/layouts/user-page"
 import Loading from "@/components/loading"
@@ -21,6 +22,12 @@ import { parseFlags } from "@/utils/discord"
 
 const useStyles = makeStyles((theme) =>
   createStyles({
+    mb: {
+      marginBottom: theme.spacing(2),
+    },
+    flex: {
+      display: "flex",
+    },
     avatar: {
       width: "80px",
       height: "80px",
@@ -54,14 +61,35 @@ const AccountPage = () => {
   const flags = parseFlags(session.user.publicFlags, session.user.premiumType)
   const flagsElements = flags.map((flag, index) => <DiscordFlagImage flag={flag} key={index} />)
 
+  const onClickRequestData = async (event: React.MouseEvent) => {
+    event.preventDefault()
+
+    let json: PostCollectData
+    try {
+      json = await fetcher<PostCollectData>("/api/user/collect-data", {
+        method: "POST",
+      })
+    } catch (e) {
+      setErrorMessage(createErrorResponse(e).error)
+      return
+    }
+
+    const el = document.createElement("a")
+    el.href = json.url
+    el.download = "fire-data-archive.zip"
+    el.target = "_blank"
+    el.click()
+    el.remove()
+  }
+
   return (
     <UserPageLayout title="Account" noindex nofollow>
       <Typography variant="h4" gutterBottom>
         General info
       </Typography>
 
-      <Paper>
-        <Box padding={2} display="flex" mb={2}>
+      <Card className={classes.mb}>
+        <CardContent className={classes.flex}>
           <Avatar src={session.user.image} className={classes.avatar} />
           <Box display="flex" flexDirection="column" mr={0} ml={2} mt="auto" mb="auto">
             <div>
@@ -74,8 +102,13 @@ const AccountPage = () => {
             </div>
             <div className={classes.flags}>{flagsElements}</div>
           </Box>
-        </Box>
-      </Paper>
+        </CardContent>
+        <CardActions>
+          <Button color="primary" onClick={onClickRequestData}>
+            Request collected data
+          </Button>
+        </CardActions>
+      </Card>
 
       <Typography variant="h4" gutterBottom>
         Your plan

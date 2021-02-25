@@ -51,3 +51,5 @@ export type PostBillingPortalResponse = { url: string }
 export type GetGuildsResponse = UserGuild[]
 
 export type PutTogglePremiumGuildResponse = string[]
+
+export type PostCollectData = { url: string }
