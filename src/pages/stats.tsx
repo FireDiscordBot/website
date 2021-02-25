@@ -12,7 +12,7 @@ import StorageIcon from "@material-ui/icons/Storage"
 
 import fetcher from "@/utils/fetcher"
 import ClusterStatsDialog from "@/components/ClusterStatsDialog"
-import Default from "@/layouts/default"
+import DefaultLayout from "@/layouts/default"
 import { fire } from "@/constants"
 import { ClusterStats, FireStats } from "@/interfaces/aether"
 import { formatBytes, formatNumber } from "@/utils/formatting"
@@ -89,7 +89,7 @@ const StatsPage = ({ initialFireStats }: Props) => {
   }, [findClusterStats, fireStats, selectedClusterStats])
 
   return (
-    <Default title="Stats">
+    <DefaultLayout title="Stats">
       <Container>
         <Grid container spacing={4} justify="center" className={classes.chartsContainer}>
           <Grid item xs={6} sm={5} md={3}>
@@ -148,7 +148,7 @@ const StatsPage = ({ initialFireStats }: Props) => {
       {typeof selectedClusterStats != "undefined" && (
         <ClusterStatsDialog clusterStats={selectedClusterStats} open={true} onClose={onCloseClusterDialog} />
       )}
-    </Default>
+    </DefaultLayout>
   )
 }
 

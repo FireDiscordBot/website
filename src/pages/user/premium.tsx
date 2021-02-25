@@ -6,8 +6,8 @@ import Box from "@material-ui/core/Box"
 import Typography from "@material-ui/core/Typography"
 import LinearProgress from "@material-ui/core/LinearProgress"
 
-import fetcher, { NetworkError } from "@/utils/fetcher"
-import { ApiErrorResponse, PostSubscriptionResponse } from "@/types"
+import fetcher, { createErrorResponse } from "@/utils/fetcher"
+import { PostSubscriptionResponse } from "@/types"
 import SimpleSnackbar from "@/components/SimpleSnackbar"
 import { Plan } from "@/interfaces/fire"
 import SelectPlanCard from "@/components/SelectPlanCard"
@@ -75,12 +75,7 @@ const PremiumPage = () => {
         method: "PUT",
       })
     } catch (e) {
-      let message = ""
-      if (e instanceof NetworkError && typeof e.data == "object") {
-        const response = e.data as ApiErrorResponse | null
-        message = response?.error ?? "Internal Server Error"
-      }
-      setErrorMessage(message)
+      setErrorMessage(createErrorResponse(e).error)
       return
     }
 
@@ -109,12 +104,7 @@ const PremiumPage = () => {
         method: "POST",
       })
     } catch (e) {
-      let message = ""
-      if (e instanceof NetworkError && typeof e.data == "object") {
-        const response = e.data as ApiErrorResponse | null
-        message = response?.error ?? "Internal Server Error"
-      }
-      setErrorMessage(message)
+      setErrorMessage(createErrorResponse(e).error)
       return
     }
 

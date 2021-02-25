@@ -1,9 +1,9 @@
-import { getReasonPhrase, StatusCodes } from "http-status-codes"
+import { StatusCodes } from "http-status-codes"
 
+import { createErrorResponse } from "@/utils/fetcher"
 import { toggleGuildPremium } from "@/lib/aether"
-import { ApiErrorResponse, AuthenticatedApiHandler, PutTogglePremiumGuildResponse } from "@/types"
+import { AuthenticatedApiHandler, PutTogglePremiumGuildResponse } from "@/types"
 import { error, withSession } from "@/utils/api-handler-utils"
-import { NetworkError } from "@/utils/fetcher"
 
 const handler: AuthenticatedApiHandler<PutTogglePremiumGuildResponse> = async (session, req, res) => {
   if (req.method != "PUT") {
@@ -23,12 +23,8 @@ const handler: AuthenticatedApiHandler<PutTogglePremiumGuildResponse> = async (s
 
     res.json(premiumGuilds)
   } catch (e) {
-    if (e instanceof NetworkError && typeof e.data == "object") {
-      const response = e.data as ApiErrorResponse | null
-      error(res, e.code, response?.error ?? getReasonPhrase(e.code))
-    } else {
-      error(res, StatusCodes.INTERNAL_SERVER_ERROR)
-    }
+    const errorResponse = createErrorResponse(e)
+    error(res, errorResponse.code, errorResponse.error)
   }
 }
 

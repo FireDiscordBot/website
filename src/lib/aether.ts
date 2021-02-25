@@ -1,8 +1,8 @@
 import { fire } from "@/constants"
 import fetcher from "@/utils/fetcher"
 
-const requestWithAuth = (accessToken: string, path: string, method?: string) =>
-  fetcher(`${fire.aetherApiUrl}/${path}`, {
+const requestWithAuth = <R = never>(accessToken: string, path: string, method?: string) =>
+  fetcher<R>(`${fire.aetherApiUrl}/${path}`, {
     method: method ?? "GET",
     headers: {
       "User-Agent": "Fire Website",
@@ -11,26 +11,33 @@ const requestWithAuth = (accessToken: string, path: string, method?: string) =>
   })
 
 export const fetchCustomerId = async (accessToken: string) => {
-  const json = await requestWithAuth(accessToken, `stripe/customer`)
-  return json.id as string
+  const json = await requestWithAuth<{ id: string }>(accessToken, `stripe/customer`)
+  return json.id
 }
 
 export const createStripeCheckoutSession = async (accessToken: string, servers: number) => {
-  const json = await requestWithAuth(accessToken, `stripe/sessions/checkout?servers=${servers}`, "POST")
-  return json.sessionId as string
+  const json = await requestWithAuth<{ sessionId: string }>(
+    accessToken,
+    `stripe/sessions/checkout?servers=${servers}`,
+    "POST",
+  )
+  return json.sessionId
 }
 
 export const createStripePortalSession = async (accessToken: string) => {
-  const json = await requestWithAuth(accessToken, `stripe/sessions/billing`, "POST")
-  return json.url as string
+  const json = await requestWithAuth<{ url: string }>(accessToken, `stripe/sessions/billing`, "POST")
+  return json.url
 }
 
 export const fetchPremiumGuilds = async (accessToken: string) => {
-  const json = await requestWithAuth(accessToken, `guilds/premium`)
-  return json as string[]
+  return await requestWithAuth<string[]>(accessToken, `guilds/premium`)
 }
 
 export const toggleGuildPremium = async (accessToken: string, guildId: string) => {
-  const json = await requestWithAuth(accessToken, `guilds/${guildId}/premium`, "PUT")
-  return json as string[]
+  return await requestWithAuth<string[]>(accessToken, `guilds/${guildId}/premium`, "PUT")
+}
+
+export const createDataArchive = async (accessToken: string) => {
+  const json = await requestWithAuth<{ url: string }>(accessToken, `data/collect`, "POST")
+  return json.url
 }

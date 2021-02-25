@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes"
 import { Stripe } from "stripe"
 
+import { createErrorResponse } from "@/utils/fetcher"
 import stripe from "@/api/server-stripe"
 import { createStripeCheckoutSession, fetchCustomerId } from "@/lib/aether"
 import { AuthenticatedApiHandler, GetSubscriptionResponse, PostSubscriptionResponse } from "@/types"
@@ -21,7 +22,16 @@ const subscriptionComparator = (first: Stripe.Subscription, second: Stripe.Subsc
 }
 
 const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _req, res) => {
-  const customerId = await fetchCustomerId(session.accessToken)
+  let customerId: string
+
+  try {
+    customerId = await fetchCustomerId(session.accessToken)
+  } catch (e) {
+    const errorResponse = createErrorResponse(e)
+    error(res, errorResponse.code, errorResponse.error)
+    return
+  }
+
   const response = await stripe.subscriptions.list({
     customer: customerId,
     expand: ["data.plan.product"],
@@ -29,11 +39,6 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _r
 
   const subscriptions = response.data.sort(subscriptionComparator)
   const hasSubscription = subscriptions.some((subscription) => ["trialing", "active"].includes(subscription.status))
-
-  // if (1 > 0) {
-  //   error(res, StatusCodes.BAD_GATEWAY)
-  //   return
-  // }
 
   if (!hasSubscription) {
     res.json({

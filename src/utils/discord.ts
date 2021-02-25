@@ -47,7 +47,7 @@ export const getGuildIcon = (guild: UserGuild) => {
 export const parseFlags = (flagsValue: number, premiumType: number) => {
   const parsedFlags: DiscordFlag[] = []
 
-  if (premiumType != 0) {
+  if (premiumType > 0) {
     const nitroFlag = flags.find((flag) => flag.key === "nitro")
     if (nitroFlag) parsedFlags.push(nitroFlag)
   }
