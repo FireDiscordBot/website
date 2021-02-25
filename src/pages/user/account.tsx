@@ -10,6 +10,7 @@ import CardActions from "@material-ui/core/CardActions"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
 import Skeleton from "@material-ui/lab/Skeleton"
 
+import { openUrl } from "@/utils/open-url"
 import fetcher, { createErrorResponse } from "@/utils/fetcher"
 import { PostCollectData } from "@/types"
 import SimpleSnackbar from "@/components/SimpleSnackbar"
@@ -74,12 +75,7 @@ const AccountPage = () => {
       return
     }
 
-    const el = document.createElement("a")
-    el.href = json.url
-    el.download = "fire-data-archive.zip"
-    el.target = "_blank"
-    el.click()
-    el.remove()
+    openUrl(json.url, true, true)
   }
 
   return (

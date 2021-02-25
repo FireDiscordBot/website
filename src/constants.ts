@@ -2,6 +2,7 @@ import { DefaultSeoProps } from "next-seo"
 
 export const fire = {
   defaultPrefix: "$",
+  requiredPermissions: "1007021303",
   githubUrl: "https://github.com/FireDiscordBot/bot",
   aetherApiUrl: process.env.NEXT_PUBLIC_AETHER_API_URL ?? "Not provided",
   realtimeStatsUrl: process.env.NEXT_PUBLIC_AETHER_WS_API_URL ?? "Not provided",
@@ -10,8 +11,13 @@ export const fire = {
 export const discord = {
   clientId: process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID ?? "0",
   clientSecret: process.env.DISCORD_CLIENT_SECRET ?? "Not provided",
-  get inviteUrl() {
-    return `https://discord.com/oauth2/authorize?client_id=${this.clientId}&permissions=1007021303&scope=bot%20applications.commands`
+  inviteUrl(guildId?: string) {
+    return (
+      `https://discord.com/oauth2/authorize?client_id=${this.clientId}` +
+      `&permissions=${fire.requiredPermissions}` +
+      "&scope=bot%20applications.commands" +
+      (guildId ? `&guild_id=${guildId}` : "")
+    )
   },
 }
 

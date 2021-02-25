@@ -86,7 +86,7 @@ const IndexPage = () => {
               </Typography>
             </Grid>
             <Grid item xs={12} className={classes.buttonsGridItem}>
-              <Button variant="contained" color="primary" className={classes.button} href={discord.inviteUrl}>
+              <Button variant="contained" color="primary" className={classes.button} href={discord.inviteUrl()}>
                 Invite
               </Button>
               <Button

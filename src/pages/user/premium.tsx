@@ -6,6 +6,8 @@ import Box from "@material-ui/core/Box"
 import Typography from "@material-ui/core/Typography"
 import LinearProgress from "@material-ui/core/LinearProgress"
 
+import { openUrl } from "@/utils/open-url"
+import { discord } from "@/constants"
 import fetcher, { createErrorResponse } from "@/utils/fetcher"
 import { PostSubscriptionResponse } from "@/types"
 import SimpleSnackbar from "@/components/SimpleSnackbar"
@@ -75,7 +77,12 @@ const PremiumPage = () => {
         method: "PUT",
       })
     } catch (e) {
-      setErrorMessage(createErrorResponse(e).error)
+      const errorResponse = createErrorResponse(e)
+      if (errorResponse.code == 404) {
+        openUrl(discord.inviteUrl(guild.id), true)
+      } else {
+        setErrorMessage(errorResponse.error)
+      }
       return
     }
 
