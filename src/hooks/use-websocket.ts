@@ -1,6 +1,7 @@
 import { EventEmitter } from "events"
 
 import * as React from "react"
+import { getSession } from "next-auth/client"
 
 import { MessageUtil } from "@/lib/ws/message-util"
 import { WebsiteEvents } from "@/interfaces/aether"
@@ -21,8 +22,12 @@ const useWebsocket = (url: string, emitter: EventEmitter) => {
       )
       emitter.emit(WebsiteEvents[decoded.type], decoded.data)
     }
-    const handler = new EventHandler().setWebsocket(ws)
-    setHandler(handler)
+    const initHandler = async () => {
+      const session = await getSession()
+      const handler = new EventHandler(session).setWebsocket(ws)
+      setHandler(handler)
+    }
+    initHandler()
 
     return () => ws.close()
   }, [emitter, url])
