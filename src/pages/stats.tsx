@@ -66,6 +66,7 @@ const StatsPage = ({ initialFireStats }: Props) => {
   const onCloseClusterDialog = () => setSelectedClusterStats(undefined)
 
   React.useEffect(() => {
+    emitter.removeAllListeners("REALTIME_STATS")
     emitter.on("REALTIME_STATS", setFireStats)
   }, [])
 
