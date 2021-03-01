@@ -27,20 +27,20 @@ export class EventHandler {
     this.websocket = websocket
     this.websocket.onopen = () => {
       console.info(
-        `%c WS %c Websocket connected to ${this.websocket?.url} `,
+        `%c WS %c Websocket connected! `,
         "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
+        this.websocket,
       )
       this.identify()
       while (this.queue?.length) this.send(this.queue.pop())
     }
     this.websocket.onclose = (event) => {
       console.error(
-        `%c WS %c Websocket closed with code ${event.code}${
-          event.reason ? " and reason " + event.reason : ""
-        }. Attempting to reconnect in 2.5s. `,
+        `%c WS %c Websocket closed! `,
         "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
+        event,
       )
       this.identified = false
       try {
