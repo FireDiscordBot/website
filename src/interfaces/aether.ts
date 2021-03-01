@@ -89,4 +89,5 @@ export enum WebsiteEvents {
   SUBSCRIBE,
   REALTIME_STATS,
   COMMANDS_UPDATE,
+  DISCOVERY_UPDATE,
 }
