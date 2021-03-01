@@ -27,7 +27,7 @@ export class EventHandler {
     this.websocket = websocket
     this.websocket.onopen = () => {
       console.info(
-        `%c WS %c Websocket connected to ${this.websocket?.url}`,
+        `%c WS %c Websocket connected to ${this.websocket?.url} `,
         "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
       )
@@ -38,7 +38,7 @@ export class EventHandler {
       console.error(
         `%c WS %c Websocket closed with code ${event.code}${
           event.reason ? " and reason " + event.reason : ""
-        }. Attempting to reconnect in 2.5s.`,
+        }. Attempting to reconnect in 2.5s. `,
         "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
       )
@@ -46,7 +46,7 @@ export class EventHandler {
       try {
         sleep(2500).then(() => {
           console.info(
-            "%c WS %c Reconnecting...",
+            "%c WS %c Reconnecting... ",
             "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
             "background: #353A47; color: white; border-radius: 0 3px 3px 0",
           )
@@ -55,7 +55,7 @@ export class EventHandler {
         })
       } catch {
         console.error(
-          "%c WS %c Websocket failed to reconnect!",
+          "%c WS %c Websocket failed to reconnect! ",
           "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
           "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         )
@@ -93,7 +93,7 @@ export class EventHandler {
       return message && this.queue.push(message)
     if (process.env.NODE_ENV == "development") (globalThis as { [key: string]: unknown }).eventHandler = this
     console.debug(
-      `%c WS %c Outgoing %c ${WebsiteEvents[message.type]}`,
+      `%c WS %c Outgoing %c ${WebsiteEvents[message.type]} `,
       "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
       "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
       "background: #353A47; color: white; border-radius: 0 3px 3px 0",

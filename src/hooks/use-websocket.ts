@@ -15,7 +15,7 @@ const useWebsocket = (url: string, emitter: EventEmitter) => {
       const decoded = MessageUtil.decode(message.data)
       if (!decoded) return
       console.debug(
-        `%c WS %c Incoming %c ${WebsiteEvents[decoded.type]}`,
+        `%c WS %c Incoming %c ${WebsiteEvents[decoded.type]} `,
         "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
         "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
