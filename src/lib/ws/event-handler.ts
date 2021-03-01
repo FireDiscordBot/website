@@ -19,6 +19,7 @@ export class EventHandler {
       this.identify()
       while (this.queue?.length) this.send(this.queue.pop())
     }
+    return this
   }
 
   handleSubscribe(route: string) {

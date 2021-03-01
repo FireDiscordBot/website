@@ -21,7 +21,6 @@ if (isBrowser()) {
 }
 
 export const emitter = new Emitter()
-const handler = new EventHandler()
 
 function MyApp(props: AppProps) {
   const { Component, pageProps } = props
@@ -31,9 +30,8 @@ function MyApp(props: AppProps) {
     jssStyles?.parentElement?.removeChild(jssStyles)
   }, [])
 
-  const [websocket] = useWebsocket(fire.websiteSocketUrl, emitter)
-  if (websocket) {
-    handler.setWebsocket(websocket)
+  const [handler] = useWebsocket(fire.websiteSocketUrl, emitter)
+  if (handler) {
     initHandler(handler)
   }
 

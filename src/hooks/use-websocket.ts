@@ -4,9 +4,10 @@ import * as React from "react"
 
 import { MessageUtil } from "@/lib/ws/message-util"
 import { WebsiteEvents } from "@/interfaces/aether"
+import { EventHandler } from "@/lib/ws/event-handler"
 
 const useWebsocket = (url: string, emitter: EventEmitter) => {
-  const [ws, setWebSocket] = React.useState<WebSocket | null>(null)
+  const [handler, setHandler] = React.useState<EventHandler | null>(null)
   React.useEffect(() => {
     const ws = new WebSocket(url)
     ws.onmessage = (message) => {
@@ -20,12 +21,13 @@ const useWebsocket = (url: string, emitter: EventEmitter) => {
       )
       emitter.emit(WebsiteEvents[decoded.type], decoded.data)
     }
-    setWebSocket(ws)
+    const handler = new EventHandler().setWebsocket(ws)
+    setHandler(handler)
 
     return () => ws.close()
   }, [emitter, url])
 
-  return [ws]
+  return [handler]
 }
 
 export default useWebsocket
