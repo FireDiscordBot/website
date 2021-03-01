@@ -81,3 +81,9 @@ export type DiscoverableGuild = {
 export type UserGuild = DiscordGuild & {
   premium: boolean
 }
+
+export enum WebsiteEvents {
+  IDENTIFY_CLIENT,
+  SUBSCRIBE,
+  REALTIME_STATS,
+}
