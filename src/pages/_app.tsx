@@ -7,16 +7,20 @@ import { SWRConfig } from "swr"
 import { ThemeProvider } from "@material-ui/core/styles"
 import CssBaseline from "@material-ui/core/CssBaseline"
 
-import { defaultSeoConfig } from "@/constants"
+import { defaultSeoConfig, fire } from "@/constants"
 import fetcher from "@/utils/fetcher"
 import theme from "@/theme"
 import { isBrowser } from "@/utils/is-browser"
-
 import "../nprogress.css"
+import useWebsocket from "@/hooks/use-websocket"
+import { Emitter } from "@/lib/ws/socket-emitter"
+import { EventHandler } from "@/lib/ws/event-handler"
 
 if (isBrowser()) {
   import("@/utils/load-nprogress")
 }
+
+export const emitter = new Emitter()
 
 function MyApp(props: AppProps) {
   const { Component, pageProps } = props
@@ -25,6 +29,9 @@ function MyApp(props: AppProps) {
     const jssStyles = document.querySelector("#jss-server-side")
     jssStyles?.parentElement?.removeChild(jssStyles)
   }, [])
+
+  const [websocket] = useWebsocket(fire.websiteSocketUrl, emitter)
+  if (websocket) initHandler(new EventHandler(websocket))
 
   return (
     <>
@@ -43,6 +50,11 @@ function MyApp(props: AppProps) {
       </ThemeProvider>
     </>
   )
+}
+
+const initHandler = (handler: EventHandler) => {
+  emitter.removeAllListeners("SUBSCRIBE")
+  emitter.on("SUBSCRIBE", (route) => handler.handleSubscribe(route))
 }
 
 export default MyApp
