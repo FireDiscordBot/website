@@ -1,7 +1,7 @@
 import * as React from "react"
 import Head from "next/head"
 import { AppProps } from "next/app"
-import { Provider as SessionProvider } from "next-auth/client"
+import { getSession, Provider as SessionProvider } from "next-auth/client"
 import { DefaultSeo } from "next-seo"
 import { SWRConfig } from "swr"
 import { ThemeProvider } from "@material-ui/core/styles"
@@ -54,7 +54,11 @@ function MyApp(props: AppProps) {
   )
 }
 
-const initHandler = (handler: EventHandler) => {
+const initHandler = async (handler: EventHandler) => {
+  if (!handler.session) {
+    const session = await getSession()
+    if (session) handler.session = session
+  }
   emitter.removeAllListeners("SUBSCRIBE")
   emitter.on("SUBSCRIBE", (route) => {
     handler.handleSubscribe(route)
