@@ -29,7 +29,7 @@ export class EventHandler {
       console.info(
         `%c WS %c Websocket connected to ${this.websocket?.url}`,
         "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
-        "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
+        "background: #353A47; color: white; border-radius: 0 3px 3px 0",
       )
       this.identify()
       while (this.queue?.length) this.send(this.queue.pop())
@@ -40,7 +40,7 @@ export class EventHandler {
           event.reason ? " and reason " + event.reason : ""
         }. Attempting to reconnect in 2.5s.`,
         "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
-        "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
+        "background: #353A47; color: white; border-radius: 0 3px 3px 0",
       )
       this.identified = false
       try {
@@ -48,7 +48,7 @@ export class EventHandler {
           console.info(
             "%c WS %c Reconnecting...",
             "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
-            "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
+            "background: #353A47; color: white; border-radius: 0 3px 3px 0",
           )
           const ws = new WebSocket(fire.websiteSocketUrl)
           return this.setWebsocket(ws)
@@ -57,7 +57,7 @@ export class EventHandler {
         console.error(
           "%c WS %c Websocket failed to reconnect!",
           "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
-          "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
+          "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         )
       }
     }
@@ -93,9 +93,9 @@ export class EventHandler {
       return message && this.queue.push(message)
     if (process.env.NODE_ENV == "development") (globalThis as { [key: string]: unknown }).eventHandler = this
     console.debug(
-      `%c WS %c ${WebsiteEvents[message.type]}`,
+      `%c WS | Outgoing %c ${WebsiteEvents[message.type]}`,
       "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
-      "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
+      "background: #353A47; color: white; border-radius: 0 3px 3px 0",
       message.data,
     )
     if (this.identified == false && this.session) this.identify()
