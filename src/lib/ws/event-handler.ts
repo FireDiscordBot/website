@@ -1,3 +1,5 @@
+import EventEmitter from "events"
+
 import { getSession } from "next-auth/client"
 
 import { Message } from "./message"
@@ -13,18 +15,42 @@ export class EventHandler {
   heartbeat?: NodeJS.Timeout
   websocket?: WebSocket
   session?: AuthSession
+  emitter: EventEmitter
   subscribed: string
   queue: Message[]
 
-  constructor(session: AuthSession | null) {
+  constructor(session: AuthSession | null, emitter: EventEmitter) {
     if (session) this.session = session
     this.identified = false
+    this.emitter = emitter
     this.subscribed = "/"
     this.queue = []
   }
 
   setWebsocket(websocket: WebSocket) {
+    if (this.websocket) {
+      this.websocket.close(1000, "Reconnecting")
+      delete this.websocket
+    }
     this.websocket = websocket
+    this.websocket.onmessage = (message) => {
+      const decoded = MessageUtil.decode(message.data)
+      if (!decoded)
+        return console.error(
+          "%c WS %c Failed to decode message! ",
+          "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
+          "background: #353A47; color: white; border-radius: 0 3px 3px 0",
+          { data: message.data },
+        )
+      console.debug(
+        `%c WS %c Incoming %c ${WebsiteEvents[decoded.type]} `,
+        "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
+        "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
+        "background: #353A47; color: white; border-radius: 0 3px 3px 0",
+        decoded,
+      )
+      this.emitter.emit(WebsiteEvents[decoded.type], decoded.data)
+    }
     this.websocket.onopen = () => {
       console.info(
         `%c WS %c Websocket connected! `,
@@ -78,7 +104,12 @@ export class EventHandler {
   }
 
   identify() {
+    if (this.identified) return
     this.identified = "identifying"
+    if (this.heartbeat) {
+      clearInterval(this.heartbeat)
+      delete this.heartbeat
+    }
     this.send(
       new Message(WebsiteEvents.IDENTIFY_CLIENT, {
         config: { subscribed: this.subscribed, session: this.session },
@@ -86,6 +117,10 @@ export class EventHandler {
       }),
     )
     this.identified = true
+    setTimeout(() => {
+      if (!this.heartbeat && this.websocket && this.websocket.readyState == this.websocket.OPEN)
+        this.websocket.close(4004, "Did not receive HELLO")
+    }, 5000)
   }
 
   private send(message?: Message) {
