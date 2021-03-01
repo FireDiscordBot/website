@@ -59,10 +59,15 @@ const initHandler = async (handler: EventHandler) => {
     const session = await getSession()
     if (session) handler.session = session
   }
-  emitter.removeAllListeners("SUBSCRIBE")
+  const events = ["SUBSCRIBE", "HELLO"]
+  for (const event of events) emitter.removeAllListeners(event)
   emitter.on("SUBSCRIBE", (route) => {
     handler.handleSubscribe(route)
   })
+  emitter.on("HELLO", ({ d }) => {
+    handler.setHeartbeat(d)
+  })
+  if (!handler.identified) handler.identify()
 }
 
 export default MyApp

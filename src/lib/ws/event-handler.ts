@@ -9,9 +9,10 @@ import { fire } from "@/constants"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 export class EventHandler {
+  identified: "identifying" | boolean
+  heartbeat?: NodeJS.Timeout
   websocket?: WebSocket
   session?: AuthSession
-  identified: "identifying" | boolean
   subscribed: string
   queue: Message[]
 
@@ -67,6 +68,13 @@ export class EventHandler {
     if (route == this.subscribed) return
     this.send(new Message(WebsiteEvents.SUBSCRIBE, { route }))
     this.subscribed = route
+  }
+
+  setHeartbeat(interval: number) {
+    if (this.heartbeat) clearInterval(this.heartbeat)
+    this.heartbeat = setInterval(() => {
+      this.send(new Message(WebsiteEvents.HEARTBEAT, {}))
+    }, interval)
   }
 
   identify() {

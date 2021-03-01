@@ -5,6 +5,7 @@ import { FireStats } from "@/interfaces/aether"
 interface EmitterEvents {
   REALTIME_STATS: (stats: FireStats) => void
   SUBSCRIBE: (route: string) => void
+  HELLO: (hello: { d: number }) => void
 }
 
 export declare interface Emitter {
