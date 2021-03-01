@@ -1,17 +1,23 @@
+import { getSession } from "next-auth/client"
+
 import { Message } from "./message"
 import { MessageUtil } from "./message-util"
 
 import { WebsiteEvents } from "@/interfaces/aether"
 import { AuthSession } from "@/interfaces/auth"
+import { fire } from "@/constants"
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 export class EventHandler {
   websocket?: WebSocket
   session?: AuthSession
+  identified: "identifying" | boolean
   subscribed: string
   queue: Message[]
 
   constructor(session: AuthSession | null) {
     if (session) this.session = session
+    this.identified = false
     this.subscribed = "/"
     this.queue = []
   }
@@ -21,6 +27,33 @@ export class EventHandler {
     this.websocket.onopen = () => {
       this.identify()
       while (this.queue?.length) this.send(this.queue.pop())
+    }
+    this.websocket.onclose = (event) => {
+      console.error(
+        `%c WS %c Websocket closed with code ${event.code}${
+          event.reason ? " and reason " + event.reason : ""
+        }. Attempting to reconnect in 2.5s.`,
+        "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
+        "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
+      )
+      this.identified = false
+      try {
+        sleep(2500).then(() => {
+          console.info(
+            `%c WS %c Reconnecting...`,
+            "background: #9CFC97; color: white; border-radius: 3px 0 0 3px;",
+            "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
+          )
+          const ws = new WebSocket(fire.websiteSocketUrl)
+          return this.setWebsocket(ws)
+        })
+      } catch {
+        console.error(
+          `%c WS %c Websocket failed to reconnect`,
+          "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
+          "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
+        )
+      }
     }
     return this
   }
@@ -32,20 +65,35 @@ export class EventHandler {
   }
 
   identify() {
+    this.identified = "identifying"
     this.send(
-      new Message(WebsiteEvents.IDENTIFY_CLIENT, { config: { subscribed: this.subscribed, session: this.session } }),
+      new Message(WebsiteEvents.IDENTIFY_CLIENT, {
+        config: { subscribed: this.subscribed, session: this.session },
+        env: process.env.NODE_ENV,
+      }),
     )
+    this.identified = true
   }
 
   private send(message?: Message) {
     if (!message || !this.websocket || this.websocket.readyState != this.websocket.OPEN)
       return message && this.queue.push(message)
+    if (process.env.NODE_ENV == "development") (globalThis as { [key: string]: unknown }).eventHandler = this
     console.debug(
       `%c WS %c ${WebsiteEvents[message.type]}`,
       "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
       "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
       message.data,
     )
+    if (this.identified == false && this.session) this.identify()
+    else if (this.identified == false) {
+      getSession().then((session) => {
+        if (session) {
+          this.session = session
+          this.identify()
+        }
+      })
+    }
     this.websocket.send(MessageUtil.encode(message))
   }
 }
