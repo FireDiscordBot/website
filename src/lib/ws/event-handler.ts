@@ -2,13 +2,16 @@ import { Message } from "./message"
 import { MessageUtil } from "./message-util"
 
 import { WebsiteEvents } from "@/interfaces/aether"
+import { AuthSession } from "@/interfaces/auth"
 
 export class EventHandler {
   websocket?: WebSocket
+  session?: AuthSession
   subscribed: string
-  queue: string[]
+  queue: Message[]
 
-  constructor() {
+  constructor(session: AuthSession | null) {
+    if (session) this.session = session
     this.subscribed = "/"
     this.queue = []
   }
@@ -24,23 +27,25 @@ export class EventHandler {
 
   handleSubscribe(route: string) {
     if (route == this.subscribed) return
-    console.debug(
-      `%c WS %c SUBSCRIBE`,
-      "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
-      "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
-      { from: this.subscribed, to: route },
-    )
-    this.send(MessageUtil.encode(new Message(WebsiteEvents.SUBSCRIBE, { route })))
+    this.send(new Message(WebsiteEvents.SUBSCRIBE, { route }))
     this.subscribed = route
   }
 
   identify() {
-    this.send(MessageUtil.encode(new Message(WebsiteEvents.IDENTIFY_CLIENT, { config: { subscribed: "/" } })))
+    this.send(
+      new Message(WebsiteEvents.IDENTIFY_CLIENT, { config: { subscribed: this.subscribed, session: this.session } }),
+    )
   }
 
-  private send(message?: string) {
+  private send(message?: Message) {
     if (!message || !this.websocket || this.websocket.readyState != this.websocket.OPEN)
       return message && this.queue.push(message)
-    this.websocket.send(message)
+    console.debug(
+      `%c WS %c ${WebsiteEvents[message.type]}`,
+      "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
+      "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
+      message.data,
+    )
+    this.websocket.send(MessageUtil.encode(message))
   }
 }
