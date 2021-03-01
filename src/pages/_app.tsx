@@ -64,8 +64,8 @@ const initHandler = async (handler: EventHandler) => {
   emitter.on("SUBSCRIBE", (route) => {
     handler.handleSubscribe(route)
   })
-  emitter.on("HELLO", ({ d }) => {
-    handler.setHeartbeat(d)
+  emitter.on("HELLO", ({ interval }) => {
+    handler.setHeartbeat(interval)
   })
   if (!handler.identified) handler.identify()
 }
