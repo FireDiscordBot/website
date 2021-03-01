@@ -84,6 +84,8 @@ export type UserGuild = DiscordGuild & {
 
 export enum WebsiteEvents {
   IDENTIFY_CLIENT,
+  HELLO,
+  HEARTBEAT,
   SUBSCRIBE,
   REALTIME_STATS,
 }
