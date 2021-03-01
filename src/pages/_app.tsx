@@ -21,6 +21,7 @@ if (isBrowser()) {
 }
 
 export const emitter = new Emitter()
+const handler = new EventHandler()
 
 function MyApp(props: AppProps) {
   const { Component, pageProps } = props
@@ -31,7 +32,10 @@ function MyApp(props: AppProps) {
   }, [])
 
   const [websocket] = useWebsocket(fire.websiteSocketUrl, emitter)
-  if (websocket) initHandler(new EventHandler(websocket))
+  if (websocket) {
+    handler.setWebsocket(websocket)
+    initHandler(handler)
+  }
 
   return (
     <>
@@ -54,7 +58,9 @@ function MyApp(props: AppProps) {
 
 const initHandler = (handler: EventHandler) => {
   emitter.removeAllListeners("SUBSCRIBE")
-  emitter.on("SUBSCRIBE", (route) => handler.handleSubscribe(route))
+  emitter.on("SUBSCRIBE", (route) => {
+    handler.handleSubscribe(route)
+  })
 }
 
 export default MyApp
