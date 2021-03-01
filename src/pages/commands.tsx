@@ -11,6 +11,8 @@ import Grid from "@material-ui/core/Grid"
 import useMediaQuery from "@material-ui/core/useMediaQuery"
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles"
 
+import { emitter } from "./_app"
+
 import fetcher from "@/utils/fetcher"
 import { fire } from "@/constants"
 import { Category } from "@/interfaces/aether"
@@ -32,20 +34,26 @@ const useStyles = makeStyles((theme) =>
 )
 
 type Props = {
-  categories: Category[]
+  initialCategories: Category[]
 }
 
-const CommandsPage = ({ categories }: Props) => {
+const CommandsPage = ({ initialCategories }: Props) => {
   const classes = useStyles()
   const router = useRouter()
 
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"))
   const [prefix, setPrefix] = React.useState(fire.defaultPrefix)
   const [selectedCategoryIndex, setSelectedCategoryIndex] = React.useState<number>(0)
+  const [categories, setCategories] = React.useState<Category[]>(initialCategories)
 
   const onChangeSelectedTab = (_event: React.ChangeEvent<unknown>, index: number) => {
     setSelectedCategoryIndex(index)
   }
+
+  React.useEffect(() => {
+    emitter.removeAllListeners("COMMANDS_UPDATE")
+    emitter.on("COMMANDS_UPDATE", setCategories)
+  }, [categories])
 
   React.useEffect(() => {
     if (typeof router.query.prefix === "string") {
@@ -110,7 +118,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 
   return {
     props: {
-      categories,
+      initialCategories: categories,
     },
     revalidate: 1800,
   }

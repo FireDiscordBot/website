@@ -88,4 +88,5 @@ export enum WebsiteEvents {
   HEARTBEAT,
   SUBSCRIBE,
   REALTIME_STATS,
+  COMMANDS_UPDATE,
 }
