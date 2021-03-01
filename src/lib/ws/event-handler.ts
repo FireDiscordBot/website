@@ -87,12 +87,14 @@ export class EventHandler {
     )
     if (this.identified == false && this.session) this.identify()
     else if (this.identified == false) {
+      this.queue.push(message)
       getSession().then((session) => {
         if (session) {
           this.session = session
           this.identify()
         }
       })
+      return
     }
     this.websocket.send(MessageUtil.encode(message))
   }
