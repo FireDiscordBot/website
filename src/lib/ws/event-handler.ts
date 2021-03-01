@@ -25,6 +25,11 @@ export class EventHandler {
   setWebsocket(websocket: WebSocket) {
     this.websocket = websocket
     this.websocket.onopen = () => {
+      console.info(
+        `%c WS %c Websocket connected to ${this.websocket?.url}`,
+        "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
+        "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
+      )
       this.identify()
       while (this.queue?.length) this.send(this.queue.pop())
     }
@@ -40,8 +45,8 @@ export class EventHandler {
       try {
         sleep(2500).then(() => {
           console.info(
-            `%c WS %c Reconnecting...`,
-            "background: #9CFC97; color: white; border-radius: 3px 0 0 3px;",
+            "%c WS %c Reconnecting...",
+            "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
             "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
           )
           const ws = new WebSocket(fire.websiteSocketUrl)
@@ -49,7 +54,7 @@ export class EventHandler {
         })
       } catch {
         console.error(
-          `%c WS %c Websocket failed to reconnect`,
+          "%c WS %c Websocket failed to reconnect!",
           "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
           "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
         )
