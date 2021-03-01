@@ -24,7 +24,7 @@ export class EventHandler {
       `%c WS %c SUBSCRIBE`,
       "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
       "background: #2F2F2F; color: white; border-radius: 0 3px 3px 0",
-      { route },
+      { old: this.subscribed, new: route },
     )
     this.send(MessageUtil.encode(new Message(WebsiteEvents.SUBSCRIBE, { route })))
     this.subscribed = route
