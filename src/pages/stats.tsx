@@ -10,6 +10,8 @@ import { createStyles, makeStyles } from "@material-ui/core/styles"
 import PeopleIcon from "@material-ui/icons/People"
 import StorageIcon from "@material-ui/icons/Storage"
 
+import { emitter } from "./_app"
+
 import fetcher from "@/utils/fetcher"
 import ClusterStatsDialog from "@/components/ClusterStatsDialog"
 import DefaultLayout from "@/layouts/default"
@@ -18,7 +20,6 @@ import { ClusterStats, FireStats } from "@/interfaces/aether"
 import { formatBytes, formatNumber } from "@/utils/formatting"
 import ClusterCard from "@/components/ClusterCard"
 import CircularProgressCard from "@/components/CircularProgressCard"
-import useWebsocket from "@/hooks/use-websocket"
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -52,7 +53,6 @@ const StatsPage = ({ initialFireStats }: Props) => {
   const classes = useStyles()
   const router = useRouter()
 
-  const [lastWsMessage] = useWebsocket(fire.realtimeStatsUrl)
   const [fireStats, setFireStats] = React.useState<FireStats>(initialFireStats)
   const [selectedClusterStats, setSelectedClusterStats] = React.useState<ClusterStats | undefined>(undefined)
 
@@ -66,14 +66,8 @@ const StatsPage = ({ initialFireStats }: Props) => {
   const onCloseClusterDialog = () => setSelectedClusterStats(undefined)
 
   React.useEffect(() => {
-    if (lastWsMessage != null) {
-      try {
-        setFireStats(JSON.parse(lastWsMessage.data))
-      } catch (e) {
-        console.error("Error trying to parse response from real time stats socket.", e)
-      }
-    }
-  }, [lastWsMessage])
+    emitter.on("REALTIME_STATS", setFireStats)
+  }, [])
 
   React.useEffect(() => {
     if (typeof router.query.cluster === "string") {
