@@ -5,7 +5,7 @@ import { getSession } from "next-auth/client"
 import { Message } from "./message"
 import { MessageUtil } from "./message-util"
 
-import { WebsiteEvents } from "@/interfaces/aether"
+import { DiscoverableGuild, WebsiteEvents } from "@/interfaces/aether"
 import { AuthSession } from "@/interfaces/auth"
 import { fire } from "@/constants"
 
@@ -50,6 +50,8 @@ export class EventHandler {
         decoded,
       )
       this.emitter.emit(WebsiteEvents[decoded.type], decoded.data)
+      // @ts-expect-error This is needed to ensure this[string] works
+      if (WebsiteEvents[decoded.type] in this) this[WebsiteEvents[decoded.type]](decoded.data)
     }
     this.websocket.onopen = () => {
       console.info(
@@ -91,16 +93,16 @@ export class EventHandler {
   }
 
   handleSubscribe(route: string, extra?: unknown) {
-    if (route == this.subscribed) return
+    if (route == this.subscribed && !extra) return
     this.send(new Message(WebsiteEvents.SUBSCRIBE, { route, extra }))
     this.subscribed = route
   }
 
-  setHeartbeat(interval: number) {
+  HELLO(data: { interval: number }) {
     if (this.heartbeat) clearInterval(this.heartbeat)
     this.heartbeat = setInterval(() => {
       this.send(new Message(WebsiteEvents.HEARTBEAT, {}))
-    }, interval)
+    }, data.interval)
   }
 
   identify() {
@@ -120,7 +122,14 @@ export class EventHandler {
     setTimeout(() => {
       if (!this.heartbeat && this.websocket && this.websocket.readyState == this.websocket.OPEN)
         this.websocket.close(4004, "Did not receive HELLO")
-    }, 5000)
+    }, 2000)
+  }
+
+  DISCOVERY_UPDATE(data: DiscoverableGuild[]) {
+    this.handleSubscribe(
+      "/discover",
+      data.map((guild) => guild.id),
+    )
   }
 
   private send(message?: Message) {
