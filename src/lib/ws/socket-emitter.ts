@@ -4,7 +4,7 @@ import { Category, DiscoverableGuild, FireStats } from "@/interfaces/aether"
 
 interface EmitterEvents {
   REALTIME_STATS: (stats: FireStats) => void
-  SUBSCRIBE: (route: string) => void
+  SUBSCRIBE: (route: string, extra?: unknown) => void
   HELLO: (hello: { interval: number }) => void
   COMMANDS_UPDATE: (categories: Category[]) => void
   DISCOVERY_UPDATE: (guilds: DiscoverableGuild[]) => void

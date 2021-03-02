@@ -20,6 +20,13 @@ type Props = {
 const DiscoverPage = ({ initialGuilds }: Props) => {
   const [guilds, setGuilds] = React.useState<DiscoverableGuild[]>(initialGuilds)
 
+  if (guilds.length)
+    emitter.emit(
+      "SUBSCRIBE",
+      "/discover",
+      guilds.map((guild) => guild.id),
+    )
+
   React.useEffect(() => {
     emitter.removeAllListeners("DISCOVERY_UPDATE")
     emitter.on("DISCOVERY_UPDATE", setGuilds)

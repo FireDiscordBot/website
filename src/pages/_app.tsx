@@ -61,8 +61,8 @@ const initHandler = async (handler: EventHandler) => {
   }
   const events = ["SUBSCRIBE", "HELLO"]
   for (const event of events) emitter.removeAllListeners(event)
-  emitter.on("SUBSCRIBE", (route) => {
-    handler.handleSubscribe(route)
+  emitter.on("SUBSCRIBE", (route, extra) => {
+    handler.handleSubscribe(route, extra)
   })
   emitter.on("HELLO", ({ interval }) => {
     handler.setHeartbeat(interval)

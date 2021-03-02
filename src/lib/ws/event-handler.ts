@@ -90,9 +90,9 @@ export class EventHandler {
     return this
   }
 
-  handleSubscribe(route: string) {
+  handleSubscribe(route: string, extra?: unknown) {
     if (route == this.subscribed) return
-    this.send(new Message(WebsiteEvents.SUBSCRIBE, { route }))
+    this.send(new Message(WebsiteEvents.SUBSCRIBE, { route, extra }))
     this.subscribed = route
   }
 
