@@ -78,16 +78,34 @@ export class EventHandler {
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         event,
       )
-      this.emitter.emit("NOTIFICATION", {
-        text: "Websocket error occurred",
-        severity: "error",
-        horizontal: "right",
-        vertical: "top",
-        autoHideDuration: 5000,
-      })
+      if (event.code == 4015)
+        this.emitter.emit("NOTIFICATION", {
+          text: "Connected to websocket in another session",
+          severity: "error",
+          horizontal: "right",
+          vertical: "top",
+          autoHideDuration: 15000,
+        })
+      else if (event.code == 4016)
+        this.emitter.emit("NOTIFICATION", {
+          text: "Connected to websocket from another location",
+          severity: "error",
+          horizontal: "right",
+          vertical: "top",
+          autoHideDuration: 15000,
+        })
+      else
+        this.emitter.emit("NOTIFICATION", {
+          text: "Websocket error occurred",
+          severity: "error",
+          horizontal: "right",
+          vertical: "top",
+          autoHideDuration: 5000,
+        })
       this.identified = false
       // cannot recover from codes below
-      if (event.code == 1013 || event.code == 1008 || event.code == 4001 || event.code == 4015) return
+      if (event.code == 1013 || event.code == 1008 || event.code == 4001 || event.code == 4015 || event.code == 4016)
+        return
       try {
         sleep(2500).then(() => {
           console.info(
