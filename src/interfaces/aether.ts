@@ -90,4 +90,13 @@ export enum WebsiteEvents {
   REALTIME_STATS,
   COMMANDS_UPDATE,
   DISCOVERY_UPDATE,
+  NOTIFICATION,
+}
+
+export interface Notification {
+  text: string
+  severity: "success" | "info" | "warning" | "error"
+  horizontal: "left" | "right" | "center"
+  vertical: "top" | "bottom"
+  autoHideDuration: number
 }

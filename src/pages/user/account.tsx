@@ -10,10 +10,11 @@ import CardActions from "@material-ui/core/CardActions"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
 import Skeleton from "@material-ui/lab/Skeleton"
 
+import { emitter } from "../_app"
+
 import { openUrl } from "@/utils/open-url"
 import fetcher, { createErrorResponse } from "@/utils/fetcher"
 import { PostCollectData } from "@/types"
-import SimpleSnackbar from "@/components/SimpleSnackbar"
 import UserPageLayout from "@/layouts/user-page"
 import Loading from "@/components/loading"
 import DiscordFlagImage from "@/components/DiscordFlagImage"
@@ -49,7 +50,14 @@ const AccountPage = () => {
   const classes = useStyles()
   const [session, loading] = useSession({ redirectTo: "/" })
   const { subscription, isLoading, error } = useCurrentSubscription(session != null && !loading)
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
+  const setErrorMessage = (text: string) =>
+    emitter.emit("NOTIFICATION", {
+      text,
+      severity: "error",
+      horizontal: "right",
+      vertical: "top",
+      autoHideDuration: 5000,
+    })
 
   React.useEffect(() => {
     setErrorMessage(error?.message)
@@ -122,14 +130,6 @@ const AccountPage = () => {
           </Link>
         </CardActions>
       </Card>
-
-      <SimpleSnackbar
-        message={errorMessage}
-        severity="error"
-        horizontal="right"
-        vertical="top"
-        autoHideDuration={5000}
-      />
     </UserPageLayout>
   )
 }

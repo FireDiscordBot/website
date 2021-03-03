@@ -15,6 +15,8 @@ import "../nprogress.css"
 import useWebsocket from "@/hooks/use-websocket"
 import { Emitter } from "@/lib/ws/socket-emitter"
 import { EventHandler } from "@/lib/ws/event-handler"
+import SimpleSnackbar from "@/components/SimpleSnackbar"
+import { Notification } from "@/interfaces/aether"
 
 if (isBrowser()) {
   import("@/utils/load-nprogress")
@@ -24,6 +26,7 @@ export const emitter = new Emitter()
 
 function MyApp(props: AppProps) {
   const { Component, pageProps } = props
+  const [notification, setNotification] = React.useState<Notification | null>(null)
 
   React.useEffect(() => {
     const jssStyles = document.querySelector("#jss-server-side")
@@ -34,6 +37,11 @@ function MyApp(props: AppProps) {
   if (handler) {
     initHandler(handler)
   }
+
+  emitter.removeAllListeners("NOTIFICATION")
+  emitter.on("NOTIFICATION", setNotification)
+
+  const onFinishCloseAnimation = () => setNotification(null)
 
   return (
     <>
@@ -47,6 +55,14 @@ function MyApp(props: AppProps) {
           <SessionProvider session={pageProps.session}>
             <CssBaseline />
             <Component {...pageProps} />
+            <SimpleSnackbar
+              message={notification?.text}
+              severity={notification?.severity}
+              horizontal={notification?.horizontal}
+              vertical={notification?.vertical}
+              autoHideDuration={notification?.autoHideDuration}
+              onFinishCloseAnimation={onFinishCloseAnimation}
+            />
           </SessionProvider>
         </SWRConfig>
       </ThemeProvider>

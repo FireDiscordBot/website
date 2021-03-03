@@ -5,11 +5,12 @@ import Grid from "@material-ui/core/Grid"
 import Box from "@material-ui/core/Box"
 import Typography from "@material-ui/core/Typography"
 
+import { emitter } from "../_app"
+
 import { openUrl } from "@/utils/open-url"
 import { discord, stripe as stripeConstants } from "@/constants"
 import fetcher, { createErrorResponse } from "@/utils/fetcher"
 import { PostSubscriptionResponse } from "@/types"
-import SimpleSnackbar from "@/components/SimpleSnackbar"
 import { Plan } from "@/interfaces/fire"
 import SelectPlanCard from "@/components/SelectPlanCard"
 import UserPage from "@/layouts/user-page"
@@ -31,7 +32,15 @@ const PremiumPage = () => {
   const { subscription, isLoading: isLoadingSubscription, error: subscriptionError } = useCurrentSubscription(
     session != null && !loading,
   )
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
+  const setErrorMessage = (text: string | null) =>
+    text &&
+    emitter.emit("NOTIFICATION", {
+      text,
+      severity: "error",
+      horizontal: "right",
+      vertical: "top",
+      autoHideDuration: 5000,
+    })
 
   const { data: guilds, isValidating, mutate: mutateGuilds, error: guildsError } = useSWR<UserGuild[]>(
     session ? "/api/user/guilds" : null,
@@ -127,8 +136,6 @@ const PremiumPage = () => {
 
   const onClosePlansDialog = () => setPlansDialogOpen(false)
 
-  const onFinishCloseAnimation = () => setErrorMessage(null)
-
   return (
     <UserPage title="Premium" noindex nofollow>
       <Typography variant="h4" gutterBottom>
@@ -167,15 +174,6 @@ const PremiumPage = () => {
         onClose={onClosePlansDialog}
         onClickPlan={onClickPlan}
         loadPlans={!subscription && !isLoadingSubscription}
-      />
-
-      <SimpleSnackbar
-        message={errorMessage}
-        severity="error"
-        horizontal="right"
-        vertical="top"
-        autoHideDuration={3000}
-        onFinishCloseAnimation={onFinishCloseAnimation}
       />
     </UserPage>
   )
