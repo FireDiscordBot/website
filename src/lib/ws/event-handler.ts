@@ -27,7 +27,7 @@ export class EventHandler {
     this.queue = []
   }
 
-  setWebsocket(websocket: WebSocket) {
+  setWebsocket(websocket: WebSocket, reconnect?: boolean) {
     if (this.websocket) {
       this.websocket.close(1000, "Reconnecting")
       delete this.websocket
@@ -54,6 +54,14 @@ export class EventHandler {
       if (WebsiteEvents[decoded.type] in this) this[WebsiteEvents[decoded.type]](decoded.data)
     }
     this.websocket.onopen = () => {
+      reconnect &&
+        this.emitter.emit("NOTIFICATION", {
+          text: "Websocket connected",
+          severity: "success",
+          horizontal: "right",
+          vertical: "top",
+          autoHideDuration: 3000,
+        })
       console.info(
         `%c WS %c Websocket connected! `,
         "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
@@ -70,6 +78,13 @@ export class EventHandler {
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         event,
       )
+      this.emitter.emit("NOTIFICATION", {
+        text: "Websocket error occurred",
+        severity: "error",
+        horizontal: "right",
+        vertical: "top",
+        autoHideDuration: 5000,
+      })
       this.identified = false
       try {
         sleep(2500).then(() => {
@@ -79,7 +94,7 @@ export class EventHandler {
             "background: #353A47; color: white; border-radius: 0 3px 3px 0",
           )
           const ws = new WebSocket(fire.websiteSocketUrl)
-          return this.setWebsocket(ws)
+          return this.setWebsocket(ws, true)
         })
       } catch {
         console.error(
@@ -89,6 +104,8 @@ export class EventHandler {
         )
       }
     }
+    if (this.websocket.readyState == this.websocket.CLOSED)
+      this.websocket.onclose(new CloseEvent("unknown", { code: 0, reason: "unknown", wasClean: false }))
     return this
   }
 
@@ -136,13 +153,15 @@ export class EventHandler {
     if (!message || !this.websocket || this.websocket.readyState != this.websocket.OPEN)
       return message && this.queue.push(message)
     if (process.env.NODE_ENV == "development") (globalThis as { [key: string]: unknown }).eventHandler = this
-    console.debug(
-      `%c WS %c Outgoing %c ${WebsiteEvents[message.type]} `,
-      "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
-      "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
-      "background: #353A47; color: white; border-radius: 0 3px 3px 0",
-      message.data,
-    )
+    // heartbeats can be spammy and have empty objects anyways
+    if (message.type != WebsiteEvents.HEARTBEAT)
+      console.debug(
+        `%c WS %c Outgoing %c ${WebsiteEvents[message.type]} `,
+        "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
+        "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
+        "background: #353A47; color: white; border-radius: 0 3px 3px 0",
+        message.data,
+      )
     if (this.identified == false && this.session) this.identify()
     else if (this.identified == false) {
       this.queue.push(message)
