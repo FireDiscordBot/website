@@ -86,6 +86,8 @@ export class EventHandler {
         autoHideDuration: 5000,
       })
       this.identified = false
+      // cannot recover from codes below
+      if (event.code == 1013 || event.code == 1008 || event.code == 4001 || event.code == 4015) return
       try {
         sleep(2500).then(() => {
           console.info(
