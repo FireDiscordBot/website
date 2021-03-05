@@ -44,3 +44,5 @@ export const defaultSeoConfig: DefaultSeoProps = {
       "A Discord bot for all your needs. With memes, utilities, moderation and more. Fire is the only bot you will need.",
   },
 }
+
+export const messageLinkRegex = /(https?:\/\/)?(?:ptb\.|canary\.)?discord(?:app)?\.com\/channels\/(?<guild_id>\d{15,21})\/(?<channel_id>\d{15,21})\/(?<message_id>\d{15,21})/g

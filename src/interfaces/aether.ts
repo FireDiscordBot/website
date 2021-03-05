@@ -82,6 +82,14 @@ export type UserGuild = DiscordGuild & {
   premium: boolean
 }
 
+export type Reminder = {
+  user: string
+  text: string
+  link: string
+  legacy: boolean
+  timestamp: number
+}
+
 export enum WebsiteEvents {
   IDENTIFY_CLIENT,
   HELLO,

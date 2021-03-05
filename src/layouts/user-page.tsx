@@ -44,6 +44,9 @@ const UserPageLayout = ({ children, ...restProps }: Props) => {
                 <ListItemLink href="/user/premium" router={router}>
                   <ListItemText primary="Premium" />
                 </ListItemLink>
+                <ListItemLink href="/user/reminders" router={router}>
+                  <ListItemText primary="Reminders"/>
+                </ListItemLink>
               </List>
             </Paper>
           </Grid>
