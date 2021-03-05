@@ -1,6 +1,6 @@
 import { fire } from "@/constants"
 import fetcher from "@/utils/fetcher"
-import {Reminder} from "@/interfaces/aether";
+import { Reminder } from "@/interfaces/aether"
 
 const requestWithAuth = <R = never>(accessToken: string, path: string, method?: string) =>
   fetcher<R>(`${fire.aetherApiUrl}/${path}`, {

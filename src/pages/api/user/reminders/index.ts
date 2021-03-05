@@ -1,8 +1,8 @@
-import {Reminder} from "@/interfaces/aether"
-import {AuthenticatedApiHandler, GetRemindersResponse} from "@/types"
-import {error, withSession} from "@/utils/api-handler-utils"
-import {createErrorResponse} from "@/utils/fetcher"
-import {fetchUserReminders} from "@/lib/aether";
+import { Reminder } from "@/interfaces/aether"
+import { AuthenticatedApiHandler, GetRemindersResponse } from "@/types"
+import { error, withSession } from "@/utils/api-handler-utils"
+import { createErrorResponse } from "@/utils/fetcher"
+import { fetchUserReminders } from "@/lib/aether"
 
 const handler: AuthenticatedApiHandler<GetRemindersResponse> = async (session, _req, res) => {
   let reminders: Reminder[]
@@ -16,7 +16,6 @@ const handler: AuthenticatedApiHandler<GetRemindersResponse> = async (session, _
   }
 
   res.json(reminders)
-
 }
 
 export default withSession(handler)
