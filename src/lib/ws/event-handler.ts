@@ -152,7 +152,7 @@ export class EventHandler {
     this.send(
       new Message(WebsiteEvents.IDENTIFY_CLIENT, {
         config: { subscribed: this.subscribed ?? window.location.pathname, session: this.session },
-        env: process.env.NODE_ENV,
+        env: process.env.VERCEL_ENV == "preview" ? "development" : process.env.NODE_ENV,
       }),
     )
     this.identified = true
