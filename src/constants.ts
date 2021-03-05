@@ -6,7 +6,7 @@ export const fire = {
   requiredScopes: "bot applications.commands",
   githubUrl: "https://github.com/FireDiscordBot/bot",
   aetherApiUrl: process.env.NEXT_PUBLIC_AETHER_API_URL ?? "Not provided",
-  realtimeStatsUrl: process.env.NEXT_PUBLIC_AETHER_WS_API_URL ?? "Not provided",
+  websiteSocketUrl: process.env.NEXT_PUBLIC_AETHER_WS_API_URL ?? "Not provided",
 }
 
 export const discord = {
@@ -44,3 +44,5 @@ export const defaultSeoConfig: DefaultSeoProps = {
       "A Discord bot for all your needs. With memes, utilities, moderation and more. Fire is the only bot you will need.",
   },
 }
+
+export const messageLinkRegex = /(https?:\/\/)?(?:ptb\.|canary\.)?discord(?:app)?\.com\/channels\/(?<guild_id>\d{15,21})\/(?<channel_id>\d{15,21})\/(?<message_id>\d{15,21})/g

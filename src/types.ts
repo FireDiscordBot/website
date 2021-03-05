@@ -1,7 +1,7 @@
 import { NextApiHandler } from "next"
 import { NextApiRequest, NextApiResponse } from "next/dist/next-server/lib/utils"
 
-import { UserGuild } from "@/interfaces/aether"
+import {Reminder, UserGuild} from "@/interfaces/aether"
 import { Plan } from "@/interfaces/fire"
 import { AuthSession } from "@/interfaces/auth"
 
@@ -49,6 +49,8 @@ export type PostSubscriptionResponse = { sessionId: string }
 export type PostBillingPortalResponse = { url: string }
 
 export type GetGuildsResponse = UserGuild[]
+
+export type GetRemindersResponse = Reminder[]
 
 export type PutTogglePremiumGuildResponse = string[]
 

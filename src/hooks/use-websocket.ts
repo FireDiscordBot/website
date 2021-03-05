@@ -1,16 +1,25 @@
+import { EventEmitter } from "events"
+
 import * as React from "react"
+import { getSession } from "next-auth/client"
 
-const useWebsocket = (url: string) => {
-  const [lastMessage, setLastMessage] = React.useState<MessageEvent | null>(null)
+import { EventHandler } from "@/lib/ws/event-handler"
 
+const useWebsocket = (url: string, emitter: EventEmitter) => {
+  const [handler, setHandler] = React.useState<EventHandler | null>(null)
   React.useEffect(() => {
     const ws = new WebSocket(url)
-    ws.onmessage = (message) => setLastMessage(message)
+    const initHandler = async () => {
+      const session = await getSession()
+      const handler = new EventHandler(session, emitter).setWebsocket(ws)
+      setHandler(handler)
+    }
+    initHandler()
 
     return () => ws.close()
-  }, [url])
+  }, [emitter, url])
 
-  return [lastMessage]
+  return [handler]
 }
 
 export default useWebsocket

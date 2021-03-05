@@ -16,6 +16,8 @@ import { createStyles, makeStyles } from "@material-ui/core/styles"
 import AvatarButton from "./AvatarButton"
 import UserAvatarMenu from "./UserAvatarMenu"
 
+import { emitter } from "@/pages/_app"
+
 const useStyles = makeStyles((theme) =>
   createStyles({
     root: {
@@ -52,6 +54,7 @@ const NavBar = () => {
     threshold: 0,
   })
   const router = useRouter()
+  emitter.emit("SUBSCRIBE", router.route)
   const [session, loading] = useSession()
 
   let homePageLink: React.ReactNode

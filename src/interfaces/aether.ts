@@ -81,3 +81,30 @@ export type DiscoverableGuild = {
 export type UserGuild = DiscordGuild & {
   premium: boolean
 }
+
+export type Reminder = {
+  user: string
+  text: string
+  link: string
+  legacy: boolean
+  timestamp: number
+}
+
+export enum WebsiteEvents {
+  IDENTIFY_CLIENT,
+  HELLO,
+  HEARTBEAT,
+  SUBSCRIBE,
+  REALTIME_STATS,
+  COMMANDS_UPDATE,
+  DISCOVERY_UPDATE,
+  NOTIFICATION,
+}
+
+export interface Notification {
+  text: string
+  severity: "success" | "info" | "warning" | "error"
+  horizontal: "left" | "right" | "center"
+  vertical: "top" | "bottom"
+  autoHideDuration: number
+}

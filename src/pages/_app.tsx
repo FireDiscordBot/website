@@ -1,30 +1,47 @@
 import * as React from "react"
 import Head from "next/head"
 import { AppProps } from "next/app"
-import { Provider as SessionProvider } from "next-auth/client"
+import { getSession, Provider as SessionProvider } from "next-auth/client"
 import { DefaultSeo } from "next-seo"
 import { SWRConfig } from "swr"
 import { ThemeProvider } from "@material-ui/core/styles"
 import CssBaseline from "@material-ui/core/CssBaseline"
 
-import { defaultSeoConfig } from "@/constants"
+import { defaultSeoConfig, fire } from "@/constants"
 import fetcher from "@/utils/fetcher"
 import theme from "@/theme"
 import { isBrowser } from "@/utils/is-browser"
-
 import "../nprogress.css"
+import useWebsocket from "@/hooks/use-websocket"
+import { Emitter } from "@/lib/ws/socket-emitter"
+import { EventHandler } from "@/lib/ws/event-handler"
+import SimpleSnackbar from "@/components/SimpleSnackbar"
+import { Notification } from "@/interfaces/aether"
 
 if (isBrowser()) {
   import("@/utils/load-nprogress")
 }
 
+export const emitter = new Emitter()
+
 function MyApp(props: AppProps) {
   const { Component, pageProps } = props
+  const [notification, setNotification] = React.useState<Notification | null>(null)
 
   React.useEffect(() => {
     const jssStyles = document.querySelector("#jss-server-side")
     jssStyles?.parentElement?.removeChild(jssStyles)
   }, [])
+
+  const [handler] = useWebsocket(fire.websiteSocketUrl, emitter)
+  if (handler) {
+    initHandler(handler)
+  }
+
+  emitter.removeAllListeners("NOTIFICATION")
+  emitter.on("NOTIFICATION", setNotification)
+
+  const onFinishCloseAnimation = () => setNotification(null)
 
   return (
     <>
@@ -38,11 +55,32 @@ function MyApp(props: AppProps) {
           <SessionProvider session={pageProps.session}>
             <CssBaseline />
             <Component {...pageProps} />
+            <SimpleSnackbar
+              message={notification?.text}
+              severity={notification?.severity}
+              horizontal={notification?.horizontal}
+              vertical={notification?.vertical}
+              autoHideDuration={notification?.autoHideDuration}
+              onFinishCloseAnimation={onFinishCloseAnimation}
+            />
           </SessionProvider>
         </SWRConfig>
       </ThemeProvider>
     </>
   )
+}
+
+const initHandler = async (handler: EventHandler) => {
+  if (!handler.session) {
+    const session = await getSession()
+    if (session) handler.session = session
+  }
+  const events = ["SUBSCRIBE"] // may be populated with more in the future
+  for (const event of events) emitter.removeAllListeners(event)
+  emitter.on("SUBSCRIBE", (route, extra) => {
+    handler.handleSubscribe(route, extra)
+  })
+  if (!handler.identified) handler.identify()
 }
 
 export default MyApp
