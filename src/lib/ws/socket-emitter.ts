@@ -1,6 +1,6 @@
 import { EventEmitter } from "events"
 
-import { Category, DiscoverableGuild, FireStats, Notification } from "@/interfaces/aether"
+import { Category, DiscoverableGuild, FireStats, Notification, Reminder } from "@/interfaces/aether"
 
 interface EmitterEvents {
   REALTIME_STATS: (stats: FireStats) => void
@@ -9,6 +9,7 @@ interface EmitterEvents {
   COMMANDS_UPDATE: (categories: Category[]) => void
   DISCOVERY_UPDATE: (guilds: DiscoverableGuild[]) => void
   NOTIFICATION: (notification: Notification) => void
+  REMINDERS_UPDATE: (reminders: Reminder[]) => void
 }
 
 export declare interface Emitter {
