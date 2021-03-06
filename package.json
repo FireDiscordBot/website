@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_ENV=development next start",
+    "prod": "next start",
     "type-check": "tsc",
     "fix:lint": "eslint src --fix",
     "fix:prettier": "prettier \"src/**/*.ts(x)?\" --write",
