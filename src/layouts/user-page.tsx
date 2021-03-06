@@ -10,8 +10,10 @@ import ListItem, { ListItemProps } from "@material-ui/core/ListItem"
 import ListItemText from "@material-ui/core/ListItemText"
 
 import DefaultLayout from "./default"
+import {AccountCircle, Event, Star} from "@material-ui/icons";
+import {ListItemIcon} from "@material-ui/core";
 
-const ListItemLink = ({
+export const ListItemLink = ({
   router,
   href,
   ...restProps
@@ -39,12 +41,21 @@ const UserPageLayout = ({ children, ...restProps }: Props) => {
             <Paper>
               <List component="nav">
                 <ListItemLink href="/user/account" router={router}>
+                  <ListItemIcon>
+                    <AccountCircle/>
+                  </ListItemIcon>
                   <ListItemText primary="Account" />
                 </ListItemLink>
                 <ListItemLink href="/user/premium" router={router}>
+                  <ListItemIcon>
+                    <Star/>
+                  </ListItemIcon>
                   <ListItemText primary="Premium" />
                 </ListItemLink>
                 <ListItemLink href="/user/reminders" router={router}>
+                  <ListItemIcon>
+                    <Event/>
+                  </ListItemIcon>
                   <ListItemText primary="Reminders"/>
                 </ListItemLink>
               </List>
