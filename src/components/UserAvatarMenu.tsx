@@ -6,6 +6,7 @@ import MenuItemLink from "./MenuItemLink"
 import {AccountCircle, Event, ExitToApp, Star} from "@material-ui/icons";
 import {ListItemIcon, ListItemText} from "@material-ui/core";
 
+
 type Props = MenuProps & { onClickLogout: MenuItemProps["onClick"] }
 
 const UserAvatarMenu = ({onClickLogout, ...props}: Props) => (
