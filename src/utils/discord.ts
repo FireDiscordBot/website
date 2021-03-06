@@ -1,7 +1,7 @@
-import {UserGuild} from "@/interfaces/aether"
-import {DiscordApiUser, DiscordFlag, DiscordGuild, flags} from "@/interfaces/discord"
+import { UserGuild } from "@/interfaces/aether"
+import { DiscordApiUser, DiscordFlag, DiscordGuild, flags } from "@/interfaces/discord"
 import fetcher from "@/utils/fetcher"
-import {messageLinkRegex} from "@/constants";
+import { messageLinkRegex } from "@/constants"
 
 const MANAGE_GUILD = 0x00000020
 
@@ -63,38 +63,35 @@ export const parseFlags = (flagsValue: number, premiumType: number) => {
   return parsedFlags
 }
 
-
 export const getMatches = (string: string, index: number) => {
-  index || (index = 1); // default to the first capturing group
-  var matches = [];
-  var match;
-  while (match = messageLinkRegex.exec(string)) {
-    matches.push(match[index]);
+  index || (index = 1) // default to the first capturing group
+  const matches = []
+  let match
+  while ((match = messageLinkRegex.exec(string))) {
+    matches.push(match[index])
   }
-  return matches;
+  return matches
 }
 
-const EPOCH = 1420070400000;
+const EPOCH = 1420070400000
 const idToBinary = (num: string[]) => {
-  let bin = '';
-  let high = parseInt(num[0].slice(0, -10)) || 0;
-  let low = parseInt(num[0].slice(-10));
+  let bin = ""
+  let high = parseInt(num[0].slice(0, -10)) || 0
+  let low = parseInt(num[0].slice(-10))
   while (low > 0 || high > 0) {
-    bin = String(low & 1) + bin;
-    low = Math.floor(low / 2);
+    bin = String(low & 1) + bin
+    low = Math.floor(low / 2)
     if (high > 0) {
-      low += 5000000000 * (high % 2);
-      high = Math.floor(high / 2);
+      low += 5000000000 * (high % 2)
+      high = Math.floor(high / 2)
     }
   }
-  return bin;
+  return bin
 }
 
 export const getTimestamp = (link: string) => {
   const id = getMatches(link, 4)
-  // @ts-ignore
-  const binary = idToBinary(id).toString(2).padStart(64, '0')
+  const binary = idToBinary(id).toString().padStart(64, "0")
 
-  return parseInt(binary.substring(0, 42), 2) + EPOCH;
+  return parseInt(binary.substring(0, 42), 2) + EPOCH
 }
-

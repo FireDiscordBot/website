@@ -13,7 +13,7 @@ import DefaultLayout from "./default"
 import {AccountCircle, Event, Star} from "@material-ui/icons";
 import {ListItemIcon} from "@material-ui/core";
 
-export const ListItemLink = ({
+const ListItemLink = ({
   router,
   href,
   ...restProps

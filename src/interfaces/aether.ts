@@ -99,6 +99,7 @@ export enum WebsiteEvents {
   COMMANDS_UPDATE,
   DISCOVERY_UPDATE,
   NOTIFICATION,
+  REMINDERS_UPDATE,
 }
 
 export interface Notification {

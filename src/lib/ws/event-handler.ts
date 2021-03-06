@@ -10,6 +10,7 @@ import { AuthSession } from "@/interfaces/auth"
 import { fire } from "@/constants"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 export class EventHandler {
   identified: "identifying" | boolean
   heartbeat?: NodeJS.Timeout
@@ -23,7 +24,7 @@ export class EventHandler {
     if (session) this.session = session
     this.identified = false
     this.emitter = emitter
-    this.subscribed = "/"
+    this.subscribed = typeof window != "undefined" ? window.location.pathname : "/"
     this.queue = []
   }
 
@@ -151,7 +152,7 @@ export class EventHandler {
     }
     this.send(
       new Message(WebsiteEvents.IDENTIFY_CLIENT, {
-        config: { subscribed: this.subscribed, session: this.session },
+        config: { subscribed: this.subscribed ?? window.location.pathname, session: this.session },
         env: process.env.NODE_ENV,
       }),
     )
