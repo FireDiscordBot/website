@@ -12,11 +12,13 @@ const DiscordFlagImage = ({ flag }: Props) => (
   <Tooltip title={flag.name}>
     <span>
       <Image
+        loader={() => ""}
         src={`/discord-flags/${flag.key}.png`}
         alt={flag.name}
         width={flag.width ?? 24}
         height={24}
         layout="fixed"
+        unoptimized={true}
       />
     </span>
   </Tooltip>

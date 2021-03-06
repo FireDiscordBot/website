@@ -67,7 +67,16 @@ const NavBar = () => {
   } else {
     homePageLink = (
       <a>
-        <NextImage src="/logo-gr.svg" width={40} height={40} layout="intrinsic" className={classes.logo} priority />
+        <NextImage
+          loader={() => ""}
+          src="/logo-gr.svg"
+          width={40}
+          height={40}
+          layout="intrinsic"
+          className={classes.logo}
+          priority
+          unoptimized={true}
+        />
       </a>
     )
   }

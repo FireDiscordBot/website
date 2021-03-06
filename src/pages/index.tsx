@@ -76,7 +76,15 @@ const IndexPage = () => {
       <Container>
         <Grid container justify="center" className={classes.banner}>
           <Grid item xs={3} md={2} className={classes.logoGridItem}>
-            <Image src="/logo-gr.svg" width={256} height={256} layout="responsive" alt="Fire's logo" />
+            <Image
+              loader={() => ""}
+              src="/logo-gr.svg"
+              width={256}
+              height={256}
+              layout="responsive"
+              alt="Fire's logo"
+              unoptimized={true}
+            />
           </Grid>
           <Grid item xs={12} container justify="center">
             <Grid item xs={12} sm={7} md={5}>
