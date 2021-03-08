@@ -22,7 +22,7 @@ export const getUserImage = (user: DiscordApiUser) => {
     const defaultAvatarNumber = parseInt(user.discriminator) % 5
     return `https://cdn.discordapp.com/embed/avatars/${defaultAvatarNumber}.png`
   } else {
-    const format = user.avatar.startsWith("a_") ? "gif" : "png"
+    const format = user.avatar.startsWith("a_") && user.premium_type ? "gif" : "png"
     return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${format}`
   }
 }
@@ -38,7 +38,7 @@ export const getGuildIcon = (guild: UserGuild) => {
     }
   }
 
-  const format = guild.icon.startsWith("a_") ? "gif" : "png"
+  const format = guild.icon.startsWith("a_") && guild.features.includes("ANIMATED_ICON") ? "gif" : "png"
   return {
     type: "image",
     value: `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.${format}`,
