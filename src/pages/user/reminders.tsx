@@ -10,6 +10,7 @@ import { withStyles } from "@material-ui/styles"
 import { KeyboardDateTimePicker } from "@material-ui/pickers"
 import moment from "moment"
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date"
+import { StatusCodes } from "http-status-codes"
 
 import { emitter } from "../_app"
 
@@ -97,7 +98,14 @@ const Reminders = () => {
     })
     if (!reminder.ok)
       emitter.emit("NOTIFICATION", {
-        text: "Failed to create reminder",
+        text:
+          reminder.status == StatusCodes.PRECONDITION_FAILED
+            ? (
+                await reminder.json().catch(() => {
+                  return { error: "Failed to create reminder" }
+                })
+              ).error
+            : "Failed to create reminder",
         severity: "error",
         horizontal: "right",
         vertical: "top",
