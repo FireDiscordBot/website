@@ -91,10 +91,18 @@ const Reminders = () => {
   }
 
   const handleReminderCreate = async () => {
-    await fetch(`/api/user/reminders/create`, {
+    const reminder = await fetch(`/api/user/reminders/create`, {
       method: "POST",
       body: JSON.stringify({ reminder: futureText, timestamp: moment(futureDate).valueOf() }),
-    }).catch((err) => console.log(err))
+    })
+    if (!reminder.ok)
+      emitter.emit("NOTIFICATION", {
+        text: "Failed to create reminder",
+        severity: "error",
+        horizontal: "right",
+        vertical: "top",
+        autoHideDuration: 3000,
+      })
   }
 
   return (
