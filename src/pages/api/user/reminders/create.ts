@@ -1,4 +1,5 @@
 import { StatusCodes } from "http-status-codes"
+import moment from "moment"
 
 import { createUserReminder } from "@/lib/aether"
 import { AuthenticatedApiHandler } from "@/types"
@@ -9,8 +10,25 @@ const handler: AuthenticatedApiHandler = async (session, req, res) => {
   if (req.method !== "POST") {
     error(res, StatusCodes.METHOD_NOT_ALLOWED)
     return
-  } else if (!req.body.reminder || req.body.timestamp < +new Date()) {
+  }
+  let body: { reminder: string; timestamp: number }
+  try {
+    body = JSON.parse(req.body)
+  } catch {
     error(res, StatusCodes.BAD_REQUEST)
+    return
+  }
+
+  const minutes = moment(body.timestamp).diff(moment(), "minutes")
+  if (!minutes || minutes < 2) {
+    error(res, StatusCodes.PRECONDITION_FAILED, "Time is too short!")
+    return
+  }
+
+  const largestTime = new Date()
+  largestTime.setMinutes(largestTime.getMinutes() + minutes)
+  if (moment(largestTime).diff(moment(), "months") >= 7) {
+    error(res, StatusCodes.PRECONDITION_FAILED, "Reminders cannot currently be set for over 6 months in the future")
     return
   }
 
@@ -18,7 +36,7 @@ const handler: AuthenticatedApiHandler = async (session, req, res) => {
   if (reminder instanceof NetworkError)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return res.status(reminder.code).json(reminder.data as any)
-  res.json(req.body)
+  res.json(body)
   return
 }
 
