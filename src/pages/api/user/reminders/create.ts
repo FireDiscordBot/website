@@ -1,15 +1,16 @@
-import {StatusCodes} from "http-status-codes"
+import { StatusCodes } from "http-status-codes"
 
-import {createUserReminder} from "@/lib/aether"
-import {AuthenticatedApiHandler} from "@/types"
-import {error, withSession} from "@/utils/api-handler-utils"
+import { createUserReminder } from "@/lib/aether"
+import { AuthenticatedApiHandler } from "@/types"
+import { error, withSession } from "@/utils/api-handler-utils"
 
-const handler: AuthenticatedApiHandler<{}> = async (session, req, res) => {
+const handler: AuthenticatedApiHandler = async (session, req, res) => {
   if (req.method !== "POST") {
     error(res, StatusCodes.METHOD_NOT_ALLOWED)
     return
   }
-  await createUserReminder(session.accessToken, req.body)
+  const reminder = await createUserReminder(session.accessToken, req.body).catch(() => null)
+  if (reminder != null) res.status(201)
 }
 
 export default withSession(handler)
