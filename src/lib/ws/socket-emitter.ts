@@ -8,7 +8,7 @@ interface EmitterEvents {
   HELLO: (hello: { interval: number }) => void
   COMMANDS_UPDATE: (categories: Category[]) => void
   DISCOVERY_UPDATE: (guilds: DiscoverableGuild[]) => void
-  NOTIFICATION: (notification: Notification) => void
+  NOTIFICATION: (notification?: Notification) => void
   REMINDERS_UPDATE: (reminders: Reminder[]) => void
 }
 
