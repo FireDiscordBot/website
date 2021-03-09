@@ -75,9 +75,9 @@ function MyApp(props: AppProps) {
 }
 
 const initHandler = async (handler: EventHandler) => {
-  if (!handler.session) {
+  if (!handler.auth) {
     const session = await getSession()
-    if (session) handler.session = session
+    if (session) handler.auth = session
   }
   const events = ["SUBSCRIBE"] // may be populated with more in the future
   for (const event of events) emitter.removeAllListeners(event)
@@ -85,6 +85,13 @@ const initHandler = async (handler: EventHandler) => {
     handler.handleSubscribe(route, extra)
   })
   if (!handler.identified) handler.identify()
+  const devToolsCheck = /./
+  devToolsCheck.toString = () => {
+    // dev tools is open
+    handler.devToolsWarning()
+    return ""
+  }
+  console.log("%c", devToolsCheck)
 }
 
 export default MyApp

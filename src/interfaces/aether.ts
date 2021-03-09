@@ -90,10 +90,18 @@ export type Reminder = {
   timestamp: number
 }
 
+export interface Payload {
+  op: number
+  d?: unknown
+  s?: number
+  t?: string
+}
+
 export enum WebsiteEvents {
   IDENTIFY_CLIENT,
   HELLO,
   HEARTBEAT,
+  HEARTBEAT_ACK,
   SUBSCRIBE,
   REALTIME_STATS,
   COMMANDS_UPDATE,

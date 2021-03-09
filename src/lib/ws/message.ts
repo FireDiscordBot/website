@@ -2,16 +2,16 @@ import { WebsiteEvents } from "../../interfaces/aether"
 
 export class Message {
   type: WebsiteEvents
-  data: Record<string, unknown>
+  data: unknown
 
-  constructor(type: WebsiteEvents, data: Record<string, unknown>) {
+  constructor(type: WebsiteEvents, data: unknown) {
     this.type = type
     this.data = data
   }
 
   toJSON() {
     return {
-      t: this.type,
+      op: this.type,
       d: this.data,
     }
   }
