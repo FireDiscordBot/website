@@ -1,24 +1,24 @@
 import * as React from "react"
 import Head from "next/head"
-import {AppProps} from "next/app"
-import {getSession, Provider as SessionProvider} from "next-auth/client"
-import {DefaultSeo} from "next-seo"
-import {SWRConfig} from "swr"
-import {ThemeProvider} from "@material-ui/core/styles"
+import { AppProps } from "next/app"
+import { getSession, Provider as SessionProvider } from "next-auth/client"
+import { DefaultSeo } from "next-seo"
+import { SWRConfig } from "swr"
+import { ThemeProvider } from "@material-ui/core/styles"
 import CssBaseline from "@material-ui/core/CssBaseline"
+import { MuiPickersUtilsProvider } from "@material-ui/pickers"
+import moment from "@date-io/moment"
 
-import {defaultSeoConfig, fire} from "@/constants"
+import { defaultSeoConfig, fire } from "@/constants"
 import fetcher from "@/utils/fetcher"
 import theme from "@/theme"
-import {isBrowser} from "@/utils/is-browser"
+import { isBrowser } from "@/utils/is-browser"
 import "../nprogress.css"
 import useWebsocket from "@/hooks/use-websocket"
-import {Emitter} from "@/lib/ws/socket-emitter"
-import {EventHandler} from "@/lib/ws/event-handler"
+import { Emitter } from "@/lib/ws/socket-emitter"
+import { EventHandler } from "@/lib/ws/event-handler"
 import SimpleSnackbar from "@/components/SimpleSnackbar"
-import {Notification} from "@/interfaces/aether"
-import {MuiPickersUtilsProvider} from "@material-ui/pickers"
-import moment from "@date-io/moment";
+import { Notification } from "@/interfaces/aether"
 
 if (isBrowser()) {
   import("@/utils/load-nprogress")
@@ -27,7 +27,7 @@ if (isBrowser()) {
 export const emitter = new Emitter()
 
 function MyApp(props: AppProps) {
-  const {Component, pageProps} = props
+  const { Component, pageProps } = props
   const [notification, setNotification] = React.useState<Notification | null>(null)
 
   React.useEffect(() => {
@@ -50,13 +50,13 @@ function MyApp(props: AppProps) {
       <MuiPickersUtilsProvider utils={moment}>
         <Head>
           <title>Fire</title>
-          <meta name="viewport" content="initial-scale=1, width=device-width"/>
+          <meta name="viewport" content="initial-scale=1, width=device-width" />
         </Head>
         <DefaultSeo {...defaultSeoConfig} />
         <ThemeProvider theme={theme}>
-          <SWRConfig value={{fetcher: fetcher}}>
+          <SWRConfig value={{ fetcher: fetcher }}>
             <SessionProvider session={pageProps.session}>
-              <CssBaseline/>
+              <CssBaseline />
               <Component {...pageProps} />
               <SimpleSnackbar
                 message={notification?.text}
