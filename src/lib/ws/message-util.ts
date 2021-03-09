@@ -2,6 +2,7 @@ import { deflateSync, inflateSync } from "zlib"
 
 import { Message } from "./message"
 
+import { Payload } from "@/interfaces/aether"
 export class MessageUtil {
   static encode(message: Message) {
     const deflated = deflateSync(JSON.stringify(message), { level: 5 })
@@ -9,18 +10,10 @@ export class MessageUtil {
   }
 
   static decode(message: string) {
-    let inflated: string
-    try {
-      inflated = inflateSync(Buffer.from(message, "base64"), {
-        level: 5,
-      }).toString()
-    } catch {
-      return null
-    }
-    const parsed = JSON.parse(inflated)
-    if (typeof parsed.t !== "number") {
-      return null
-    }
-    return new Message(parsed.t, parsed.d)
+    const inflated = inflateSync(Buffer.from(message, "base64"), {
+      level: 5,
+    })?.toString()
+    if (!inflated) return null
+    else return JSON.parse(inflated) as Payload
   }
 }

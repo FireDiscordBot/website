@@ -15,13 +15,16 @@ export class EventHandler {
   identified: "identifying" | boolean
   heartbeat?: NodeJS.Timeout
   websocket?: WebSocket
-  session?: AuthSession
   emitter: EventEmitter
+  auth?: AuthSession
   subscribed: string
+  session?: string
   queue: Message[]
+  acked?: boolean
+  seq?: number
 
   constructor(session: AuthSession | null, emitter: EventEmitter) {
-    if (session) this.session = session
+    if (session) this.auth = session
     this.identified = false
     this.emitter = emitter
     this.subscribed = typeof window != "undefined" ? window.location.pathname : "/"
@@ -43,16 +46,19 @@ export class EventHandler {
           "background: #353A47; color: white; border-radius: 0 3px 3px 0",
           { data: message.data },
         )
-      console.debug(
-        `%c WS %c Incoming %c ${WebsiteEvents[decoded.type]} `,
-        "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
-        "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
-        "background: #353A47; color: white; border-radius: 0 3px 3px 0",
-        decoded,
-      )
-      this.emitter.emit(WebsiteEvents[decoded.type], decoded.data)
+      if (typeof decoded.s == "number") this.seq = decoded.s
+      // heartbeats acks can be spammy and have a null body anyways
+      if (decoded.op != WebsiteEvents.HEARTBEAT_ACK)
+        console.debug(
+          `%c WS %c Incoming %c ${WebsiteEvents[decoded.op]} `,
+          "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
+          "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
+          "background: #353A47; color: white; border-radius: 0 3px 3px 0",
+          decoded,
+        )
+      this.emitter.emit(WebsiteEvents[decoded.op], decoded.d)
       // @ts-expect-error This is needed to ensure this[string] works
-      if (WebsiteEvents[decoded.type] in this) this[WebsiteEvents[decoded.type]](decoded.data)
+      if (WebsiteEvents[decoded.op] in this) this[WebsiteEvents[decoded.op]](decoded.d)
     }
     this.websocket.onopen = () => {
       reconnect &&
@@ -95,6 +101,14 @@ export class EventHandler {
           vertical: "top",
           autoHideDuration: 15000,
         })
+      else if (event.code == 4005)
+        this.emitter.emit("NOTIFICATION", {
+          text: "Invalid Session",
+          severity: "error",
+          horizontal: "right",
+          vertical: "top",
+          autoHideDuration: 5000,
+        })
       else
         this.emitter.emit("NOTIFICATION", {
           text: "Websocket error occurred",
@@ -136,11 +150,18 @@ export class EventHandler {
     this.subscribed = route
   }
 
-  HELLO(data: { interval: number }) {
+  HELLO(data: { sessionId: string; interval: number }) {
     if (this.heartbeat) clearInterval(this.heartbeat)
     this.heartbeat = setInterval(() => {
-      this.send(new Message(WebsiteEvents.HEARTBEAT, {}))
+      if (this.acked == false) return this.websocket?.close(4004, "Did not receive heartbeat ack")
+      this.acked = false
+      this.send(new Message(WebsiteEvents.HEARTBEAT, this.seq || null))
     }, data.interval)
+    this.session = data.sessionId
+  }
+
+  HEARTBEAT_ACK() {
+    this.acked = true
   }
 
   identify() {
@@ -152,8 +173,10 @@ export class EventHandler {
     }
     this.send(
       new Message(WebsiteEvents.IDENTIFY_CLIENT, {
-        config: { subscribed: this.subscribed ?? window.location.pathname, session: this.session },
+        config: { subscribed: this.subscribed ?? window.location.pathname, session: this.auth },
         env: process.env.NODE_ENV,
+        sessionId: this.session,
+        seq: this.seq,
       }),
     )
     this.identified = true
@@ -170,11 +193,24 @@ export class EventHandler {
     )
   }
 
+  devToolsWarning() {
+    console.log(
+      `%c STOP!
+
+%cUNLESS YOU KNOW WHAT YOU'RE DOING, DO NOT COPY/PASTE ANYTHING IN HERE!
+DOING SO COULD REVEAL SENSITIVE INFORMATION SUCH AS YOUR EMAIL OR ACCESS TOKEN
+
+IT'S BEST TO JUST CLOSE THIS WINDOW AND PRETEND IT DOES NOT EXIST.`,
+      "background: #C95D63; color: white; font-size: xxx-large; border-radius: 8px 8px 8px 8px;",
+      "background: #353A47; color: white; font-size: medium; border-radius: 0 0 0 0",
+    )
+  }
+
   private send(message?: Message) {
     if (!message || !this.websocket || this.websocket.readyState != this.websocket.OPEN)
       return message && this.queue.push(message)
     if (process.env.NODE_ENV == "development") (globalThis as { [key: string]: unknown }).eventHandler = this
-    // heartbeats can be spammy and have empty objects anyways
+    // heartbeats can be spammy and just have the sequence anyways
     if (message.type != WebsiteEvents.HEARTBEAT)
       console.debug(
         `%c WS %c Outgoing %c ${WebsiteEvents[message.type]} `,
@@ -183,12 +219,12 @@ export class EventHandler {
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         message.data,
       )
-    if (this.identified == false && this.session) this.identify()
+    if (this.identified == false && this.auth) this.identify()
     else if (this.identified == false) {
       this.queue.push(message)
       getSession().then((session) => {
         if (session) {
-          this.session = session
+          this.auth = session
           this.identify()
         }
       })
