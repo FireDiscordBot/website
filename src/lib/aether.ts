@@ -52,3 +52,7 @@ export const fetchUserReminders = async (accessToken: string) => {
 export const createUserReminder = async (accessToken: string, body: { reminder: string; timestamp: number }) => {
   return await requestWithAuth<unknown>(accessToken, `user/reminders`, "POST", body)
 }
+
+export const deleteUserReminder = async (accessToken: string, timestamp: string) => {
+  return await requestWithAuth<unknown>(accessToken, `user/reminders/${timestamp}`, "DELETE")
+}

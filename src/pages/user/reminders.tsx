@@ -54,6 +54,8 @@ const ReminderProgressBar = withStyles((theme: Theme) =>
   }),
 )(LinearProgress)
 
+let toDelete: number[] = []
+
 const Reminders = () => {
   const [session, loading] = useSession({ redirectTo: "/" })
   const [currentTime, setCurrentTime] = useState(0)
@@ -111,6 +113,36 @@ const Reminders = () => {
         vertical: "top",
         autoHideDuration: 3000,
       })
+    else if (typeof window != "undefined" && window?.document?.getElementById("reminder-text") instanceof HTMLElement) {
+      const element = window.document.getElementById("reminder-text")
+      if (element) element.innerText = ""
+    }
+  }
+
+  const handleReminderDelete = async (reminder: Reminder) => {
+    if (!toDelete.includes(reminder.timestamp)) {
+      toDelete.push(reminder.timestamp)
+      setTimeout(() => (toDelete = toDelete.filter((timestamp) => timestamp != reminder.timestamp)), 5000)
+      return emitter.emit("NOTIFICATION", {
+        text: "Click again to confirm deletion",
+        severity: "warning",
+        horizontal: "right",
+        vertical: "top",
+        autoHideDuration: 5000,
+      })
+    } else toDelete = toDelete.filter((timestamp) => timestamp != reminder.timestamp)
+    const deleted = await fetch(`/api/user/reminders/${reminder.timestamp}`, {
+      method: "DELETE",
+    })
+    if (!deleted.ok)
+      emitter.emit("NOTIFICATION", {
+        text: "Failed to delete reminder",
+        severity: "error",
+        horizontal: "right",
+        vertical: "top",
+        autoHideDuration: 3000,
+      })
+    else emitter.emit("NOTIFICATION", undefined)
   }
 
   return (
@@ -124,6 +156,7 @@ const Reminders = () => {
         <Grid container item xs={12} sm={12} spacing={4}>
           <Grid item xs={12} md={8}>
             <TextField
+              id="reminder-text"
               onChange={(value) => handleTextChange(value.target.value)}
               fullWidth
               placeholder={"Create a reminder..."}
@@ -156,7 +189,12 @@ const Reminders = () => {
                         <Typography color="textPrimary">{reminder.text}</Typography>
                       </Grid>
                       <Grid container item xs={12} sm={1} alignContent={"flex-start"} justify={"flex-end"}>
-                        <IconButton className={classes.trashButton}>
+                        <IconButton
+                          className={classes.trashButton}
+                          onClick={() => {
+                            handleReminderDelete(reminder)
+                          }}
+                        >
                           <Delete />
                         </IconButton>
                       </Grid>
