@@ -1,9 +1,10 @@
-import { fire } from "@/constants"
+import {fire} from "@/constants"
 import fetcher from "@/utils/fetcher"
-import { Reminder } from "@/interfaces/aether"
+import {Reminder} from "@/interfaces/aether"
 
-const requestWithAuth = <R = never>(accessToken: string, path: string, method?: string) =>
+const requestWithAuth = <R = never>(accessToken: string, path: string, method?: string, body?: any) =>
   fetcher<R>(`${fire.aetherApiUrl}/${path}`, {
+    body: body,
     method: method ?? "GET",
     headers: {
       "User-Agent": "Fire Website",
@@ -45,4 +46,8 @@ export const createDataArchive = async (accessToken: string) => {
 
 export const fetchUserReminders = async (accessToken: string) => {
   return await requestWithAuth<Reminder[]>(accessToken, `user/reminders`)
+}
+
+export const createUserReminder = async (accessToken: string, body: any) => {
+  return await requestWithAuth<{}>(accessToken, `user/reminders`, "POST", body)
 }

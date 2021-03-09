@@ -1,22 +1,27 @@
 import Typography from "@material-ui/core/Typography"
 import * as React from "react"
-import { Box, Card, Grid, IconButton, LinearProgress } from "@material-ui/core"
-import { createStyles, makeStyles } from "@material-ui/core/styles"
-import { Delete } from "@material-ui/icons"
-import { useEffect, useState } from "react"
-import useSWR, { cache } from "swr"
+import {useEffect, useState} from "react"
+import {Box, Button, Card, Grid, IconButton, LinearProgress, TextField} from "@material-ui/core"
+import {createStyles, makeStyles, Theme} from "@material-ui/core/styles"
+import {Delete} from "@material-ui/icons"
+import useSWR, {cache} from "swr"
 
-import { emitter } from "../_app"
+import {emitter} from "../_app"
 
 import useSession from "@/hooks/use-session"
 import UserPageLayout from "@/layouts/user-page"
-import { Reminder } from "@/interfaces/aether"
-import { getTimestamp } from "@/utils/discord"
+import {Reminder} from "@/interfaces/aether"
+import {getTimestamp} from "@/utils/discord"
+import Tooltip from "@material-ui/core/Tooltip";
+import {withStyles} from "@material-ui/styles";
+import {KeyboardDateTimePicker} from '@material-ui/pickers'
+import moment from "moment";
+import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
     reminderContainer: {
-      margin: theme.spacing(1),
+      marginBottom: theme.spacing(1),
     },
     reminderCard: {
       display: "flex",
@@ -30,22 +35,33 @@ const useStyles = makeStyles((theme) =>
     borderRight: {
       borderRight: `1px solid ${theme.palette.divider}`,
     },
-    progressbar: {
-      borderBottomRightRadius: "4px",
-      borderBottomLeftRadius: "4px",
-    },
     trashButton: {
       float: "right",
     },
   }),
 )
 
+const ReminderProgressBar = withStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      borderBottomRightRadius: "4px",
+      borderBottomLeftRadius: "4px",
+    },
+    barColorSecondary: {
+      backgroundColor: theme.palette.success.main
+    },
+  }),
+)(LinearProgress);
+
 const Reminders = () => {
-  const [session, loading] = useSession({ redirectTo: "/" })
+  const [session, loading] = useSession({redirectTo: "/"})
   const [currentTime, setCurrentTime] = useState(0)
+  const [futureDate, setFutureDate] = useState(moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"));
+  const [futureText, setFutureText] = useState("");
+
   const classes = useStyles()
 
-  const { data } = useSWR<Reminder[]>(session ? "/api/user/reminders" : null, {
+  const {data} = useSWR<Reminder[]>(session ? "/api/user/reminders" : null, {
     revalidateOnMount: !cache.has(session ? "/api/user/reminders" : null),
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
@@ -60,53 +76,110 @@ const Reminders = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime((prevProgress) => (prevProgress >= Date.now() ? 0 : Date.now()))
-    }, 1000)
+    }, 999)
     return () => {
       clearInterval(timer)
     }
   }, [currentTime])
+
+  const handleDateChange = (_date: MaterialUiPickersDate, value?: string | null) => {
+    setFutureDate(value ? value : moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"))
+  }
+
+  const handleTextChange = (value: string | null | undefined) => {
+    setFutureText(value ? value : "")
+  }
+
+  const handleReminderCreate = async () => {
+    await fetch(`/api/user/reminders/create`, {
+      method: "POST",
+      body: JSON.stringify({"reminder": futureText, "timestamp": moment(futureDate).valueOf()}),
+    }).catch(err => console.log(err))
+  }
+
   return (
     <UserPageLayout title="Reminders" noindex nofollow>
-      <Typography variant="h4" gutterBottom>
-        Reminders
-      </Typography>
-      {!loading && (
-        <div>
-          {reminders?.map((reminder, index) => (
-            <div key={index} className={classes.reminderContainer}>
-              <Card className={classes.reminderCard}>
-                <Grid container direction="row" justify="space-between" alignItems="center">
-                  <Grid item xs={12} sm={6}>
-                    <Typography color="textPrimary">{reminder.text}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <IconButton className={classes.trashButton}>
-                      {" "}
-                      <Delete />
-                    </IconButton>
-                  </Grid>
-                </Grid>
-              </Card>
-              <Box display="flex" alignItems="center">
-                <Box width="100%">
-                  <LinearProgress
-                    variant="determinate"
-                    value={
-                      ((Date.now() - getTimestamp(reminder.link)) /
-                        (reminder.timestamp - getTimestamp(reminder.link))) *
-                      100
-                    }
-                    className={classes.progressbar}
-                  />
-                  {}
-                </Box>
-              </Box>
+      <Grid container direction={"column"} spacing={2}>
+        <Grid item xs={12} sm={12}>
+          <Typography variant="h4" gutterBottom>
+            Reminders
+          </Typography>
+        </Grid>
+        <Grid container item xs={12} sm={12} spacing={4}>
+          <Grid item xs={12} md={8}>
+            <TextField onChange={(value) => handleTextChange(value.target.value)} fullWidth
+                       placeholder={"Create a reminder..."}/>
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <KeyboardDateTimePicker
+              variant="inline"
+              ampm={false}
+              value={futureDate}
+              onChange={(date, value) => handleDateChange(date, value)}
+              disablePast
+
+              format="yyyy-MM-DD HH:mm:ss"
+            />
+          </Grid>
+          <Grid item xs={12} md={1}>
+            <Button variant={"outlined"} onClick={handleReminderCreate}>Create</Button>
+          </Grid>
+        </Grid>
+        <Grid item xs={12} sm={12}>
+          {!loading && (
+            <div>
+              {reminders?.map((reminder, index) => (
+                <div key={index} className={classes.reminderContainer}>
+                  <Card className={classes.reminderCard}>
+                    <Grid container direction="row">
+                      <Grid item xs={12} sm={11}>
+                        <Typography color="textPrimary">{reminder.text}</Typography>
+                      </Grid>
+                      <Grid container item xs={12} sm={1} alignContent={"flex-start"} justify={"flex-end"}>
+                        <IconButton className={classes.trashButton}>
+                          <Delete/>
+                        </IconButton>
+                      </Grid>
+                    </Grid>
+                  </Card>
+                  <Tooltip title={(timeConverter(Date.now(), reminder.timestamp))}>
+                    <Box display="flex" alignItems="center">
+                      <Box width="100%">
+                        <ReminderProgressBar
+                          variant="determinate"
+                          color={getProgress(reminder) == 100 ? "secondary" : "primary"}
+                          value={getProgress(reminder)}
+                        />
+                      </Box>
+                    </Box>
+                  </Tooltip>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+          )}
+        </Grid>
+      </Grid>
     </UserPageLayout>
   )
 }
 
+
+const timeConverter = (start: any, end: any) => {
+  const date1 = new Date(start);
+  const date2 = new Date(end);
+  const difference = Math.abs(date2.getTime() - date1.getTime()) / 1000;
+  const days = Math.floor(difference / 86400);
+  const hours = Math.floor(difference / 3600) % 24;
+  const minutes = Math.floor(difference / 60) % 60;
+  const seconds = Math.floor(difference) % 60;
+  return `${days} Days, ${hours} Hours, ${minutes} Minutes, and ${seconds} seconds left!`;
+}
+
+const getProgress = (reminder: Reminder) => {
+  const progress =
+    ((Date.now() - getTimestamp(reminder.link)) / (reminder.timestamp - getTimestamp(reminder.link))) * 100
+  return progress >= 100 ? 100 : progress
+}
+
 export default Reminders
+
