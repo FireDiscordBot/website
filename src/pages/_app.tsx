@@ -28,7 +28,7 @@ export const emitter = new Emitter()
 
 function MyApp(props: AppProps) {
   const { Component, pageProps } = props
-  const [notification, setNotification] = React.useState<Notification | null>(null)
+  const [notification, setNotification] = React.useState<Notification | undefined>(undefined)
 
   React.useEffect(() => {
     const jssStyles = document.querySelector("#jss-server-side")
@@ -43,7 +43,7 @@ function MyApp(props: AppProps) {
   emitter.removeAllListeners("NOTIFICATION")
   emitter.on("NOTIFICATION", setNotification)
 
-  const onFinishCloseAnimation = () => setNotification(null)
+  const onFinishCloseAnimation = () => setNotification(undefined)
 
   return (
     <>
