@@ -63,6 +63,14 @@ const StatsPage = ({ initialFireStats }: Props) => {
     [fireStats.clusters],
   )
   const onClickClusterCard = (id: number) => setSelectedClusterStats(findClusterStats(id))
+  const onClickClusterError = (id: number) =>
+    emitter.emit("NOTIFICATION", {
+      text: `Cluster ${id} is currently unavailable`,
+      severity: "error",
+      horizontal: "right",
+      vertical: "top",
+      autoHideDuration: 5000,
+    })
   const onCloseClusterDialog = () => setSelectedClusterStats(undefined)
 
   React.useEffect(() => {
@@ -134,7 +142,7 @@ const StatsPage = ({ initialFireStats }: Props) => {
 
           {fireStats.clusters.map((cluster) => (
             <Grid item key={cluster.id}>
-              <ClusterCard cluster={cluster} onClick={onClickClusterCard} />
+              <ClusterCard cluster={cluster} onClick={cluster.error ? onClickClusterError : onClickClusterCard} />
             </Grid>
           ))}
         </Grid>
