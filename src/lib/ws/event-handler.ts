@@ -101,7 +101,7 @@ export class EventHandler {
           vertical: "top",
           autoHideDuration: 15000,
         })
-      else if (event.code == 4005)
+      else if (event.code == 4005) {
         this.emitter.emit("NOTIFICATION", {
           text: "Invalid Session",
           severity: "error",
@@ -109,7 +109,9 @@ export class EventHandler {
           vertical: "top",
           autoHideDuration: 5000,
         })
-      else
+        delete this.session
+        delete this.seq
+      } else
         this.emitter.emit("NOTIFICATION", {
           text: "Websocket error occurred",
           severity: "error",
