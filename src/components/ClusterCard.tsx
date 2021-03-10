@@ -18,7 +18,16 @@ const ClusterCard = ({ cluster, onClick }: Props) => {
     <Card>
       <CardActionArea onClick={onClickCard}>
         <CardContent>
-          <Typography variant="body1">{cluster.id}</Typography>
+          <Typography
+            variant="body1"
+            color={
+              cluster.error || cluster.unavailableGuilds || cluster.shards.some((shard) => shard.status != 0)
+                ? "error"
+                : "initial"
+            }
+          >
+            {cluster.id}
+          </Typography>
         </CardContent>
       </CardActionArea>
     </Card>
