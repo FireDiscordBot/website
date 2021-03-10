@@ -14,20 +14,27 @@ export type ClusterStats = {
   env: string
   user: string
   userId: string
-  started: string
   uptime: string
+  started: string
   cpu: number
+  ram: string
   ramBytes: number
+  totalRam: string
+  totalRamBytes: number
   pid: number
   version: string
   versions: string
   guilds: number
   unavailableGuilds: number
   users: number
+  userStatuses?: { online: number; dnd: number; idle: number; offline: number }
   commands: number
   events: number
   restPing: number
   shards: ShardStats[]
+  error?: string
+  reason?: string
+  code?: number
 }
 
 export type FireStats = {
