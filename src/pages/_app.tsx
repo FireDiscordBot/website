@@ -14,7 +14,7 @@ import useWebsocket from "../hooks/use-websocket";
 export const emitter = new Emitter();
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
-  const [handler] = useWebsocket("wss://aether-ws-dev.gaminggeek.dev/website", emitter);
+  const [handler] = useWebsocket("wss://aether-ws.gaminggeek.dev/website", emitter);
   if (handler) {
     initHandler(handler);
   }
