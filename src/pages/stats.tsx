@@ -5,15 +5,17 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 import Head from "../components/Head";
-import type { Stats } from "../types";
+import { FireStats } from "../../lib/interfaces/aether";
 import ClusterModal from "../components/ClusterModal";
 
+import { emitter } from "./_app";
+
 interface Props {
-  initialStats: Stats;
+  initialStats: FireStats;
 }
 
 const StatsPage: NextPage<Props> = ({ initialStats }) => {
-  const [stats, setStats] = useState<Stats>(initialStats);
+  const [stats, setStats] = useState<FireStats>(initialStats);
   const [clusterInfoId, setClusterInfoId] = useState<number | null>(null);
 
   const [filter, setFilter] = useState<string | null>(null);
@@ -29,15 +31,10 @@ const StatsPage: NextPage<Props> = ({ initialStats }) => {
     );
   };
 
-  useEffect(() => {
-    const ws = new WebSocket("wss://aether-ws.gaminggeek.dev/realtime-stats");
-    ws.onmessage = (msg) => {
-      const newStats: Stats = JSON.parse(msg.data);
-      setStats(newStats);
-    };
-
-    return () => ws.close();
-  }, []);
+  React.useEffect(() => {
+    emitter.removeAllListeners("REALTIME_STATS")
+    emitter.on("REALTIME_STATS", setStats)
+  }, [])
 
   let clusterModal = undefined;
 
@@ -180,7 +177,7 @@ StatsPage.getInitialProps = async () => {
       },
     };
   });
-  const initialStats: Stats = await response.json();
+  const initialStats: FireStats = await response.json();
 
   return {
     initialStats,

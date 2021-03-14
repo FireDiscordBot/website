@@ -1,17 +1,17 @@
-import React from "react";
+import { ClusterStats } from "../../lib/interfaces/aether";
 import Modal from "react-bootstrap/Modal";
-import type { Cluster } from "../types";
+import React from "react";
 
 interface Props {
   show: boolean;
   onHide: () => void;
-  cluster: Cluster;
+  cluster: ClusterStats;
 }
 
 const getCommitURL = (version: string) =>
   `https://github.com/FireDiscordBot/bot/commit/${version}`;
 
-const OnlineCluster = (cluster: Cluster) => {
+const OnlineCluster = (cluster: ClusterStats) => {
   return (
     <Modal.Body>
       <div>
@@ -62,7 +62,7 @@ const OnlineCluster = (cluster: Cluster) => {
   );
 };
 
-const OfflineCluster = (cluster: Cluster) => {
+const OfflineCluster = (cluster: ClusterStats) => {
   return (
     <Modal.Body>
       <div>

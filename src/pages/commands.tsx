@@ -17,6 +17,7 @@ interface Props {
 
 const Commands: NextPage<Props> = ({ categories, commands }) => {
   const router = useRouter();
+
   const prefix =
     router.query.prefix && router.query.prefix.length <= 10
       ? (router.query.prefix as string)
