@@ -128,7 +128,7 @@ export class EventHandler {
             "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
             "background: #353A47; color: white; border-radius: 0 3px 3px 0"
           );
-          const ws = new WebSocket("wss://aether-ws-dev.gaminggeek.dev/website");
+          const ws = new WebSocket("wss://aether-ws.gaminggeek.dev/website");
           return this.setWebsocket(ws, true);
         });
       } catch {
