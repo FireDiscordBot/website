@@ -130,27 +130,36 @@ export class EventHandler {
           "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         )
         // Failed to verify identify, check session
-        getSession().then(async (session) => {
-          if (session && session.accessToken) {
-            const user = await fetchUser(session.accessToken).catch()
-            if (!user && typeof window !== "undefined") {
-              console.warn(
-                `%c Session %c Session is invalid, attempting to logout `,
-                "background: #FFFD98; color: black; border-radius: 3px 0 0 3px;",
-                "background: #353A47; color: white; border-radius: 0 3px 3px 0",
-              )
-              window.document.getElementById("user-menu-logout")?.click()
-            } else if (typeof window !== "undefined") {
-              console.info(
-                `%c WS %c Session is valid, attempting refresh! `,
-                "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
-                "background: #353A47; color: white; border-radius: 0 3px 3px 0",
-                user,
-              )
-              window.location.reload()
+        try {
+          getSession().then(async (session) => {
+            if (session && session.accessToken) {
+              const user = await fetchUser(session.accessToken).catch()
+              if (!user && typeof window !== "undefined") {
+                console.warn(
+                  `%c Session %c Session is invalid, attempting to logout `,
+                  "background: #FFFD98; color: black; border-radius: 3px 0 0 3px;",
+                  "background: #353A47; color: white; border-radius: 0 3px 3px 0",
+                )
+                window.document.getElementById("user-menu-logout")?.click()
+              } else if (typeof window !== "undefined") {
+                console.info(
+                  `%c WS %c Session is valid, attempting refresh! `,
+                  "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
+                  "background: #353A47; color: white; border-radius: 0 3px 3px 0",
+                  user,
+                )
+                window.location.reload()
+              }
             }
-          }
-        })
+          })
+        } catch {
+          console.warn(
+            `%c Session %c Session is invalid or failed to fetch, attempting to logout `,
+            "background: #FFFD98; color: black; border-radius: 3px 0 0 3px;",
+            "background: #353A47; color: white; border-radius: 0 3px 3px 0",
+          )
+          window.document.getElementById("user-menu-logout")?.click()
+        }
       }
       // cannot recover from codes below (4001 is special and handled above but if we're here, it didn't work)
       if (event.code == 1013 || event.code == 1008 || event.code == 4001 || event.code == 4015 || event.code == 4016)
