@@ -3,9 +3,7 @@ import { UserGuild } from "@/interfaces/aether"
 import { messageLinkRegex } from "@/constants"
 import fetcher from "@/utils/fetcher"
 
-const MANAGE_GUILD = 0x00000020
-
-export const fetchManageableGuilds = async (accessToken: string): Promise<DiscordGuild[]> => {
+export const fetchGuilds = async (accessToken: string): Promise<DiscordGuild[]> => {
   const guilds: DiscordGuild[] = await fetcher("https://discord.com/api/users/@me/guilds", {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -13,9 +11,20 @@ export const fetchManageableGuilds = async (accessToken: string): Promise<Discor
   })
   if (!guilds) return []
 
-  return guilds.filter((guild) => {
-    return (guild.permissions & MANAGE_GUILD) == MANAGE_GUILD
-  })
+  if (guilds.length == 100) {
+    // for the odd chance someone is in over 100
+    const moreGuilds: DiscordGuild[] = await fetcher(
+      `https://discord.com/api/users/@me/guilds?after=${guilds[guilds.length].id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    )
+    if (moreGuilds.length) guilds.push(...moreGuilds)
+  }
+
+  return guilds
 }
 
 export const fetchUser = async (accessToken: string): Promise<DiscordApiUser> => {

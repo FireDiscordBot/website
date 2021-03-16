@@ -2,14 +2,14 @@ import { DiscordGuild } from "@/interfaces/discord"
 import { fetchPremiumGuilds } from "@/lib/aether"
 import { AuthenticatedApiHandler, GetGuildsResponse } from "@/types"
 import { error, withSession } from "@/utils/api-handler-utils"
-import { fetchManageableGuilds } from "@/utils/discord"
+import { fetchGuilds } from "@/utils/discord"
 import { createErrorResponse } from "@/utils/fetcher"
 
 const handler: AuthenticatedApiHandler<GetGuildsResponse> = async (session, _req, res) => {
-  let manageableGuilds: DiscordGuild[]
+  let userGuilds: DiscordGuild[]
 
   try {
-    manageableGuilds = await fetchManageableGuilds(session.accessToken)
+    userGuilds = await fetchGuilds(session.accessToken)
   } catch (e) {
     const errorResponse = createErrorResponse(e)
     error(res, errorResponse.code, errorResponse.error)
@@ -28,7 +28,7 @@ const handler: AuthenticatedApiHandler<GetGuildsResponse> = async (session, _req
     }
   }
 
-  const guilds = manageableGuilds.map((manageableGuild) => ({
+  const guilds = userGuilds.map((manageableGuild) => ({
     ...manageableGuild,
     premium: premiumGuilds.includes(manageableGuild.id),
   }))
