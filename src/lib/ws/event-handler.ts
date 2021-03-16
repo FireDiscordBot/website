@@ -5,14 +5,16 @@ import { getSession } from "next-auth/client"
 import { Message } from "./message"
 import { MessageUtil } from "./message-util"
 
-import { DiscoverableGuild, WebsiteEvents } from "@/interfaces/aether"
+import { DiscoverableGuild, IdentifyResponse, WebsiteEvents } from "@/interfaces/aether"
 import { AuthSession } from "@/interfaces/auth"
 import { fire } from "@/constants"
+import { fetchUser } from "@/utils/discord"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export class EventHandler {
   identified: "identifying" | boolean
+  config?: Record<string, unknown>
   heartbeat?: NodeJS.Timeout
   websocket?: WebSocket
   emitter: EventEmitter
@@ -120,9 +122,17 @@ export class EventHandler {
           autoHideDuration: 5000,
         })
       this.identified = false
+      if (event.code == 4001) {
+        // Failed to verify identify, check session
+        getSession().then(async (session) => {
+          if (session && session.accessToken) {
+            const user = await fetchUser(session.accessToken).catch()
+            if (!user && typeof window !== "undefined") window.document.getElementById("user-menu-logout")?.click()
+          }
+        })
+      }
       // cannot recover from codes below
-      if (event.code == 1013 || event.code == 1008 || event.code == 4001 || event.code == 4015 || event.code == 4016)
-        return
+      if (event.code == 1013 || event.code == 1008 || event.code == 4015 || event.code == 4016) return
       try {
         sleep(2500).then(() => {
           console.info(
@@ -186,6 +196,17 @@ export class EventHandler {
       if (!this.heartbeat && this.websocket && this.websocket.readyState == this.websocket.OPEN)
         this.websocket.close(4004, "Did not receive HELLO")
     }, 2000)
+  }
+
+  IDENTIFY_CLIENT(data: IdentifyResponse) {
+    this.config = data.config
+    if (this.auth?.user?.id != data.user?.id) this.websocket?.close(4001, "Failed to verify identify")
+  }
+
+  CONFIG_UPDATE(data: { name: string; value: unknown }) {
+    if (!this.config) return
+    if (data.value == "deleteSetting") return delete this.config[data.name]
+    this.config[data.name] = data.value
   }
 
   DISCOVERY_UPDATE(data: DiscoverableGuild[]) {
