@@ -94,7 +94,7 @@ const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
                   {formatNumber(clusterStats.guilds)}
                 </Typography>
                 <Typography variant="body1" color="textSecondary">
-                  Guilds
+                  Servers
                 </Typography>
               </CardContent>
             </Card>
@@ -123,7 +123,7 @@ const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
           </Grid>
           <Grid item xs={12} sm={6}>
             <StatLine title="Commands" value={formatNumber(clusterStats.commands)} />
-            <StatLine title="Unavailable Guilds" value={formatNumber(clusterStats.unavailableGuilds)} />
+            <StatLine title="Unavailable Servers" value={formatNumber(clusterStats.unavailableGuilds)} />
             <StatLine title="Events" value={formatNumber(clusterStats.events)} />
           </Grid>
         </Grid>

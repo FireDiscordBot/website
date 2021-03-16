@@ -114,7 +114,7 @@ const StatsPage = ({ initialFireStats }: Props) => {
                   {formatNumber(fireStats.guilds)}
                 </Typography>
                 <Typography variant="body1" color="textSecondary">
-                  Guilds
+                  Servers
                 </Typography>
               </CardContent>
             </Card>

@@ -203,7 +203,7 @@ const PremiumPage = () => {
       </Box>
 
       <Typography variant="h4" gutterBottom>
-        Guilds
+        Servers
       </Typography>
 
       <Box mb={2}>
