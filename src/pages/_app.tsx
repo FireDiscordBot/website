@@ -85,13 +85,7 @@ const initHandler = async (handler: EventHandler) => {
     handler.handleSubscribe(route, extra)
   })
   if (!handler.identified) handler.identify()
-  const devToolsCheck = /./
-  devToolsCheck.toString = () => {
-    // dev tools is open
-    handler.devToolsWarning()
-    return ""
-  }
-  console.log("%c", devToolsCheck)
+  handler.devToolsWarning()
 }
 
 export default MyApp
