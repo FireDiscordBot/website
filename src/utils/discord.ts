@@ -1,7 +1,7 @@
-import { UserGuild } from "@/interfaces/aether"
 import { DiscordApiUser, DiscordFlag, DiscordGuild, flags } from "@/interfaces/discord"
-import fetcher from "@/utils/fetcher"
+import { UserGuild } from "@/interfaces/aether"
 import { messageLinkRegex } from "@/constants"
+import fetcher from "@/utils/fetcher"
 
 const MANAGE_GUILD = 0x00000020
 
@@ -11,10 +11,19 @@ export const fetchManageableGuilds = async (accessToken: string): Promise<Discor
       Authorization: `Bearer ${accessToken}`,
     },
   })
+  if (!guilds) return []
 
   return guilds.filter((guild) => {
     return (guild.permissions & MANAGE_GUILD) == MANAGE_GUILD
   })
+}
+
+export const fetchUser = async (accessToken: string): Promise<DiscordApiUser> => {
+  const user: DiscordApiUser = await fetcher("https://discord.com/api/users/@me", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+
+  return user
 }
 
 export const getUserImage = (user: DiscordApiUser) => {
