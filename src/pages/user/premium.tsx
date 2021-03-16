@@ -106,6 +106,7 @@ const PremiumPage = () => {
 
     const filteredGuilds =
       initialGuilds?.filter((guild) => guild.name.toLowerCase().includes(value.toLowerCase())) || []
+    if (page > Math.ceil(filteredGuilds.length / 12)) setPage(Math.ceil(filteredGuilds.length / 12))
     setGuilds(sort(filteredGuilds))
   }
 
@@ -232,10 +233,10 @@ const PremiumPage = () => {
 
       {guilds.length > 12 && (
         <Pagination
-          count={Math.ceil(guilds.length / 12)}
-          variant="outlined"
-          onChange={handleChangePage}
           style={{ marginTop: 15, display: "flex", alignItems: "center", justifyContent: "center" }}
+          count={Math.ceil(guilds.length / 12)}
+          onChange={handleChangePage}
+          variant="outlined"
         />
       )}
 
