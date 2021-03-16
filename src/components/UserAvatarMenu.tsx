@@ -1,15 +1,14 @@
 import * as React from "react"
-import Menu, {MenuProps} from "@material-ui/core/Menu"
-import MenuItem, {MenuItemProps} from "@material-ui/core/MenuItem"
+import Menu, { MenuProps } from "@material-ui/core/Menu"
+import MenuItem, { MenuItemProps } from "@material-ui/core/MenuItem"
+import { AccountCircle, Event, ExitToApp, Star } from "@material-ui/icons"
+import { ListItemIcon, ListItemText } from "@material-ui/core"
 
 import MenuItemLink from "./MenuItemLink"
-import {AccountCircle, Event, ExitToApp, Star} from "@material-ui/icons";
-import {ListItemIcon, ListItemText} from "@material-ui/core";
-
 
 type Props = MenuProps & { onClickLogout: MenuItemProps["onClick"] }
 
-const UserAvatarMenu = ({onClickLogout, ...props}: Props) => (
+const UserAvatarMenu = ({ onClickLogout, ...props }: Props) => (
   <Menu
     anchorOrigin={{
       vertical: "center",
@@ -25,27 +24,27 @@ const UserAvatarMenu = ({onClickLogout, ...props}: Props) => (
   >
     <MenuItemLink href="/user/account">
       <ListItemIcon>
-        <AccountCircle/>
+        <AccountCircle />
       </ListItemIcon>
-      <ListItemText primary="Account"/>
+      <ListItemText primary="Account" />
     </MenuItemLink>
     <MenuItemLink href="/user/premium">
       <ListItemIcon>
-        <Star/>
+        <Star />
       </ListItemIcon>
-      <ListItemText primary="Premium"/>
+      <ListItemText primary="Premium" />
     </MenuItemLink>
     <MenuItemLink href="/user/reminders">
       <ListItemIcon>
-        <Event/>
+        <Event />
       </ListItemIcon>
-      <ListItemText primary="Reminders"/>
+      <ListItemText primary="Reminders" />
     </MenuItemLink>
-    <MenuItem onClick={onClickLogout}>
+    <MenuItem onClick={onClickLogout} id="user-menu-logout">
       <ListItemIcon>
-        <ExitToApp/>
+        <ExitToApp />
       </ListItemIcon>
-      <ListItemText primary="Logout"/>
+      <ListItemText primary="Logout" />
     </MenuItem>
   </Menu>
 )
