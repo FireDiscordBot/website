@@ -1,4 +1,4 @@
-import { DiscordGuild } from "@/interfaces/discord"
+import { DiscordApiUser, DiscordGuild } from "@/interfaces/discord"
 
 export type ShardStats = {
   id: number
@@ -89,15 +89,7 @@ export type UserGuild = DiscordGuild & {
   premium: boolean
 }
 
-export type Reminder = {
-  user: string
-  text: string
-  link: string
-  legacy: boolean
-  timestamp: number
-}
-
-export interface Payload {
+export type Payload = {
   op: number
   d?: unknown
   s?: number
@@ -115,12 +107,27 @@ export enum WebsiteEvents {
   DISCOVERY_UPDATE,
   NOTIFICATION,
   REMINDERS_UPDATE,
+  CONFIG_UPDATE,
 }
 
-export interface Notification {
+export type Notification = {
   text: string
   severity: "success" | "info" | "warning" | "error"
   horizontal: "left" | "right" | "center"
   vertical: "top" | "bottom"
   autoHideDuration: number
+}
+
+export type Reminder = {
+  user: string
+  text: string
+  link: string
+  legacy: boolean
+  timestamp: number
+}
+
+export type IdentifyResponse = {
+  config?: Record<string, unknown>
+  user?: DiscordApiUser
+  session: string
 }
