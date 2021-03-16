@@ -4,6 +4,8 @@ import useSWR, { mutate } from "swr"
 import Grid from "@material-ui/core/Grid"
 import Box from "@material-ui/core/Box"
 import Typography from "@material-ui/core/Typography"
+import { TextField } from "@material-ui/core"
+import { Pagination } from "@material-ui/lab"
 
 import { emitter } from "../_app"
 
@@ -27,6 +29,24 @@ if (!stripeConstants.publicKey) {
 
 const stripePromise = loadStripe(stripeConstants.publicKey)
 
+// stolen from https://stackoverflow.com/a/57697857 lol
+const paginate = function (array: UserGuild[], index: number, size: number) {
+  // transform values
+  index = Math.abs(index)
+  index = index > 0 ? index - 1 : index
+  size = size < 1 ? 1 : size
+
+  // filter
+  return [
+    ...array.filter((_, n) => {
+      return n >= index * size && n < (index + 1) * size
+    }),
+  ]
+}
+
+const getSort = (guild: UserGuild) => guild.name.toLowerCase().charCodeAt(0)
+const sort = (guilds: UserGuild[]) => guilds.sort((a, b) => getSort(a) - getSort(b))
+
 const PremiumPage = () => {
   const [session, loading] = useSession({ redirectTo: "/" })
   const { subscription, isLoading: isLoadingSubscription, error: subscriptionError } = useCurrentSubscription(
@@ -42,14 +62,18 @@ const PremiumPage = () => {
       autoHideDuration: 5000,
     })
 
-  const { data: guilds, isValidating, mutate: mutateGuilds, error: guildsError } = useSWR<UserGuild[]>(
+  const { data: initialGuilds, isValidating, mutate: mutateGuilds, error: guildsError } = useSWR<UserGuild[]>(
     session ? "/api/user/guilds" : null,
     {
       revalidateOnReconnect: false,
       revalidateOnFocus: false,
     },
   )
-  const premiumGuildsCount = React.useMemo(() => guilds?.filter((guild) => guild.premium)?.length ?? 0, [guilds])
+  const premiumGuildsCount = React.useMemo(() => initialGuilds?.filter((guild) => guild.premium)?.length ?? 0, [
+    initialGuilds,
+  ])
+  const [guilds, setGuilds] = React.useState(sort(initialGuilds || []))
+
   const [plansDialogOpen, setPlansDialogOpen] = React.useState(false)
 
   React.useEffect(() => {
@@ -63,8 +87,26 @@ const PremiumPage = () => {
     setErrorMessage(message)
   }, [subscriptionError, guildsError])
 
+  React.useEffect(() => {
+    if (!guilds) setGuilds(sort(initialGuilds || []))
+  }, [guilds, initialGuilds])
+
+  const [page, setPage] = React.useState(1)
+
+  const handleChangePage = (_: unknown, page: number) => {
+    setPage(page)
+  }
+
   if (!session || loading) {
     return <Loading />
+  }
+
+  const handleTextChange = (value: string | null | undefined) => {
+    if (!value) return setGuilds(sort(initialGuilds || []))
+
+    const filteredGuilds =
+      initialGuilds?.filter((guild) => guild.name.toLowerCase().includes(value.toLowerCase())) || []
+    setGuilds(sort(filteredGuilds))
   }
 
   const onClickToggle = async (guild: UserGuild) => {
@@ -94,14 +136,24 @@ const PremiumPage = () => {
       return
     }
 
+    // update guilds state
     const newGuilds = guilds ? [...guilds] : []
     const guildIndex = newGuilds.findIndex((newGuild) => newGuild.id == guild.id)
     if (guildIndex !== -1) {
       const guild = newGuilds[guildIndex]
       newGuilds[guildIndex] = { ...guild, premium: premiumGuilds.includes(guild.id) }
     }
+    setGuilds(newGuilds)
 
-    return mutateGuilds(newGuilds, false)
+    // update initial guilds list (not filtered)
+    const newInitialGuilds = initialGuilds ? [...initialGuilds] : []
+    const initialGuildIndex = newInitialGuilds.findIndex((newGuild) => newGuild.id == guild.id)
+    if (initialGuildIndex !== -1) {
+      const guild = newInitialGuilds[initialGuildIndex]
+      newInitialGuilds[initialGuildIndex] = { ...guild, premium: premiumGuilds.includes(guild.id) }
+    }
+
+    mutateGuilds(newInitialGuilds, false)
   }
 
   const onClickPlan = async (plan: Plan) => {
@@ -154,6 +206,15 @@ const PremiumPage = () => {
         Guilds
       </Typography>
 
+      <Box mb={2}>
+        <TextField
+          id="guild-filter"
+          onChange={(value) => handleTextChange(value.target.value)}
+          fullWidth
+          placeholder={"Find a server..."}
+        />
+      </Box>
+
       <Grid container spacing={2}>
         {isValidating &&
           [...Array(8)].map((_, index) => (
@@ -162,12 +223,21 @@ const PremiumPage = () => {
             </Grid>
           ))}
         {!isValidating &&
-          guilds?.map((guild, index) => (
+          paginate(guilds || [], page, 12).map((guild, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
               <UserGuildCard guild={guild} onClickToggle={onClickToggle} />
             </Grid>
           ))}
       </Grid>
+
+      {guilds.length > 12 && (
+        <Pagination
+          count={Math.ceil(guilds.length / 12)}
+          variant="outlined"
+          onChange={handleChangePage}
+          style={{ marginTop: 15, display: "flex", alignItems: "center", justifyContent: "center" }}
+        />
+      )}
 
       <SelectPlanCard
         open={plansDialogOpen}
