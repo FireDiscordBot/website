@@ -93,6 +93,7 @@ export interface Payload {
 
 export enum WebsiteEvents {
   IDENTIFY_CLIENT,
+  RESUME_CLIENT,
   HELLO,
   HEARTBEAT,
   HEARTBEAT_ACK,
