@@ -28,10 +28,11 @@ export class EventHandler {
 
   constructor(session: AuthSession | null, emitter: EventEmitter) {
     if (session) this.auth = session
+    this.subscribed = typeof window != "undefined" ? window.location.pathname : "/"
     this.identified = false
     this.emitter = emitter
-    this.subscribed = typeof window != "undefined" ? window.location.pathname : "/"
     this.queue = []
+    this.seq = 0
   }
 
   setWebsocket(websocket: WebSocket, reconnect?: boolean) {
@@ -171,7 +172,7 @@ export class EventHandler {
             "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
             "background: #353A47; color: white; border-radius: 0 3px 3px 0",
           )
-          const ws = new WebSocket(fire.websiteSocketUrl)
+          const ws = new WebSocket(`${fire.websiteSocketUrl}?sessionId=${this.session || ""}&seq=${this.seq}`)
           return this.setWebsocket(ws, true)
         })
       } catch {
@@ -218,8 +219,6 @@ export class EventHandler {
       new Message(WebsiteEvents.IDENTIFY_CLIENT, {
         config: { subscribed: this.subscribed ?? window.location.pathname, session: this.auth },
         env: process.env.NODE_ENV,
-        sessionId: this.session,
-        seq: this.seq,
       }),
     )
     this.identified = true
