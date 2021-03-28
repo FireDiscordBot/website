@@ -9,7 +9,7 @@ import CssBaseline from "@material-ui/core/CssBaseline"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import moment from "@date-io/moment"
 
-import { defaultSeoConfig, fire } from "@/constants"
+import { defaultSeoConfig } from "@/constants"
 import fetcher from "@/utils/fetcher"
 import theme from "@/theme"
 import { isBrowser } from "@/utils/is-browser"
@@ -26,7 +26,7 @@ if (isBrowser()) {
 
 export const emitter = new Emitter()
 
-function MyApp(props: AppProps) {
+function FireApp(props: AppProps) {
   const { Component, pageProps } = props
   const [notification, setNotification] = React.useState<Notification | undefined>(undefined)
 
@@ -35,8 +35,8 @@ function MyApp(props: AppProps) {
     jssStyles?.parentElement?.removeChild(jssStyles)
   }, [])
 
-  const [handler] = useWebsocket(fire.websiteSocketUrl, emitter)
-  if (handler) {
+  const [handler] = useWebsocket(emitter)
+  if (handler && !handler.initialised) {
     initHandler(handler)
   }
 
@@ -86,6 +86,7 @@ const initHandler = async (handler: EventHandler) => {
   })
   if (!handler.identified) handler.identify()
   handler.devToolsWarning()
+  handler.initialised = true
 }
 
-export default MyApp
+export default FireApp
