@@ -84,7 +84,7 @@ const initHandler = async (handler: EventHandler) => {
   emitter.on("SUBSCRIBE", (route, extra) => {
     handler.handleSubscribe(route, extra)
   })
-  if (!handler.identified) handler.identify()
+  if (!handler.identified) await handler.identify()
   handler.devToolsWarning()
   handler.initialised = true
 }
