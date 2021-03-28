@@ -202,6 +202,8 @@ export class EventHandler {
     this.identified = true // should already be true but just in case
     this.session = data.session
     this.config = { ...this.config, ...data.config }
+    if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
+      (globalThis as { [key: string]: unknown }).eventHandler = this // easy access for debugging
     console.info(
       `%c WS %c Successfully resumed${data.replayed ? "with " + data.replayed + " replayed events" : ""} `,
       "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
@@ -223,6 +225,10 @@ export class EventHandler {
     const identified = await this.sendIdentify().catch((reason: string) => this.websocket?.close(4008, reason))
     if (!identified) return
     this.config = { ...this.config, ...identified.config }
+    if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
+      // easy access for debugging
+      (globalThis as { [key: string]: unknown }).eventHandler = this
+    else delete (globalThis as { [key: string]: unknown }).eventHandler
     if (this.auth?.user?.id != identified.user?.id) this.websocket?.close(4001, "Failed to verify identify")
     this.identified = true
     setTimeout(() => {
@@ -278,7 +284,10 @@ IT'S BEST TO JUST CLOSE THIS WINDOW AND PRETEND IT DOES NOT EXIST.`,
   private send(message?: Message) {
     if (!message || !this.websocket || this.websocket.readyState != this.websocket.OPEN)
       return message && this.queue.push(message)
-    if (process.env.NODE_ENV == "development") (globalThis as { [key: string]: unknown }).eventHandler = this
+    if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
+      // easy access for debugging
+      (globalThis as { [key: string]: unknown }).eventHandler = this
+    else delete (globalThis as { [key: string]: unknown }).eventHandler
     // heartbeats can be spammy and just have the sequence anyways
     if (message.type != WebsiteEvents.HEARTBEAT)
       console.debug(
