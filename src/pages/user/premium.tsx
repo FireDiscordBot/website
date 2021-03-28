@@ -45,7 +45,7 @@ const paginate = function (array: UserGuild[], index: number, size: number) {
 }
 
 const getSort = (guild: UserGuild) => guild.name.toLowerCase().charCodeAt(0)
-const sort = (guilds: UserGuild[]) => guilds.sort((a, b) => getSort(a) - getSort(b))
+const sort = (guilds?: UserGuild[]) => (guilds?.length ? guilds.sort((a, b) => getSort(a) - getSort(b)) : undefined)
 
 const PremiumPage = () => {
   const [session, loading] = useSession({ redirectTo: "/" })
@@ -72,7 +72,7 @@ const PremiumPage = () => {
   const premiumGuildsCount = React.useMemo(() => initialGuilds?.filter((guild) => guild.premium)?.length ?? 0, [
     initialGuilds,
   ])
-  const [guilds, setGuilds] = React.useState(sort(initialGuilds || []))
+  const [guilds, setGuilds] = React.useState(sort(initialGuilds))
 
   const [plansDialogOpen, setPlansDialogOpen] = React.useState(false)
 
@@ -223,6 +223,7 @@ const PremiumPage = () => {
               <UserGuildCard onClickToggle={onClickToggle} />
             </Grid>
           ))}
+        {!guilds}
         {!isValidating &&
           paginate(guilds || [], page, 12).map((guild, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
@@ -231,10 +232,10 @@ const PremiumPage = () => {
           ))}
       </Grid>
 
-      {guilds.length > 12 && (
+      {(guilds?.length || 0) > 12 && (
         <Pagination
           style={{ marginTop: 15, display: "flex", alignItems: "center", justifyContent: "center" }}
-          count={Math.ceil(guilds.length / 12)}
+          count={Math.ceil((guilds?.length || 0) / 12)}
           onChange={handleChangePage}
           variant="outlined"
         />
