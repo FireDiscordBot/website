@@ -94,8 +94,10 @@ export class EventHandler {
         })
         delete this.session
         delete this.seq
-        window.localStorage.removeItem("aether_session")
-        window.localStorage.removeItem("aether_seq")
+        if (typeof window != "undefined") {
+          window.localStorage.removeItem("aether_session")
+          window.localStorage.removeItem("aether_seq")
+        }
       } else
         this.emitter.emit("NOTIFICATION", {
           text: "Websocket error occurred",
@@ -188,7 +190,15 @@ export class EventHandler {
   }
 
   RESUME_CLIENT(data: { user: AuthUser; replayed: number; session: string; config: Record<string, unknown> }) {
-    if (this.auth?.user?.id != data.user?.id) return this.websocket?.close(4001, "Failed to verify identify")
+    if (this.auth?.user?.id != data.user?.id) {
+      delete this.session
+      delete this.seq
+      if (typeof window != "undefined") {
+        window.localStorage.removeItem("aether_session")
+        window.localStorage.removeItem("aether_seq")
+      }
+      return this.websocket?.close(4005, "Invalid Session")
+    }
     this.identified = true // should already be true but just in case
     this.session = data.session
     this.config = { ...this.config, ...data.config }
