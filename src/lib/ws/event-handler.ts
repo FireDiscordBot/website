@@ -94,6 +94,8 @@ export class EventHandler {
         })
         delete this.session
         delete this.seq
+        window.localStorage.removeItem("aether_session")
+        window.localStorage.removeItem("aether_seq")
       } else
         this.emitter.emit("NOTIFICATION", {
           text: "Websocket error occurred",
@@ -128,6 +130,8 @@ export class EventHandler {
                   "background: #353A47; color: white; border-radius: 0 3px 3px 0",
                   user,
                 )
+                window.localStorage.removeItem("aether_session")
+                window.localStorage.removeItem("aether_seq")
                 window.location.reload()
               }
             }
