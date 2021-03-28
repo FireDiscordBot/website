@@ -15,28 +15,32 @@ type Props = {
   initialGuilds: DiscoverableGuild[]
 }
 
+const getSortedGuilds = (guilds: DiscoverableGuild[], sortIds: string[]) =>
+  guilds.sort(
+    (a, b) =>
+      (sortIds.includes(a.id) ? sortIds.indexOf(a.id) : 2) - (sortIds.includes(b.id) ? sortIds.indexOf(b.id) : 2),
+  )
+
 // TODO: implement pagination or infinite scrolling
 // maybe add error message when no guilds are found?
 const DiscoverPage = ({ initialGuilds }: Props) => {
+  const [sortIds, setSortIds] = React.useState<string[]>(initialGuilds.map((guild) => guild.id))
   const [guilds, setGuilds] = React.useState<DiscoverableGuild[]>(initialGuilds)
 
-  if (guilds.length)
-    emitter.emit(
-      "SUBSCRIBE",
-      "/discover",
-      guilds.map((guild) => guild.id),
-    )
-
   React.useEffect(() => {
+    const setGuildsWithSort = (guilds: DiscoverableGuild[]) => {
+      setGuilds(getSortedGuilds(guilds, sortIds))
+      setSortIds(guilds.map((guild) => guild.id))
+    }
     emitter.removeAllListeners("DISCOVERY_UPDATE")
-    emitter.on("DISCOVERY_UPDATE", setGuilds)
-  }, [guilds])
+    emitter.on("DISCOVERY_UPDATE", setGuildsWithSort)
+  }, [guilds, sortIds])
 
   return (
     <DefaultLayout title="Discover">
       <Container>
         <Grid container spacing={4}>
-          {guilds.map((guild, index) => (
+          {getSortedGuilds(guilds, sortIds).map((guild, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <DiscoverableGuildCard guild={guild} />
             </Grid>
