@@ -4,9 +4,10 @@ import { getSession } from "next-auth/client"
 
 import { Message } from "./message"
 import { MessageUtil } from "./message-util"
+import { Websocket } from "./websocket"
 
-import { DiscoverableGuild, IdentifyResponse, WebsiteEvents } from "@/interfaces/aether"
-import { AuthSession } from "@/interfaces/auth"
+import { IdentifyResponse, WebsiteEvents } from "@/interfaces/aether"
+import { AuthSession, AuthUser } from "@/interfaces/auth"
 import { fire } from "@/constants"
 import { fetchUser } from "@/utils/discord"
 
@@ -16,8 +17,8 @@ export class EventHandler {
   identified: "identifying" | boolean
   config?: Record<string, unknown>
   heartbeat?: NodeJS.Timeout
-  devToolsWarned?: boolean
-  websocket?: WebSocket
+  initialised?: boolean
+  websocket?: Websocket
   emitter: EventEmitter
   auth?: AuthSession
   subscribed: string
@@ -35,35 +36,13 @@ export class EventHandler {
     this.seq = 0
   }
 
-  setWebsocket(websocket: WebSocket, reconnect?: boolean) {
+  setWebsocket(websocket: Websocket, reconnect?: boolean) {
+    websocket.eventHandler = this
     if (this.websocket) {
       this.websocket.close(1000, "Reconnecting")
       delete this.websocket
     }
     this.websocket = websocket
-    this.websocket.onmessage = (message) => {
-      const decoded = MessageUtil.decode(message.data)
-      if (!decoded)
-        return console.error(
-          "%c WS %c Failed to decode message! ",
-          "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
-          "background: #353A47; color: white; border-radius: 0 3px 3px 0",
-          { data: message.data },
-        )
-      if (typeof decoded.s == "number") this.seq = decoded.s
-      // heartbeats acks can be spammy and have a null body anyways
-      if (decoded.op != WebsiteEvents.HEARTBEAT_ACK)
-        console.debug(
-          `%c WS %c Incoming %c ${WebsiteEvents[decoded.op]} `,
-          "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
-          "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
-          "background: #353A47; color: white; border-radius: 0 3px 3px 0",
-          decoded,
-        )
-      this.emitter.emit(WebsiteEvents[decoded.op], decoded.d)
-      // @ts-expect-error This is needed to ensure this[string] works
-      if (WebsiteEvents[decoded.op] in this) this[WebsiteEvents[decoded.op]](decoded.d)
-    }
     this.websocket.onopen = () => {
       reconnect &&
         this.emitter.emit("NOTIFICATION", {
@@ -82,7 +61,7 @@ export class EventHandler {
       this.identify()
       while (this.queue?.length) this.send(this.queue.pop())
     }
-    this.websocket.onclose = (event) => {
+    this.websocket.onclose = (event: CloseEvent) => {
       console.error(
         `%c WS %c Websocket closed! `,
         "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
@@ -172,7 +151,7 @@ export class EventHandler {
             "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
             "background: #353A47; color: white; border-radius: 0 3px 3px 0",
           )
-          const ws = new WebSocket(`${fire.websiteSocketUrl}?sessionId=${this.session || ""}&seq=${this.seq}`)
+          const ws = new Websocket(`${fire.websiteSocketUrl}?sessionId=${this.session || ""}&seq=${this.seq}`)
           return this.setWebsocket(ws, true)
         })
       } catch {
@@ -204,23 +183,33 @@ export class EventHandler {
     this.session = data.sessionId
   }
 
+  RESUME_CLIENT(data: { user: AuthUser; replayed: number; session: string; config: Record<string, unknown> }) {
+    if (this.auth?.user?.id != data.user?.id) return this.websocket?.close(4001, "Failed to verify identify")
+    this.identified = true // should already be true but just in case
+    this.session = data.session
+    this.config = { ...this.config, ...data.config }
+    console.info(
+      `%c WS %c Successfully resumed${data.replayed ? "with " + data.replayed + " replayed events" : ""} `,
+      "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
+      "background: #353A47; color: white; border-radius: 0 3px 3px 0",
+    )
+  }
+
   HEARTBEAT_ACK() {
     this.acked = true
   }
 
-  identify() {
+  async identify() {
     if (this.identified) return
     this.identified = "identifying"
     if (this.heartbeat) {
       clearInterval(this.heartbeat)
       delete this.heartbeat
     }
-    this.send(
-      new Message(WebsiteEvents.IDENTIFY_CLIENT, {
-        config: { subscribed: this.subscribed ?? window.location.pathname, session: this.auth },
-        env: process.env.NODE_ENV,
-      }),
-    )
+    const identified = await this.sendIdentify().catch((reason: string) => this.websocket?.close(4008, reason))
+    if (!identified) return
+    this.config = { ...this.config, ...identified.config }
+    if (this.auth?.user?.id != identified.user?.id) this.websocket?.close(4001, "Failed to verify identify")
     this.identified = true
     setTimeout(() => {
       if (!this.heartbeat && this.websocket && this.websocket.readyState == this.websocket.OPEN)
@@ -228,9 +217,28 @@ export class EventHandler {
     }, 2000)
   }
 
-  IDENTIFY_CLIENT(data: IdentifyResponse) {
-    this.config = data.config
-    if (this.auth?.user?.id != data.user?.id) this.websocket?.close(4001, "Failed to verify identify")
+  private sendIdentify(): Promise<IdentifyResponse> {
+    return new Promise((resolve, reject) => {
+      const nonce = (+new Date()).toString()
+      this.websocket?.handlers.set(nonce, resolve)
+      this.send(
+        new Message(
+          WebsiteEvents.IDENTIFY_CLIENT,
+          {
+            config: { subscribed: this.subscribed ?? window.location.pathname, session: this.auth },
+            env: process.env.NODE_ENV,
+          },
+          nonce,
+        ),
+      )
+
+      setTimeout(() => {
+        if (this.websocket?.handlers.has(nonce) && this.identified != true) {
+          this.websocket.handlers.delete(nonce)
+          reject("Identify timed out")
+        }
+      }, 10000)
+    })
   }
 
   CONFIG_UPDATE(data: { name: string; value: unknown }) {
@@ -239,16 +247,8 @@ export class EventHandler {
     this.config[data.name] = data.value
   }
 
-  DISCOVERY_UPDATE(data: DiscoverableGuild[]) {
-    this.handleSubscribe(
-      "/discover",
-      data.map((guild) => guild.id),
-    )
-  }
-
   devToolsWarning() {
-    if (this.devToolsWarned) return
-    this.devToolsWarned = true
+    if (this.initialised) return
     console.log(
       `%c STOP!
 
@@ -272,7 +272,7 @@ IT'S BEST TO JUST CLOSE THIS WINDOW AND PRETEND IT DOES NOT EXIST.`,
         "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
         "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
-        message.data,
+        message.toJSON(),
       )
     if (this.identified == false && this.auth) this.identify()
     else if (this.identified == false) {
