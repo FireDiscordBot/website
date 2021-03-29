@@ -28,9 +28,9 @@ const handler: AuthenticatedApiHandler<GetGuildsResponse> = async (session, _req
     }
   }
 
-  const guilds = userGuilds.map((manageableGuild) => ({
-    ...manageableGuild,
-    premium: premiumGuilds.includes(manageableGuild.id),
+  const guilds = userGuilds.map((userGuild) => ({
+    ...userGuild,
+    premium: premiumGuilds.includes(userGuild.id),
   }))
 
   res.json(guilds)
