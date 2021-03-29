@@ -14,6 +14,13 @@ export class NetworkError extends Error {
 }
 
 export const createErrorResponse = (error: Error): ApiErrorResponse => {
+  // eslint-disable-next-line no-prototype-builtins
+  if (error instanceof NetworkError && typeof error.data == "object" && error.data?.hasOwnProperty("message")) {
+    // convert discord errors into the same format used by aether/inv.wtf
+    // 'tis hacky but it works, better than 500s and exceptions
+    ;(error.data as ApiErrorResponse).error = (error.data as { message: string; code: number })?.message
+    ;(error.data as ApiErrorResponse).code = error.code
+  }
   if (error instanceof NetworkError && typeof error.data == "object") {
     return <ApiErrorResponse>error.data
   } else {

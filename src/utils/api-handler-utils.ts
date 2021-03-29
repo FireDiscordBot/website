@@ -5,6 +5,7 @@ import { getSession } from "next-auth/client"
 import { ApiErrorResponse, ApiHandler, ApiResponseBody, AuthenticatedApiHandler } from "@/types"
 
 export const error = <T>(res: NextApiResponse<ApiResponseBody<T>>, code: StatusCodes, message?: string) => {
+  if (message?.startsWith(`${code}: `)) message = message.slice(code.toString().length + 2)
   res.status(code).json(<ApiErrorResponse>{
     success: false,
     code,
