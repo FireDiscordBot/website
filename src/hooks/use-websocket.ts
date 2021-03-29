@@ -19,7 +19,7 @@ const useWebsocket = (emitter: EventEmitter) => {
           ? fire.websiteSocketUrl
           : `${fire.websiteSocketUrl}?sessionId=${window.localStorage.getItem(
               "aether_session",
-            )}&seq=${window.localStorage.getItem("aether_seq")}`,
+            ) || ""}&seq=${window.localStorage.getItem("aether_seq") || "0"}`,
         handler,
       )
       handler.setWebsocket(ws)
