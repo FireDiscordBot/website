@@ -23,7 +23,7 @@ const useWebsocket = (emitter: EventEmitter) => {
         handler,
       )
       handler.setWebsocket(ws)
-      if (typeof window != "undefined" && window.localStorage.getItem("aether_session"))
+      if (typeof window != "undefined" && window.localStorage.getItem("aether_session")?.length == 32)
         handler.session = window.localStorage.getItem("aether_session") as string
       setHandler(handler)
     }

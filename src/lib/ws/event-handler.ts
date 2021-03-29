@@ -17,15 +17,15 @@ export class EventHandler {
   identified: "identifying" | boolean
   config?: Record<string, unknown>
   heartbeat?: NodeJS.Timeout
+  private _session?: string
   initialised?: boolean
   websocket?: Websocket
   emitter: EventEmitter
+  private _seq?: number
   auth?: AuthSession
   subscribed: string
-  session?: string
   queue: Message[]
   acked?: boolean
-  seq?: number
 
   constructor(session: AuthSession | null, emitter: EventEmitter) {
     if (session) this.auth = session
@@ -33,7 +33,25 @@ export class EventHandler {
     this.identified = false
     this.emitter = emitter
     this.queue = []
-    this.seq = 0
+    this._seq = 0
+  }
+
+  get seq() {
+    return this._seq || 0
+  }
+
+  set seq(seq: number) {
+    this._seq = seq
+    if (typeof window != "undefined") window.localStorage.setItem("aether_seq", seq.toString())
+  }
+
+  get session() {
+    return this._session || ""
+  }
+
+  set session(session: string) {
+    this._session = session
+    if (typeof window != "undefined") window.localStorage.setItem("aether_session", session)
   }
 
   setWebsocket(websocket: Websocket, reconnect?: boolean) {
@@ -93,8 +111,8 @@ export class EventHandler {
             vertical: "top",
             autoHideDuration: 5000,
           })
-        delete this.session
-        delete this.seq
+        delete this._session
+        delete this._seq
         if (typeof window != "undefined") {
           window.localStorage.removeItem("aether_session")
           window.localStorage.removeItem("aether_seq")
@@ -158,7 +176,7 @@ export class EventHandler {
             "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
             "background: #353A47; color: white; border-radius: 0 3px 3px 0",
           )
-          const ws = new Websocket(`${fire.websiteSocketUrl}?sessionId=${this.session || ""}&seq=${this.seq}`)
+          const ws = new Websocket(`${fire.websiteSocketUrl}?sessionId=${this.session}&seq=${this.seq}`)
           return this.setWebsocket(ws, true)
         })
       } catch {
@@ -192,8 +210,8 @@ export class EventHandler {
 
   RESUME_CLIENT(data: { user: AuthUser; replayed: number; session: string; config: Record<string, unknown> }) {
     if (this.auth?.user?.id != data.user?.id) {
-      delete this.session
-      delete this.seq
+      delete this._session
+      delete this._seq
       if (typeof window != "undefined") {
         window.localStorage.removeItem("aether_session")
         window.localStorage.removeItem("aether_seq")

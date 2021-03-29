@@ -30,10 +30,6 @@ export class Websocket extends WebSocket {
         )
       if (this.eventHandler) {
         if (typeof message.s == "number") this.eventHandler.seq = message.s
-        if (typeof window != "undefined" && this.eventHandler.session) {
-          window.localStorage.setItem("aether_session", this.eventHandler.session)
-          window.localStorage.setItem("aether_seq", this.eventHandler.seq?.toString() || "0")
-        }
         // heartbeats acks can be spammy and have a null body anyways
         if (message.op != WebsiteEvents.HEARTBEAT_ACK)
           console.debug(
