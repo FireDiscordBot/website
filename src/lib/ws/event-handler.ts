@@ -238,7 +238,7 @@ export class EventHandler {
     }, 2000)
   }
 
-  private sendIdentify(): Promise<IdentifyResponse> {
+  private sendIdentify(): Promise<IdentifyResponse | null> {
     return new Promise((resolve, reject) => {
       const nonce = (+new Date()).toString()
       this.websocket?.handlers.set(nonce, resolve)
@@ -257,6 +257,9 @@ export class EventHandler {
         if (this.websocket?.handlers.has(nonce) && this.identified != true) {
           this.websocket.handlers.delete(nonce)
           reject("Identify timed out")
+        } else if (this.websocket?.handlers.has(nonce)) {
+          this.websocket.handlers.delete(nonce)
+          resolve(null)
         }
       }, 10000)
     })
