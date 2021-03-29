@@ -85,13 +85,14 @@ export class EventHandler {
           autoHideDuration: 15000,
         })
       else if (event.code == 4005) {
-        this.emitter.emit("NOTIFICATION", {
-          text: "Invalid Session",
-          severity: "error",
-          horizontal: "right",
-          vertical: "top",
-          autoHideDuration: 5000,
-        })
+        if (this.identified && this.session)
+          this.emitter.emit("NOTIFICATION", {
+            text: "Invalid Session",
+            severity: "error",
+            horizontal: "right",
+            vertical: "top",
+            autoHideDuration: 5000,
+          })
         delete this.session
         delete this.seq
         if (typeof window != "undefined") {
@@ -205,7 +206,7 @@ export class EventHandler {
     if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
       (globalThis as { [key: string]: unknown }).eventHandler = this // easy access for debugging
     console.info(
-      `%c WS %c Successfully resumed${data.replayed ? "with " + data.replayed + " replayed events" : ""} `,
+      `%c WS %c Successfully resumed${data.replayed ? " with " + data.replayed + " replayed events" : ""} `,
       "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
       "background: #353A47; color: white; border-radius: 0 3px 3px 0",
     )
@@ -259,6 +260,10 @@ export class EventHandler {
         }
       }, 10000)
     })
+  }
+
+  sendGuildJoinRequest(id: string, nonce: string) {
+    this.send(new Message(WebsiteEvents.GUILD_JOIN_REQUEST, { id }, nonce))
   }
 
   CONFIG_UPDATE(data: { name: string; value: unknown }) {

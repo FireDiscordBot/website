@@ -8,7 +8,7 @@ import { Websocket } from "@/lib/ws/websocket"
 import { fire } from "@/constants"
 
 const useWebsocket = (emitter: EventEmitter) => {
-  const [handler, setHandler] = React.useState<EventHandler | null>(null)
+  const [handler, setHandler] = React.useState<EventHandler>()
   React.useEffect(() => {
     let ws: Websocket
     const initHandler = async () => {
@@ -17,9 +17,9 @@ const useWebsocket = (emitter: EventEmitter) => {
       ws = new Websocket(
         typeof window == "undefined"
           ? fire.websiteSocketUrl
-          : `${fire.websiteSocketUrl}?sessionId=${window.localStorage.getItem(
-              "aether_session",
-            ) || ""}&seq=${window.localStorage.getItem("aether_seq") || "0"}`,
+          : `${fire.websiteSocketUrl}?sessionId=${window.localStorage.getItem("aether_session") || ""}&seq=${
+              window.localStorage.getItem("aether_seq") || "0"
+            }`,
         handler,
       )
       handler.setWebsocket(ws)
@@ -32,7 +32,7 @@ const useWebsocket = (emitter: EventEmitter) => {
     return () => ws?.close()
   }, [emitter])
 
-  return [handler]
+  return handler
 }
 
 export default useWebsocket

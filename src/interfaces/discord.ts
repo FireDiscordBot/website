@@ -106,3 +106,42 @@ export const flags: DiscordFlag[] = [
     name: "Early Verified Bot Developer",
   },
 ]
+
+export interface Invite {
+  code: string
+  guild: Guild
+  channel: Channel
+  approximate_member_count?: number
+  approximate_presence_count?: number
+}
+
+export interface Channel {
+  id: string
+  name: string
+  type: number
+}
+
+export interface Guild {
+  id: string
+  name: string
+  splash?: string
+  banner?: string
+  description?: string
+  icon?: string
+  features: string[]
+  verification_level: number
+  vanity_url_code?: string
+  welcome_screen?: WelcomeScreen
+}
+
+export interface WelcomeScreen {
+  description: string
+  welcome_channels: WelcomeChannel[]
+}
+
+export interface WelcomeChannel {
+  channel_id: string
+  description: string
+  emoji_id?: string
+  emoji_name: string
+}

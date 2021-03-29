@@ -110,6 +110,7 @@ export enum WebsiteEvents {
   NOTIFICATION,
   REMINDERS_UPDATE,
   CONFIG_UPDATE,
+  GUILD_JOIN_REQUEST,
 }
 
 export type Notification = {
