@@ -103,7 +103,7 @@ export class EventHandler {
           autoHideDuration: 15000,
         })
       else if (event.code == 4005) {
-        if (this.identified && this.session)
+        if (this.identified == true && !!this.session)
           this.emitter.emit("NOTIFICATION", {
             text: "Invalid Session",
             severity: "error",
@@ -177,7 +177,7 @@ export class EventHandler {
             "background: #353A47; color: white; border-radius: 0 3px 3px 0",
           )
           const ws = new Websocket(`${fire.websiteSocketUrl}?sessionId=${this.session}&seq=${this.seq}`)
-          return this.setWebsocket(ws, true)
+          return this.setWebsocket(ws, this.identified == true && !!this.session)
         })
       } catch {
         console.error(
