@@ -67,7 +67,6 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     props: {
       initialGuilds: guilds,
     },
-    revalidate: 300,
   }
 }
 
