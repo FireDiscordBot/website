@@ -287,6 +287,10 @@ export class EventHandler {
     this.send(new Message(WebsiteEvents.GUILD_JOIN_REQUEST, { id }, nonce))
   }
 
+  requestData(nonce: string) {
+    this.send(new Message(WebsiteEvents.DATA_REQUEST, {}, nonce))
+  }
+
   CONFIG_UPDATE(data: { name: string; value: unknown }) {
     if (!this.config) return
     if (data.value == "deleteSetting") return delete this.config[data.name]
