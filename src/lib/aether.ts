@@ -1,6 +1,7 @@
 import { fire } from "@/constants"
 import fetcher from "@/utils/fetcher"
 import { Reminder } from "@/interfaces/aether"
+import { GetCollectData } from "@/types"
 
 const requestWithAuth = <R = never>(accessToken: string, path: string, method?: string, body?: unknown) =>
   fetcher<R>(`${fire.aetherApiUrl}/${path}`, {
@@ -43,6 +44,11 @@ export const toggleGuildPremium = async (accessToken: string, guildId: string) =
 export const createDataArchive = async (accessToken: string) => {
   const json = await requestWithAuth<{ url: string }>(accessToken, `data/collect`, "POST")
   return json.url
+}
+
+export const getDataRequest = async (accessToken: string) => {
+  const json = await requestWithAuth<GetCollectData>(accessToken, `data/collect`, "GET")
+  return json
 }
 
 export const fetchUserReminders = async (accessToken: string) => {
