@@ -172,7 +172,6 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       shardCount: 0,
       guilds: 0,
       users: 0,
-      events: 0,
       clusters: [],
     }
   }

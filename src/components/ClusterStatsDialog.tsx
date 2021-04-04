@@ -124,7 +124,6 @@ const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
           <Grid item xs={12} sm={6}>
             <StatLine title="Commands" value={formatNumber(clusterStats.commands)} />
             <StatLine title="Unavailable Servers" value={formatNumber(clusterStats.unavailableGuilds)} />
-            <StatLine title="Events" value={formatNumber(clusterStats.events)} />
           </Grid>
         </Grid>
 
