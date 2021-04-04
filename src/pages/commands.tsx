@@ -18,6 +18,8 @@ import { fire } from "@/constants"
 import { Category } from "@/interfaces/aether"
 import DefaultLayout from "@/layouts/default"
 import CommandAccordion from "@/components/CommandAccordion"
+import {withStyles} from "@material-ui/core";
+import {red} from "@material-ui/core/colors";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -36,6 +38,12 @@ const useStyles = makeStyles((theme) =>
 type Props = {
   initialCategories: Category[]
 }
+
+const CategoriesTabs = withStyles({
+  indicator: {
+    backgroundColor: red[700],
+  },
+})(Tabs);
 
 const CommandsPage = ({ initialCategories }: Props) => {
   const classes = useStyles()
@@ -69,10 +77,10 @@ const CommandsPage = ({ initialCategories }: Props) => {
     <DefaultLayout title="Commands">
       <Container>
         <Grid container>
-          <Grid item xs={12} md={2}>
+          <Grid item xs={12} md={12}>
             <Paper className={classes.fullHeight}>
-              <Tabs
-                orientation={!isMobile ? "vertical" : "horizontal"}
+              <CategoriesTabs
+                orientation={"horizontal"}
                 variant="scrollable"
                 value={selectedCategoryIndex}
                 onChange={onChangeSelectedTab}
@@ -83,14 +91,14 @@ const CommandsPage = ({ initialCategories }: Props) => {
                 {categories.map((category, index) => (
                   <Tab label={category.name} key={index} />
                 ))}
-              </Tabs>
+              </CategoriesTabs>
             </Paper>
           </Grid>
-          <Grid item xs={12} md={10}>
+          <Grid item xs={12} md={12}>
             {categories.map(
               (category, index) =>
                 selectedCategoryIndex == index && (
-                  <Box p={3} width="100%" key={index}>
+                  <Box paddingTop={3} width="100%" key={index}>
                     {category.commands.map((command, index) => (
                       <CommandAccordion command={command} prefix={prefix} key={index} />
                     ))}
