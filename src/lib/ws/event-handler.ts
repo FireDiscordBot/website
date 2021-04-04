@@ -10,14 +10,30 @@ import { IdentifyResponse, WebsiteEvents } from "@/interfaces/aether"
 import { AuthSession, AuthUser } from "@/interfaces/auth"
 import { fire } from "@/constants"
 import { fetchUser } from "@/utils/discord"
+import { DiscordGuild } from "@/interfaces/discord"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const getReconnectTime = (code: number) => {
+  switch (code) {
+    case 1012: {
+      return process.env.NODE_ENV == "development" ? 10000 : 2500
+    }
+    case 4005: {
+      return 0
+    }
+    default: {
+      return 2500
+    }
+  }
+}
 
 export class EventHandler {
   identified: "identifying" | boolean
   config?: Record<string, unknown>
   heartbeat?: NodeJS.Timeout
   private _session?: string
+  guilds: DiscordGuild[]
   initialised?: boolean
   websocket?: Websocket
   emitter: EventEmitter
@@ -32,6 +48,7 @@ export class EventHandler {
     this.subscribed = typeof window != "undefined" ? window.location.pathname : "/"
     this.identified = false
     this.emitter = emitter
+    this.guilds = []
     this.queue = []
     this._seq = 0
   }
@@ -170,7 +187,7 @@ export class EventHandler {
       if (event.code == 1013 || event.code == 1008 || event.code == 4001 || event.code == 4015 || event.code == 4016)
         return
       try {
-        sleep(2500).then(() => {
+        sleep(getReconnectTime(event.code)).then(() => {
           console.info(
             "%c WS %c Reconnecting... ",
             "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
@@ -295,6 +312,14 @@ export class EventHandler {
     if (!this.config) return
     if (data.value == "deleteSetting") return delete this.config[data.name]
     this.config[data.name] = data.value
+  }
+
+  GUILD_CREATE(guild: DiscordGuild) {
+    if (!this.guilds.find((g) => g.id == guild.id)) this.guilds.push(guild)
+  }
+
+  GUILD_DELETE(data: { id: string }) {
+    this.guilds = this.guilds.filter((guild) => guild.id != data.id)
   }
 
   devToolsWarning() {
