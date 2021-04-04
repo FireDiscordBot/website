@@ -88,7 +88,7 @@ const PremiumPage = () => {
   }, [subscriptionError, guildsError])
 
   React.useEffect(() => {
-    if (!guilds) setGuilds(sort(initialGuilds || []))
+    if (!guilds) setGuilds(sort(initialGuilds))
   }, [guilds, initialGuilds])
 
   const [page, setPage] = React.useState(1)
