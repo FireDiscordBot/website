@@ -27,9 +27,7 @@ export type ClusterStats = {
   guilds: number
   unavailableGuilds: number
   users: number
-  userStatuses?: { online: number; dnd: number; idle: number; offline: number }
   commands: number
-  events: number
   restPing: number
   shards: ShardStats[]
   error?: string
@@ -49,7 +47,6 @@ export type FireStats = {
   shardCount: number
   guilds: number
   users: number
-  events: number
   clusters: ClusterStats[]
 }
 
@@ -104,6 +101,8 @@ export enum WebsiteEvents {
   HEARTBEAT,
   HEARTBEAT_ACK,
   SUBSCRIBE,
+  GUILD_CREATE,
+  GUILD_DELETE,
   REALTIME_STATS,
   COMMANDS_UPDATE,
   DISCOVERY_UPDATE,
