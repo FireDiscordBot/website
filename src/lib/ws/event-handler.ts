@@ -225,7 +225,13 @@ export class EventHandler {
     this.session = data.sessionId
   }
 
-  RESUME_CLIENT(data: { user: AuthUser; replayed: number; session: string; config: Record<string, unknown> }) {
+  RESUME_CLIENT(data: {
+    guilds: DiscordGuild[]
+    user: AuthUser
+    replayed: number
+    session: string
+    config: Record<string, unknown>
+  }) {
     if (this.auth?.user?.id != data.user?.id) {
       delete this._session
       delete this._seq
@@ -234,6 +240,10 @@ export class EventHandler {
         window.sessionStorage.removeItem("aether_seq")
       }
       return this.websocket?.close(4005, "Invalid Session")
+    } else this.auth.user = data.user
+    if (!data.guilds.length || data.guilds.length != this.guilds.length) {
+      this.send(new Message(WebsiteEvents.GUILD_SYNC, { existing: this.guilds }))
+      this.guilds = []
     }
     this.identified = true // should already be true but just in case
     this.session = data.session
@@ -258,7 +268,9 @@ export class EventHandler {
       clearInterval(this.heartbeat)
       delete this.heartbeat
     }
-    const identified = await this.sendIdentify().catch((reason: string) => this.websocket?.close(4008, reason))
+    const identified = await this.sendIdentify().catch((reason: string) => {
+      this.websocket?.close(4008, reason)
+    })
     if (!identified) return
     this.config = { ...this.config, ...identified.config }
     if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
@@ -266,6 +278,7 @@ export class EventHandler {
       (globalThis as { [key: string]: unknown }).eventHandler = this
     else delete (globalThis as { [key: string]: unknown }).eventHandler
     if (this.auth?.user?.id != identified.user?.id) this.websocket?.close(4001, "Failed to verify identify")
+    this.send(new Message(WebsiteEvents.GUILD_SYNC, {}))
     this.identified = true
     setTimeout(() => {
       if (!this.heartbeat && this.websocket && this.websocket.readyState == this.websocket.OPEN)
@@ -320,6 +333,17 @@ export class EventHandler {
 
   GUILD_DELETE(data: { id: string }) {
     this.guilds = this.guilds.filter((guild) => guild.id != data.id)
+  }
+
+  GUILD_SYNC(data: { success: false; code: number } | { success: true; guilds: { id: string; unavailable: true }[] }) {
+    if (!data.success) {
+      console.error(
+        `%c GUILDS %c Guild Sync Failed! `,
+        "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
+        "background: #353A47; color: white; border-radius: 0 3px 3px 0",
+        data,
+      )
+    }
   }
 
   devToolsWarning() {

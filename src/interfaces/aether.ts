@@ -103,6 +103,7 @@ export enum WebsiteEvents {
   SUBSCRIBE,
   GUILD_CREATE,
   GUILD_DELETE,
+  GUILD_SYNC,
   REALTIME_STATS,
   COMMANDS_UPDATE,
   DISCOVERY_UPDATE,
@@ -130,6 +131,7 @@ export type Reminder = {
 }
 
 export type IdentifyResponse = {
+  guilds?: { id: string; unavailable: true }[]
   config?: Record<string, unknown>
   user?: DiscordApiUser
   session: string
