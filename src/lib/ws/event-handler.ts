@@ -335,8 +335,13 @@ export class EventHandler {
     this.guilds = this.guilds.filter((guild) => guild.id != data.id)
   }
 
-  GUILD_SYNC(data: { success: false; code: number } | { success: true; guilds: { id: string; unavailable: true }[] }) {
-    if (!data.success) {
+  GUILD_SYNC(
+    data:
+      | { success: false; code: number } // error occured
+      | { success: true; guilds: { id: string; unavailable: true }[] } // success
+      | { success: null }, // finished guild sync
+  ) {
+    if (data.success == false) {
       console.error(
         `%c GUILDS %c Guild Sync Failed! `,
         "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
