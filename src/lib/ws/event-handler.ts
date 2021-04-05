@@ -59,7 +59,7 @@ export class EventHandler {
 
   set seq(seq: number) {
     this._seq = seq
-    if (typeof window != "undefined") window.localStorage.setItem("aether_seq", seq.toString())
+    if (typeof window != "undefined") window.sessionStorage.setItem("aether_seq", seq.toString())
   }
 
   get session() {
@@ -68,7 +68,7 @@ export class EventHandler {
 
   set session(session: string) {
     this._session = session
-    if (typeof window != "undefined") window.localStorage.setItem("aether_session", session)
+    if (typeof window != "undefined") window.sessionStorage.setItem("aether_session", session)
   }
 
   setWebsocket(websocket: Websocket, reconnect?: boolean) {
@@ -131,8 +131,8 @@ export class EventHandler {
         delete this._session
         delete this._seq
         if (typeof window != "undefined") {
-          window.localStorage.removeItem("aether_session")
-          window.localStorage.removeItem("aether_seq")
+          window.sessionStorage.removeItem("aether_session")
+          window.sessionStorage.removeItem("aether_seq")
         }
       } else
         this.emitter.emit("NOTIFICATION", {
@@ -168,8 +168,8 @@ export class EventHandler {
                   "background: #353A47; color: white; border-radius: 0 3px 3px 0",
                   user,
                 )
-                window.localStorage.removeItem("aether_session")
-                window.localStorage.removeItem("aether_seq")
+                window.sessionStorage.removeItem("aether_session")
+                window.sessionStorage.removeItem("aether_seq")
                 window.location.reload()
               }
             }
@@ -230,8 +230,8 @@ export class EventHandler {
       delete this._session
       delete this._seq
       if (typeof window != "undefined") {
-        window.localStorage.removeItem("aether_session")
-        window.localStorage.removeItem("aether_seq")
+        window.sessionStorage.removeItem("aether_session")
+        window.sessionStorage.removeItem("aether_seq")
       }
       return this.websocket?.close(4005, "Invalid Session")
     }

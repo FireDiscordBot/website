@@ -17,14 +17,14 @@ const useWebsocket = (emitter: EventEmitter) => {
       ws = new Websocket(
         typeof window == "undefined"
           ? fire.websiteSocketUrl
-          : `${fire.websiteSocketUrl}?sessionId=${window.localStorage.getItem("aether_session") || ""}&seq=${
-              window.localStorage.getItem("aether_seq") || "0"
+          : `${fire.websiteSocketUrl}?sessionId=${window.sessionStorage.getItem("aether_session") || ""}&seq=${
+              window.sessionStorage.getItem("aether_seq") || "0"
             }`,
         handler,
       )
       handler.setWebsocket(ws)
-      if (typeof window != "undefined" && window.localStorage.getItem("aether_session")?.length == 32)
-        handler.session = window.localStorage.getItem("aether_session") as string
+      if (typeof window != "undefined" && window.sessionStorage.getItem("aether_session")?.length == 32)
+        handler.session = window.sessionStorage.getItem("aether_session") as string
       setHandler(handler)
     }
     initHandler()
