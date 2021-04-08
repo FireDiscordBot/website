@@ -94,7 +94,7 @@ export type Payload = {
   n?: string // nonce
 }
 
-export enum WebsiteEvents {
+export enum EventType {
   IDENTIFY_CLIENT,
   RESUME_CLIENT,
   HELLO,

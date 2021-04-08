@@ -6,7 +6,7 @@ import { Message } from "./message"
 import { MessageUtil } from "./message-util"
 import { Websocket } from "./websocket"
 
-import { IdentifyResponse, WebsiteEvents } from "@/interfaces/aether"
+import { IdentifyResponse, EventType } from "@/interfaces/aether"
 import { AuthSession, AuthUser } from "@/interfaces/auth"
 import { fire } from "@/constants"
 import { fetchUser } from "@/utils/discord"
@@ -211,7 +211,7 @@ export class EventHandler {
 
   handleSubscribe(route: string, extra?: unknown) {
     if (route == this.subscribed && !extra) return
-    this.send(new Message(WebsiteEvents.SUBSCRIBE, { route, extra }))
+    this.send(new Message(EventType.SUBSCRIBE, { route, extra }))
     this.subscribed = route
   }
 
@@ -220,7 +220,7 @@ export class EventHandler {
     this.heartbeat = setInterval(() => {
       if (this.acked == false) return this.websocket?.close(4004, "Did not receive heartbeat ack")
       this.acked = false
-      this.send(new Message(WebsiteEvents.HEARTBEAT, this.seq || null))
+      this.send(new Message(EventType.HEARTBEAT, this.seq || null))
     }, data.interval)
     this.session = data.sessionId
   }
@@ -242,7 +242,7 @@ export class EventHandler {
       return this.websocket?.close(4005, "Invalid Session")
     } else this.auth.user = data.user
     if (!data.guilds.length || data.guilds.length != this.guilds.length) {
-      this.send(new Message(WebsiteEvents.GUILD_SYNC, { existing: this.guilds }))
+      this.send(new Message(EventType.GUILD_SYNC, { existing: this.guilds }))
       this.guilds = []
     }
     this.identified = true // should already be true but just in case
@@ -264,10 +264,6 @@ export class EventHandler {
   async identify() {
     if (this.identified) return
     this.identified = "identifying"
-    if (this.heartbeat) {
-      clearInterval(this.heartbeat)
-      delete this.heartbeat
-    }
     const identified = await this.sendIdentify().catch((reason: string) => {
       this.websocket?.close(4008, reason)
     })
@@ -278,7 +274,7 @@ export class EventHandler {
       (globalThis as { [key: string]: unknown }).eventHandler = this
     else delete (globalThis as { [key: string]: unknown }).eventHandler
     if (this.auth?.user?.id != identified.user?.id) this.websocket?.close(4001, "Failed to verify identify")
-    this.send(new Message(WebsiteEvents.GUILD_SYNC, {}))
+    if (this.auth?.user?.id) this.send(new Message(EventType.GUILD_SYNC, {}))
     this.identified = true
     setTimeout(() => {
       if (!this.heartbeat && this.websocket && this.websocket.readyState == this.websocket.OPEN)
@@ -292,7 +288,7 @@ export class EventHandler {
       this.websocket?.handlers.set(nonce, resolve)
       this.send(
         new Message(
-          WebsiteEvents.IDENTIFY_CLIENT,
+          EventType.IDENTIFY_CLIENT,
           {
             config: { subscribed: this.subscribed ?? window.location.pathname, session: this.auth },
             env: process.env.NODE_ENV,
@@ -314,11 +310,11 @@ export class EventHandler {
   }
 
   sendGuildJoinRequest(id: string, nonce: string) {
-    this.send(new Message(WebsiteEvents.GUILD_JOIN_REQUEST, { id }, nonce))
+    this.send(new Message(EventType.GUILD_JOIN_REQUEST, { id }, nonce))
   }
 
   requestData(nonce: string) {
-    this.send(new Message(WebsiteEvents.DATA_REQUEST, {}, nonce))
+    this.send(new Message(EventType.DATA_REQUEST, {}, nonce))
   }
 
   CONFIG_UPDATE(data: { name: string; value: unknown }) {
@@ -373,9 +369,9 @@ IT'S BEST TO JUST CLOSE THIS WINDOW AND PRETEND IT DOES NOT EXIST.`,
       (globalThis as { [key: string]: unknown }).eventHandler = this
     else delete (globalThis as { [key: string]: unknown }).eventHandler
     // heartbeats can be spammy and just have the sequence anyways
-    if (message.type != WebsiteEvents.HEARTBEAT)
+    if (message.type != EventType.HEARTBEAT)
       console.debug(
-        `%c WS %c Outgoing %c ${WebsiteEvents[message.type]} `,
+        `%c WS %c Outgoing %c ${EventType[message.type]} `,
         "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
         "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",

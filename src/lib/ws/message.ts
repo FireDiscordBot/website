@@ -1,11 +1,11 @@
-import { WebsiteEvents } from "../../interfaces/aether"
+import { EventType } from "../../interfaces/aether"
 
 export class Message {
-  type: WebsiteEvents
+  type: EventType
   nonce?: string
   data: unknown
 
-  constructor(type: WebsiteEvents, data: unknown, nonce?: string) {
+  constructor(type: EventType, data: unknown, nonce?: string) {
     this.nonce = nonce
     this.type = type
     this.data = data

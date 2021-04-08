@@ -1,7 +1,7 @@
 import { EventHandler } from "./event-handler"
 import { MessageUtil } from "./message-util"
 
-import { WebsiteEvents } from "@/interfaces/aether"
+import { EventType } from "@/interfaces/aether"
 
 let WebSocket
 if (typeof window != "undefined") WebSocket = window.WebSocket
@@ -31,17 +31,17 @@ export class Websocket extends WebSocket {
       if (this.eventHandler) {
         if (typeof message.s == "number") this.eventHandler.seq = message.s
         // heartbeats acks can be spammy and have a null body anyways
-        if (message.op != WebsiteEvents.HEARTBEAT_ACK)
+        if (message.op != EventType.HEARTBEAT_ACK)
           console.debug(
-            `%c WS %c Incoming %c ${WebsiteEvents[message.op]} `,
+            `%c WS %c Incoming %c ${EventType[message.op]} `,
             "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
             "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
             "background: #353A47; color: white; border-radius: 0 3px 3px 0",
             message,
           )
-        this.eventHandler.emitter.emit(WebsiteEvents[message.op], message.d)
+        this.eventHandler.emitter.emit(EventType[message.op], message.d)
         // @ts-expect-error This is needed to ensure this[string] works
-        if (WebsiteEvents[message.op] in this.eventHandler) this.eventHandler[WebsiteEvents[message.op]](message.d)
+        if (EventType[message.op] in this.eventHandler) this.eventHandler[EventType[message.op]](message.d)
       }
       if (message.n && this.handlers.has(message.n)) {
         const handler = this.handlers.get(message.n)
