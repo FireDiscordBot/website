@@ -6,8 +6,8 @@ import { Message } from "./message"
 import { MessageUtil } from "./message-util"
 import { Websocket } from "./websocket"
 
-import { IdentifyResponse, EventType } from "@/interfaces/aether"
-import { AuthSession, AuthUser } from "@/interfaces/auth"
+import { IdentifyResponse, EventType, ResumeResponse } from "@/interfaces/aether"
+import { AuthSession } from "@/interfaces/auth"
 import { fire } from "@/constants"
 import { fetchUser } from "@/utils/discord"
 import { DiscordGuild } from "@/interfaces/discord"
@@ -33,6 +33,7 @@ export class EventHandler {
   config?: Record<string, unknown>
   heartbeat?: NodeJS.Timeout
   private _session?: string
+  logIgnore: EventType[]
   guilds: DiscordGuild[]
   initialised?: boolean
   websocket?: Websocket
@@ -51,6 +52,8 @@ export class EventHandler {
     this.guilds = []
     this.queue = []
     this._seq = 0
+
+    this.logIgnore = [EventType.HEARTBEAT, EventType.HEARTBEAT_ACK]
   }
 
   get seq() {
@@ -218,20 +221,17 @@ export class EventHandler {
   HELLO(data: { sessionId: string; interval: number }) {
     if (this.heartbeat) clearInterval(this.heartbeat)
     this.heartbeat = setInterval(() => {
-      if (this.acked == false) return this.websocket?.close(4004, "Did not receive heartbeat ack")
+      if (this.acked == false) {
+        delete this.acked // resets to undefined
+        return this.websocket?.close(4004, "Did not receive heartbeat ack")
+      }
       this.acked = false
       this.send(new Message(EventType.HEARTBEAT, this.seq || null))
     }, data.interval)
     this.session = data.sessionId
   }
 
-  RESUME_CLIENT(data: {
-    guilds: DiscordGuild[]
-    user: AuthUser
-    replayed: number
-    session: string
-    config: Record<string, unknown>
-  }) {
+  RESUME_CLIENT(data: ResumeResponse) {
     if (this.auth?.user?.id != data.user?.id) {
       delete this._session
       delete this._seq
@@ -240,7 +240,7 @@ export class EventHandler {
         window.sessionStorage.removeItem("aether_seq")
       }
       return this.websocket?.close(4005, "Invalid Session")
-    } else this.auth.user = data.user
+    } else if (this.auth && data.user) this.auth.user = data.user
     if (!data.guilds.length || data.guilds.length != this.guilds.length) {
       this.send(new Message(EventType.GUILD_SYNC, { existing: this.guilds }))
       this.guilds = []
@@ -344,7 +344,10 @@ export class EventHandler {
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         data,
       )
-    }
+      // we're about to be given a GUILD_CREATE for all mutual guilds, which can be spammy
+    } else if (data.success == true) this.logIgnore.push(EventType.GUILD_CREATE)
+    // mass guild sync has finished, we can unignore.
+    else this.logIgnore = this.logIgnore.filter((type) => type != EventType.GUILD_CREATE)
   }
 
   devToolsWarning() {
@@ -369,7 +372,7 @@ IT'S BEST TO JUST CLOSE THIS WINDOW AND PRETEND IT DOES NOT EXIST.`,
       (globalThis as { [key: string]: unknown }).eventHandler = this
     else delete (globalThis as { [key: string]: unknown }).eventHandler
     // heartbeats can be spammy and just have the sequence anyways
-    if (message.type != EventType.HEARTBEAT)
+    if (!this.logIgnore.includes(message.type))
       console.debug(
         `%c WS %c Outgoing %c ${EventType[message.type]} `,
         "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
