@@ -75,6 +75,7 @@ export class EventHandler {
   }
 
   setWebsocket(websocket: Websocket, reconnect?: boolean) {
+    delete this.acked
     websocket.eventHandler = this
     if (this.websocket) {
       this.websocket.close(1000, "Reconnecting")
