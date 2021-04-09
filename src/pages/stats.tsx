@@ -149,7 +149,11 @@ const StatsPage = ({ initialFireStats }: Props) => {
       </Container>
 
       {typeof selectedClusterStats != "undefined" && (
-        <ClusterStatsDialog clusterStats={selectedClusterStats} open={true} onClose={onCloseClusterDialog} />
+        <ClusterStatsDialog
+          clusterStats={selectedClusterStats}
+          open={!selectedClusterStats.error}
+          onClose={onCloseClusterDialog}
+        />
       )}
     </DefaultLayout>
   )
