@@ -12,10 +12,12 @@ export class Message {
   }
 
   toJSON() {
-    return {
-      op: this.type,
-      d: this.data,
-      n: this.nonce,
-    }
+    if (this.nonce)
+      return {
+        op: this.type,
+        d: this.data,
+        n: this.nonce,
+      }
+    else return { op: this.type, d: this.data }
   }
 }
