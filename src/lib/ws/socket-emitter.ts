@@ -1,8 +1,18 @@
 import { EventEmitter } from "events"
 
-import { Category, DiscoverableGuild, FireStats, Notification, Reminder } from "@/interfaces/aether"
+import {
+  Category,
+  DiscoverableGuild,
+  FireStats,
+  IdentifyResponse,
+  Notification,
+  Reminder,
+  ResumeResponse,
+} from "@/interfaces/aether"
 
 interface EmitterEvents {
+  IDENTIFY_CLIENT: (response: IdentifyResponse) => void
+  RESUME_CLIENT: (response: ResumeResponse) => void
   REALTIME_STATS: (stats: FireStats) => void
   SUBSCRIBE: (route: string, extra?: unknown) => void
   HELLO: (hello: { interval: number }) => void
@@ -10,6 +20,7 @@ interface EmitterEvents {
   DISCOVERY_UPDATE: (guilds: DiscoverableGuild[]) => void
   NOTIFICATION: (notification?: Notification) => void
   REMINDERS_UPDATE: (reminders: Reminder[]) => void
+  CONFIG_UPDATE: (update: { name: string; value: unknown }) => void
 }
 
 export declare interface Emitter {
