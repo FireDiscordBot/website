@@ -31,7 +31,7 @@ export class Websocket extends WebSocket {
       if (this.eventHandler) {
         if (typeof message.s == "number") this.eventHandler.seq = message.s
         // heartbeats acks can be spammy and have a null body anyways
-        if (message.op != EventType.HEARTBEAT_ACK)
+        if (!this.eventHandler.logIgnore.includes(message.op))
           console.debug(
             `%c WS %c Incoming %c ${EventType[message.op]} `,
             "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
