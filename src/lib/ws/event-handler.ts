@@ -17,7 +17,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 const getReconnectTime = (code: number) => {
   switch (code) {
     case 1012: {
-      return process.env.NODE_ENV == "development" ? 10000 : 2500
+      return process.env.NODE_ENV == "development" ? 12000 : 3000
     }
     case 4005: {
       return 0
@@ -352,10 +352,7 @@ export class EventHandler {
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         data,
       )
-      // we're about to be given a GUILD_CREATE for all mutual guilds, which can be spammy
-    } else if (data.success == true) this.logIgnore.push(EventType.GUILD_CREATE)
-    // mass guild sync has finished, we can unignore.
-    else this.logIgnore = this.logIgnore.filter((type) => type != EventType.GUILD_CREATE)
+    }
   }
 
   devToolsWarning() {
