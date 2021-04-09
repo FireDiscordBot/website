@@ -1,10 +1,12 @@
 import * as React from "react"
 import Menu, { MenuProps } from "@material-ui/core/Menu"
 import MenuItem, { MenuItemProps } from "@material-ui/core/MenuItem"
-import { AccountCircle, Event, ExitToApp, Star } from "@material-ui/icons"
+import { AccountCircle, Event, ExitToApp, Star, Code } from "@material-ui/icons"
 import { ListItemIcon, ListItemText } from "@material-ui/core"
 
 import MenuItemLink from "./MenuItemLink"
+
+import { handler } from "@/pages/_app"
 
 type Props = MenuProps & { onClickLogout: MenuItemProps["onClick"] }
 
@@ -40,6 +42,14 @@ const UserAvatarMenu = ({ onClickLogout, ...props }: Props) => (
       </ListItemIcon>
       <ListItemText primary="Reminders" />
     </MenuItemLink>
+    {handler?.config && handler.config["utils.superuser"] == true && (
+      <MenuItemLink href="/user/admin">
+        <ListItemIcon>
+          <Code />
+        </ListItemIcon>
+        <ListItemText primary="Admin" />
+      </MenuItemLink>
+    )}
     <MenuItem onClick={onClickLogout} id="user-menu-logout">
       <ListItemIcon>
         <ExitToApp />

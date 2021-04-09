@@ -8,10 +8,12 @@ import Paper from "@material-ui/core/Paper"
 import List from "@material-ui/core/List"
 import ListItem, { ListItemProps } from "@material-ui/core/ListItem"
 import ListItemText from "@material-ui/core/ListItemText"
+import { AccountCircle, Code, Event, Star } from "@material-ui/icons"
+import { ListItemIcon } from "@material-ui/core"
 
 import DefaultLayout from "./default"
-import {AccountCircle, Event, Star} from "@material-ui/icons";
-import {ListItemIcon} from "@material-ui/core";
+
+import { handler } from "@/pages/_app"
 
 const ListItemLink = ({
   router,
@@ -42,22 +44,30 @@ const UserPageLayout = ({ children, ...restProps }: Props) => {
               <List component="nav">
                 <ListItemLink href="/user/account" router={router}>
                   <ListItemIcon>
-                    <AccountCircle/>
+                    <AccountCircle />
                   </ListItemIcon>
                   <ListItemText primary="Account" />
                 </ListItemLink>
                 <ListItemLink href="/user/premium" router={router}>
                   <ListItemIcon>
-                    <Star/>
+                    <Star />
                   </ListItemIcon>
                   <ListItemText primary="Premium" />
                 </ListItemLink>
                 <ListItemLink href="/user/reminders" router={router}>
                   <ListItemIcon>
-                    <Event/>
+                    <Event />
                   </ListItemIcon>
-                  <ListItemText primary="Reminders"/>
+                  <ListItemText primary="Reminders" />
                 </ListItemLink>
+                {handler?.config && handler.config["utils.superuser"] == true && (
+                  <ListItemLink href="/user/admin" router={router}>
+                    <ListItemIcon>
+                      <Code />
+                    </ListItemIcon>
+                    <ListItemText primary="Admin" />
+                  </ListItemLink>
+                )}
               </List>
             </Paper>
           </Grid>
