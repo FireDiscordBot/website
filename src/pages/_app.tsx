@@ -14,7 +14,10 @@ import useWebsocket from "../hooks/use-websocket";
 export const emitter = new Emitter();
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
-  const [handler] = useWebsocket("wss://aether-ws-dev.gaminggeek.dev/website", emitter);
+  const [handler] = useWebsocket(
+    "wss://aether-ws-dev.gaminggeek.dev/website?encoding=zlib",
+    emitter
+  );
   if (handler) {
     initHandler(handler);
   }
@@ -29,19 +32,19 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
 };
 
 const initHandler = async (handler: EventHandler) => {
-  const events = ["SUBSCRIBE"] // may be populated with more in the future
-  for (const event of events) emitter.removeAllListeners(event)
+  const events = ["SUBSCRIBE"]; // may be populated with more in the future
+  for (const event of events) emitter.removeAllListeners(event);
   emitter.on("SUBSCRIBE", (route, extra) => {
-    handler.handleSubscribe(route, extra)
-  })
-  if (!handler.identified) handler.identify()
-  const devToolsCheck = /./
+    handler.handleSubscribe(route, extra);
+  });
+  if (!handler.identified) handler.identify();
+  const devToolsCheck = /./;
   devToolsCheck.toString = () => {
     // dev tools is open
-    handler.devToolsWarning()
-    return ""
-  }
-  console.log("%c", devToolsCheck)
-}
+    handler.devToolsWarning();
+    return "";
+  };
+  console.log("%c", devToolsCheck);
+};
 
 export default MyApp;
