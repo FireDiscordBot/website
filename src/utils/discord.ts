@@ -1,4 +1,4 @@
-import { DiscordApiUser, DiscordFlag, DiscordGuild, flags } from "@/interfaces/discord"
+import { APIUser, DiscordFlag, DiscordGuild, flags } from "@/interfaces/discord"
 import { UserGuild } from "@/interfaces/aether"
 import { messageLinkRegex } from "@/constants"
 import fetcher from "@/utils/fetcher"
@@ -27,15 +27,15 @@ export const fetchGuilds = async (accessToken: string): Promise<DiscordGuild[]> 
   return guilds
 }
 
-export const fetchUser = async (accessToken: string): Promise<DiscordApiUser> => {
-  const user: DiscordApiUser = await fetcher("https://discord.com/api/v8/users/@me", {
+export const fetchUser = async (accessToken: string): Promise<APIUser> => {
+  const user: APIUser = await fetcher("https://discord.com/api/v8/users/@me", {
     headers: { Authorization: `Bearer ${accessToken}` },
   })
 
   return user
 }
 
-export const getUserImage = (user: DiscordApiUser) => {
+export const getUserImage = (user: APIUser) => {
   if (user.avatar === null) {
     const defaultAvatarNumber = parseInt(user.discriminator) % 5
     return `https://cdn.discordapp.com/embed/avatars/${defaultAvatarNumber}.png`

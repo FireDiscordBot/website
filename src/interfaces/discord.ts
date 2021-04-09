@@ -1,7 +1,7 @@
 /**
  * https://discord.com/developers/docs/resources/user#user-object-user-structure
  */
-export type DiscordApiUser = {
+export type APIUser = {
   id: string
   username: string
   discriminator: string
@@ -13,6 +13,29 @@ export type DiscordApiUser = {
   flags: number
   premium_type: number
   public_flags: number
+}
+
+export type APIUserPartial = {
+  id: string
+  username: string
+  avatar: string
+  discriminator: string
+  public_flags: number
+}
+
+/**
+ * https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-structure
+ */
+export type APIMember = {
+  user: APIUserPartial
+  roles: string[]
+  nick?: string
+  premium_since?: string // ISO8601 timestamp
+  joined_at?: string // ISO8601 timestamp
+  pending: boolean
+  deaf: boolean
+  mute: boolean
+  permissions: string
 }
 
 export type DiscordGuild = {

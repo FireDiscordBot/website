@@ -3,13 +3,13 @@ import NextAuth, { InitOptions } from "next-auth"
 import Providers from "next-auth/providers"
 
 import type { AuthSession, AuthToken, AuthUser } from "@/interfaces/auth"
-import type { DiscordApiUser } from "@/interfaces/discord"
+import type { APIUser } from "@/interfaces/discord"
 import { getUserImage } from "@/utils/discord"
 import { discord } from "@/constants"
 
 const discordProvider = Providers.Discord({
   scope: "identify email guilds",
-  profile: (profile: DiscordApiUser): AuthUser => ({
+  profile: (profile: APIUser): AuthUser => ({
     id: profile.id,
     name: profile.username,
     discriminator: profile.discriminator,
