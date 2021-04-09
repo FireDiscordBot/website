@@ -15,7 +15,7 @@ export const emitter = new Emitter();
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   const [handler] = useWebsocket(
-    "wss://aether-ws-dev.gaminggeek.dev/website?encoding=zlib",
+    "wss://aether-ws.gaminggeek.dev/website?encoding=zlib",
     emitter
   );
   if (handler) {

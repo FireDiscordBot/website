@@ -129,7 +129,7 @@ export class EventHandler {
             "background: #353A47; color: white; border-radius: 0 3px 3px 0"
           );
           const ws = new WebSocket(
-            "wss://aether-ws-dev.gaminggeek.dev/website?encoding=zlib"
+            "wss://aether-ws.gaminggeek.dev/website?encoding=zlib"
           );
           return this.setWebsocket(ws, true);
         });
