@@ -10,7 +10,7 @@ import { IdentifyResponse, EventType, ResumeResponse } from "@/interfaces/aether
 import { AuthSession } from "@/interfaces/auth"
 import { fire } from "@/constants"
 import { fetchUser } from "@/utils/discord"
-import { DiscordGuild } from "@/interfaces/discord"
+import { APIMember, DiscordGuild } from "@/interfaces/discord"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -139,7 +139,7 @@ export class EventHandler {
         }
       } else
         this.emitter.emit("NOTIFICATION", {
-          text: "Websocket error occurred",
+          text: event.reason ? event.reason : "Websocket error occurred",
           severity: "error",
           horizontal: "right",
           vertical: "top",
@@ -187,7 +187,14 @@ export class EventHandler {
           })
       }
       // cannot recover from codes below (4001 is special and handled above but if we're here, it didn't work)
-      if (event.code == 1013 || event.code == 1008 || event.code == 4001 || event.code == 4015 || event.code == 4016)
+      if (
+        event.code == 1013 ||
+        event.code == 1008 ||
+        event.code == 4001 ||
+        event.code == 4003 ||
+        event.code == 4015 ||
+        event.code == 4016
+      )
         return
       try {
         sleep(getReconnectTime(event.code)).then(() => {
@@ -196,7 +203,7 @@ export class EventHandler {
             "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
             "background: #353A47; color: white; border-radius: 0 3px 3px 0",
           )
-          const ws = new Websocket(`${fire.websiteSocketUrl}?sessionId=${this.session}&seq=${this.seq}`)
+          const ws = new Websocket(`${fire.websiteSocketUrl}?sessionId=${this.session}&seq=${this.seq}&encoding=zlib`)
           return this.setWebsocket(ws, this.identified == true && !!this.session)
         })
       } catch {
@@ -323,7 +330,7 @@ export class EventHandler {
     this.config[data.name] = data.value
   }
 
-  GUILD_CREATE(guild: DiscordGuild) {
+  GUILD_CREATE(guild: DiscordGuild & { bot?: APIMember }) {
     if (!this.guilds.find((g) => g.id == guild.id)) this.guilds.push(guild)
   }
 
