@@ -23,8 +23,9 @@ export class Websocket extends WebSocket {
       const message = MessageUtil.decode(event.data)
       if (!message)
         return console.error(
-          "%c WS %c Failed to decode message! ",
-          "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
+          "%c WS %c Messages %c Failed to decode message! ",
+          "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
+          "background: #C95D63; color: white; border-radius: 0 3px 3px 0",
           "background: #353A47; color: white; border-radius: 0 3px 3px 0",
           { data: event.data },
         )

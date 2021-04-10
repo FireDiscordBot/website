@@ -93,8 +93,9 @@ export class EventHandler {
           autoHideDuration: 3000,
         })
       console.info(
-        `%c WS %c Websocket connected! `,
-        "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
+        `%c WS %c Connection %c Websocket connected! `,
+        "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
+        "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         { url: websocket.url },
       )
@@ -103,8 +104,9 @@ export class EventHandler {
     }
     this.websocket.onclose = (event: CloseEvent) => {
       console.error(
-        `%c WS %c Websocket closed! `,
-        "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
+        `%c WS %c Connection %c Websocket closed! `,
+        "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
+        "background: #C95D63; color: white; border-radius: 0 3px 3px 0",
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         event,
       )
@@ -168,14 +170,18 @@ export class EventHandler {
                 window.document.getElementById("user-menu-logout")?.click()
               } else if (typeof window !== "undefined") {
                 console.info(
-                  `%c WS %c Session is valid, attempting refresh! `,
-                  "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
+                  `%c WS %c Sessions %c Session is valid! `,
+                  "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
+                  "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
                   "background: #353A47; color: white; border-radius: 0 3px 3px 0",
                   user,
                 )
                 window.sessionStorage.removeItem("aether_session")
                 window.sessionStorage.removeItem("aether_seq")
-                window.location.reload()
+                delete this._session
+                delete this._seq
+                const ws = new Websocket(`${fire.websiteSocketUrl}?encoding=zlib`)
+                return this.setWebsocket(ws, true)
               }
             }
           })
@@ -201,8 +207,9 @@ export class EventHandler {
       try {
         sleep(getReconnectTime(event.code)).then(() => {
           console.info(
-            "%c WS %c Reconnecting... ",
-            "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
+            "%c WS %c Connection %c Reconnecting... ",
+            "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
+            "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
             "background: #353A47; color: white; border-radius: 0 3px 3px 0",
           )
           const ws = new Websocket(`${fire.websiteSocketUrl}?sessionId=${this.session}&seq=${this.seq}&encoding=zlib`)
@@ -210,7 +217,8 @@ export class EventHandler {
         })
       } catch {
         console.error(
-          "%c WS %c Websocket failed to reconnect! ",
+          "%c WS %c Connection %c Websocket failed to reconnect! ",
+          "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
           "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
           "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         )
@@ -260,8 +268,9 @@ export class EventHandler {
     if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
       (globalThis as { [key: string]: unknown }).eventHandler = this // easy access for debugging
     console.info(
-      `%c WS %c Successfully resumed${data.replayed ? " with " + data.replayed + " replayed events" : ""} `,
-      "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
+      `%c WS %c Sessions %c Successfully resumed${data.replayed ? " with " + data.replayed + " replayed events" : ""} `,
+      "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
+      "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
       "background: #353A47; color: white; border-radius: 0 3px 3px 0",
     )
   }
@@ -282,7 +291,7 @@ export class EventHandler {
       // easy access for debugging
       (globalThis as { [key: string]: unknown }).eventHandler = this
     else delete (globalThis as { [key: string]: unknown }).eventHandler
-    if (this.auth?.user?.id != identified.user?.id) this.websocket?.close(4001, "Failed to verify identify")
+    if (this.auth && this.auth?.user?.id != identified.user?.id) this.websocket?.close(4001, "Mismatched identities")
     if (this.auth?.user?.id) this.send(new Message(EventType.GUILD_SYNC, {}))
     this.identified = true
     setTimeout(() => {
