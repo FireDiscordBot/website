@@ -1,6 +1,6 @@
 import { fire } from "@/constants"
 import fetcher from "@/utils/fetcher"
-import { Reminder } from "@/interfaces/aether"
+import { BuildOverride, Reminder } from "@/interfaces/aether"
 import { GetCollectData } from "@/types"
 
 const requestWithAuth = <R = never>(accessToken: string, path: string, method?: string, body?: unknown) =>
@@ -61,4 +61,8 @@ export const createUserReminder = async (accessToken: string, body: { reminder: 
 
 export const deleteUserReminder = async (accessToken: string, timestamp: string) => {
   return await requestWithAuth<unknown>(accessToken, `user/reminders/${timestamp}`, "DELETE")
+}
+
+export const getBuildOverrides = async (accessToken: string) => {
+  return await requestWithAuth<BuildOverride[]>(accessToken, `__development/overrides`, "GET")
 }
