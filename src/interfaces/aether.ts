@@ -147,3 +147,13 @@ export type ResumeResponse = {
   session: string
   config: Record<string, unknown>
 }
+
+export type BuildOverride = {
+  id: string
+  experiment: string
+  treatment: number
+  releaseChannel: "development" | "production"
+  validForUserIds: string[]
+  expiresAt: Date
+  hash?: string
+}
