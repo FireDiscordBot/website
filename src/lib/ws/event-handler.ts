@@ -233,7 +233,7 @@ export class EventHandler {
   }
 
   handleSubscribe(route: string, extra?: unknown) {
-    if (route == this.subscribed && !extra) return
+    if (route == this.subscribed && (!extra || extra == { shallow: false })) return
     this.send(new Message(EventType.SUBSCRIBE, { route, extra }))
     this.subscribed = route
   }
