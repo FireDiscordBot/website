@@ -95,7 +95,7 @@ export class EventHandler {
         `%c WS %c Websocket connected! `,
         "background: #9CFC97; color: black; border-radius: 3px 0 0 3px;",
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
-        this.websocket,
+        { url: websocket.url },
       )
       this.identify()
       while (this.queue?.length) this.send(this.queue.pop())
