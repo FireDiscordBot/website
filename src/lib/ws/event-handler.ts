@@ -1,6 +1,7 @@
 import EventEmitter from "events"
 
 import { getSession } from "next-auth/client"
+import Router from "next/router"
 
 import { Message } from "./message"
 import { MessageUtil } from "./message-util"
@@ -353,6 +354,10 @@ export class EventHandler {
         data,
       )
     }
+  }
+
+  PUSH_ROUTE(data: { route: string }) {
+    if (Router.route != data.route) Router.push(data.route)
   }
 
   devToolsWarning() {

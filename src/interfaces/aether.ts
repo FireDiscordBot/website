@@ -114,6 +114,7 @@ export enum EventType {
   CONFIG_UPDATE,
   GUILD_JOIN_REQUEST,
   DATA_REQUEST,
+  PUSH_ROUTE,
 }
 
 export type Notification = {
