@@ -80,11 +80,6 @@ const initHandler = async (handler: EventHandler) => {
     const session = await getSession()
     if (session) handler.auth = session
   }
-  const events = ["SUBSCRIBE"] // may be populated with more in the future
-  for (const event of events) emitter.removeAllListeners(event)
-  emitter.on("SUBSCRIBE", (route, extra) => {
-    handler.handleSubscribe(route, extra)
-  })
   if (!handler.identified) await handler.identify()
   handler.devToolsWarning()
   handler.initialised = true

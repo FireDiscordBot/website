@@ -1,7 +1,7 @@
 import EventEmitter from "events"
 
 import { getSession } from "next-auth/client"
-import Router from "next/router"
+import Router, { Router as RouterType } from "next/router"
 
 import { Message } from "./message"
 import { MessageUtil } from "./message-util"
@@ -40,6 +40,7 @@ export class EventHandler {
   websocket?: Websocket
   emitter: EventEmitter
   private _seq?: number
+  router?: RouterType
   auth?: AuthSession
   subscribed: string
   queue: Message[]
@@ -55,6 +56,8 @@ export class EventHandler {
     this._seq = 0
 
     this.logIgnore = [EventType.HEARTBEAT, EventType.HEARTBEAT_ACK]
+    this.router = Router.router ?? undefined
+    if (this.router) this.router.events.on("routeChangeStart", this.handleSubscribe.bind(this))
   }
 
   get seq() {
@@ -366,7 +369,14 @@ export class EventHandler {
   }
 
   PUSH_ROUTE(data: { route: string }) {
-    if (Router.route != data.route) Router.push(data.route)
+    this.navigate(data.route)
+  }
+
+  navigate(route: string, extra?: unknown) {
+    if (this.router?.route == route) return
+    this.router?.push(route).then((pushed) => {
+      if (pushed) this.handleSubscribe(route, extra)
+    })
   }
 
   devToolsWarning() {

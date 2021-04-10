@@ -1,5 +1,4 @@
 import * as React from "react"
-import Router from "next/router"
 import { NextSeoProps } from "next-seo"
 import { useState } from "react"
 
@@ -49,7 +48,7 @@ const SuperuserLayout = ({ children, type, ...restProps }: Props) => {
   else if (superuser == null) return <Loading></Loading>
   else {
     try {
-      Router.push("/")
+      handler.router?.push("/")
     } catch {
       return <Loading></Loading>
     }
