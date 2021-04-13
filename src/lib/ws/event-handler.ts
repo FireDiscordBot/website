@@ -11,7 +11,7 @@ import { IdentifyResponse, EventType, ResumeResponse } from "@/interfaces/aether
 import { AuthSession } from "@/interfaces/auth"
 import { fire } from "@/constants"
 import { fetchUser } from "@/utils/discord"
-import { APIMember, DiscordGuild } from "@/interfaces/discord"
+import { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -34,6 +34,7 @@ export class EventHandler {
   config?: Record<string, unknown>
   heartbeat?: NodeJS.Timeout
   private _session?: string
+  oauth?: AuthorizationInfo
   logIgnore: EventType[]
   guilds: DiscordGuild[]
   initialised?: boolean
@@ -76,6 +77,10 @@ export class EventHandler {
   set session(session: string) {
     this._session = session
     if (typeof window != "undefined") window.sessionStorage.setItem("aether_session", session)
+  }
+
+  get user() {
+    return this.oauth?.user
   }
 
   setWebsocket(websocket: Websocket, reconnect?: boolean) {
@@ -252,7 +257,7 @@ export class EventHandler {
   }
 
   RESUME_CLIENT(data: ResumeResponse) {
-    if (this.auth?.user?.id != data.user?.id) {
+    if (this.auth?.user?.id != data.auth?.user?.id) {
       delete this._session
       delete this._seq
       if (typeof window != "undefined") {
@@ -260,7 +265,7 @@ export class EventHandler {
         window.sessionStorage.removeItem("aether_seq")
       }
       return this.websocket?.close(4005, "Invalid Session")
-    } else if (this.auth && data.user) this.auth.user = data.user
+    } else if (this.auth && data.auth) this.oauth = data.auth
     if (!data.guilds.length || data.guilds.length != this.guilds.length) {
       this.send(new Message(EventType.GUILD_SYNC, { existing: this.guilds }))
       this.guilds = []
@@ -268,6 +273,7 @@ export class EventHandler {
     this.identified = true // should already be true but just in case
     this.session = data.session
     this.config = { ...this.config, ...data.config }
+    this.oauth = data.auth
     if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
       (globalThis as { [key: string]: unknown }).eventHandler = this // easy access for debugging
     console.info(
@@ -290,11 +296,13 @@ export class EventHandler {
     })
     if (!identified) return
     this.config = { ...this.config, ...identified.config }
+    this.oauth = identified.auth
     if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
       // easy access for debugging
       (globalThis as { [key: string]: unknown }).eventHandler = this
     else delete (globalThis as { [key: string]: unknown }).eventHandler
-    if (this.auth && this.auth?.user?.id != identified.user?.id) this.websocket?.close(4001, "Mismatched identities")
+    if (this.auth && this.auth?.user?.id != identified.auth?.user?.id)
+      this.websocket?.close(4001, "Mismatched identities")
     if (this.auth?.user?.id) this.send(new Message(EventType.GUILD_SYNC, {}))
     this.identified = true
     setTimeout(() => {

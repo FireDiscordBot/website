@@ -1,3 +1,69 @@
+export type Scope =
+  | "bot"
+  | "connections"
+  | "email"
+  | "identify"
+  | "guilds"
+  | "guilds.join"
+  | "gdm.join"
+  | "messages.read"
+  | "rpc"
+  | "rpc.notifications.read"
+  | "webhook.incoming"
+  | "applications.builds.upload"
+  | "applications.builds.read"
+  | "applications.store.update"
+  | "applications.entitlements"
+  | "relationships.read"
+  | "activities.read"
+  | "activities.write"
+  | "applications.commands"
+  | "applications.commands.update"
+
+export type AuthorizationInfo =
+  | {
+      application: Application
+      scopes: Scope[]
+      expires: Date
+      user: PartialOAuthUser
+      is_partial: true
+    }
+  | {
+      application: Application
+      scopes: Scope[]
+      expires: Date
+      user: APIUser
+      is_partial: false
+    }
+
+export interface Application {
+  id: string
+  name: string
+  icon: string
+  description: string
+  summary: string
+  cover_image: string
+  primary_sku_id: string
+  hook: boolean
+  slug: string
+  guild_id: string
+  bot_public: boolean
+  bot_require_code_grant: boolean
+  terms_of_service_url: string
+  privacy_policy_url: string
+  verify_key: string
+}
+
+export interface PartialOAuthUser {
+  id: string
+  username: string
+  avatar: string
+  discriminator: string
+  public_flags: number
+  email: undefined
+  verified: undefined
+}
+
 /**
  * https://discord.com/developers/docs/resources/user#user-object-user-structure
  */

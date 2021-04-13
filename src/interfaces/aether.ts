@@ -1,6 +1,4 @@
-import { AuthUser } from "./auth"
-
-import { APIUser, DiscordGuild } from "@/interfaces/discord"
+import { AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
 
 export type ShardStats = {
   id: number
@@ -136,13 +134,13 @@ export type Reminder = {
 export type IdentifyResponse = {
   guilds?: { id: string; unavailable: true }[]
   config?: Record<string, unknown>
-  user?: APIUser
+  auth?: AuthorizationInfo
   session: string
 }
 
 export type ResumeResponse = {
   guilds: DiscordGuild[]
-  user: AuthUser
+  auth?: AuthorizationInfo
   replayed: number
   session: string
   config: Record<string, unknown>
