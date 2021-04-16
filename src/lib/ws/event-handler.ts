@@ -84,6 +84,9 @@ export class EventHandler {
   }
 
   setWebsocket(websocket: Websocket, reconnect?: boolean) {
+    if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
+      // easy access for debugging
+      (globalThis as { [key: string]: unknown }).eventHandler = this
     delete this.acked
     websocket.eventHandler = this
     if (this.websocket) {
@@ -107,8 +110,8 @@ export class EventHandler {
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         { url: websocket.url },
       )
+      while (this.queue.length) this.send(this.queue.pop())
       this.identify()
-      while (this.queue?.length) this.send(this.queue.pop())
     }
     this.websocket.onclose = (event: CloseEvent) => {
       console.error(
@@ -271,6 +274,7 @@ export class EventHandler {
       this.guilds = []
     }
     this.identified = true // should already be true but just in case
+    while (this.queue.length) this.send(this.queue.pop())
     this.session = data.session
     this.config = { ...this.config, ...data.config }
     this.oauth = data.auth
@@ -305,6 +309,7 @@ export class EventHandler {
       this.websocket?.close(4001, "Mismatched identities")
     if (this.auth?.user?.id) this.send(new Message(EventType.GUILD_SYNC, {}))
     this.identified = true
+    while (this.queue.length) this.send(this.queue.pop())
     setTimeout(() => {
       if (!this.heartbeat && this.websocket && this.websocket.readyState == this.websocket.OPEN)
         this.websocket.close(4004, "Did not receive HELLO")
@@ -402,7 +407,12 @@ IT'S BEST TO JUST CLOSE THIS WINDOW AND PRETEND IT DOES NOT EXIST.`,
   }
 
   private send(message?: Message) {
-    if (!message || !this.websocket || this.websocket.readyState != this.websocket.OPEN)
+    if (
+      !message ||
+      !this.websocket ||
+      this.websocket.readyState != this.websocket.OPEN ||
+      (message.type != EventType.IDENTIFY_CLIENT && !this.identified)
+    )
       return message && this.queue.push(message)
     if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
       // easy access for debugging
@@ -417,17 +427,6 @@ IT'S BEST TO JUST CLOSE THIS WINDOW AND PRETEND IT DOES NOT EXIST.`,
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         message.toJSON(),
       )
-    if (this.identified == false && this.auth) this.identify()
-    else if (this.identified == false) {
-      this.queue.push(message)
-      getSession().then((session) => {
-        if (session) {
-          this.auth = session
-          this.identify()
-        }
-      })
-      return
-    }
     this.websocket.send(MessageUtil.encode(message))
   }
 }
