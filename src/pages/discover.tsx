@@ -15,6 +15,14 @@ type Props = {
   initialGuilds: DiscoverableGuild[]
 }
 
+export function shuffleArray<T>(array: T[]): T[] {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[array[i], array[j]] = [array[j], array[i]]
+  }
+  return array
+}
+
 const getSortedGuilds = (guilds: DiscoverableGuild[], sortIds: string[]) =>
   guilds.sort(
     (a, b) =>
@@ -24,6 +32,7 @@ const getSortedGuilds = (guilds: DiscoverableGuild[], sortIds: string[]) =>
 // TODO: implement pagination or infinite scrolling
 // maybe add error message when no guilds are found?
 const DiscoverPage = ({ initialGuilds }: Props) => {
+  shuffleArray(initialGuilds)
   const [sortIds, setSortIds] = React.useState<string[]>(initialGuilds.map((guild) => guild.id))
   const [guilds, setGuilds] = React.useState<DiscoverableGuild[]>(initialGuilds)
 
@@ -55,7 +64,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
   let guilds: DiscoverableGuild[]
 
   try {
-    guilds = await fetcher(`${fire.aetherApiUrl}/discoverable`, {
+    guilds = await fetcher(`${fire.aetherApiUrl}/v2/discoverable`, {
       mode: "cors",
       headers: { "User-Agent": "Fire Website" },
     })
