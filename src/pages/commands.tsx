@@ -67,15 +67,17 @@ const Commands: NextPage<Props> = ({ categories, commands }) => {
     view = (
       <>
         <Col md={3}>
-          <h3>
-            <strong>Categories</strong>
-          </h3>
-          <p className="category-note">{currentCategory.Note}</p>
+          <div className="sticky">
+            <h3>
+              <strong>Categories</strong>
+            </h3>
+            <p className="category-note">{currentCategory.Note}</p>
 
-          <div id="categories">
-            <ul id="categories-list" className="list-unstyled">
-              {categoriesComponents}
-            </ul>
+            <div id="categories">
+              <ul id="categories-list" className="list-unstyled">
+                {categoriesComponents}
+              </ul>
+            </div>
           </div>
         </Col>
 

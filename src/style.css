@@ -99,12 +99,23 @@ body {
 	border-radius: 10px;
 }
 
+.sticky {
+	position: -webkit-sticky;
+	position: sticky;
+	top: 0;
+}
+
 #categories-list {
 	width: 100%;
 	margin: 0;
 }
 
 @media (max-width: 768px) {
+	.sticky {
+		position: initial;
+		top: initial;
+	}
+
 	#categories-list {
 		columns: 2;
 	}
