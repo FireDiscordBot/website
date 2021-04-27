@@ -14,9 +14,11 @@ export class Websocket extends WebSocket {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handlers: Map<string, (value: any) => void>
   eventHandler?: EventHandler
+  url: string
 
   constructor(url: string, eventHandler?: EventHandler) {
     super(url)
+    this.url = url.split("?")[0]
     if (eventHandler) this.eventHandler = eventHandler
     this.handlers = new Map()
     this.onmessage = (event: MessageEvent) => {

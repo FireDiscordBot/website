@@ -9,9 +9,9 @@ import { Websocket } from "./websocket"
 
 import { IdentifyResponse, EventType, ResumeResponse } from "@/interfaces/aether"
 import { AuthSession } from "@/interfaces/auth"
-import { fire } from "@/constants"
 import { fetchUser } from "@/utils/discord"
 import { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
+import { getGateway } from "@/utils/aether"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -20,7 +20,8 @@ const getReconnectTime = (code: number) => {
     case 1012: {
       return process.env.NODE_ENV == "development" ? 12000 : 3000
     }
-    case 4005: {
+    case 4005:
+    case 4999: {
       return 0
     }
     default: {
@@ -113,7 +114,7 @@ export class EventHandler {
       while (this.queue.length) this.send(this.queue.pop())
       this.identify()
     }
-    this.websocket.onclose = (event: CloseEvent) => {
+    this.websocket.onclose = async (event: CloseEvent) => {
       console.error(
         `%c WS %c Connection %c Websocket closed! `,
         "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
@@ -191,7 +192,8 @@ export class EventHandler {
                 window.sessionStorage.removeItem("aether_seq")
                 delete this._session
                 delete this._seq
-                const ws = new Websocket(`${fire.websiteSocketUrl}?encoding=zlib`)
+                if (!this.websocket) throw new Error("what the fuck")
+                const ws = new Websocket(`${this.websocket.url}?encoding=zlib`)
                 return this.setWebsocket(ws, true)
               }
             }
@@ -215,17 +217,37 @@ export class EventHandler {
         event.code == 4016
       )
         return
-      try {
-        sleep(getReconnectTime(event.code)).then(() => {
-          console.info(
-            "%c WS %c Connection %c Reconnecting... ",
+      if (event.code == 4029) {
+        const gateway = await getGateway(this.auth?.accessToken)
+        if (!gateway.limits.connect.remaining) {
+          console.error(
+            `%c WS %c Rate Limit %c Waiting for ${gateway.limits.connect.resetAfter / 1000} seconds... `,
             "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
-            "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
+            "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
             "background: #353A47; color: white; border-radius: 0 3px 3px 0",
           )
-          const ws = new Websocket(`${fire.websiteSocketUrl}?sessionId=${this.session}&seq=${this.seq}&encoding=zlib`)
-          return this.setWebsocket(ws, this.identified == true && !!this.session)
-        })
+          await sleep(gateway.limits.connect.resetAfter)
+        } else if (!gateway.limits.connectGlobal.remaining) {
+          console.error(
+            `%c WS %c Rate Limit %c Waiting for ${gateway.limits.connectGlobal.resetAfter / 1000} seconds... `,
+            "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
+            "background: #C95D63; color: white; border-radius: 3px 0 0 3px;",
+            "background: #353A47; color: white; border-radius: 0 3px 3px 0",
+          )
+          await sleep(gateway.limits.connectGlobal.resetAfter)
+        }
+      }
+      try {
+        await sleep(getReconnectTime(event.code))
+        console.info(
+          "%c WS %c Connection %c Reconnecting... ",
+          "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
+          "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
+          "background: #353A47; color: white; border-radius: 0 3px 3px 0",
+        )
+        if (!this.websocket) throw new Error("what the fuck")
+        const ws = new Websocket(`${this.websocket.url}?sessionId=${this.session}&seq=${this.seq}&encoding=zlib`)
+        return this.setWebsocket(ws, true)
       } catch {
         console.error(
           "%c WS %c Connection %c Websocket failed to reconnect! ",

@@ -155,3 +155,19 @@ export type BuildOverride = {
   expiresAt: Date
   hash?: string
 }
+
+interface WSRateLimit {
+  total: number
+  remaining: number
+  resetAfter: number
+  maxConcurrency: number
+}
+
+export type WebsiteGateway = {
+  url: string
+  limits: {
+    connect: WSRateLimit
+    connectGlobal: WSRateLimit
+    identify?: WSRateLimit
+  }
+}
