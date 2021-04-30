@@ -400,7 +400,11 @@ export class EventHandler {
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         data,
       )
-    }
+    } else if (data.success) this.logIgnore.push(...[EventType.GUILD_CREATE, EventType.GUILD_DELETE])
+    else
+      this.logIgnore = this.logIgnore.filter(
+        (event) => event != EventType.GUILD_CREATE && event != EventType.GUILD_DELETE,
+      )
   }
 
   PUSH_ROUTE(data: { route: string }) {
