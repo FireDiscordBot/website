@@ -37,7 +37,7 @@ const AppNavbar = () => {
       <Container>
         <NextLink href="/" passHref>
           <Navbar.Brand>
-            <img id="logo-img" src="/logo.svg" />
+            <img id="logo-img" src="/logo_white.svg" />
           </Navbar.Brand>
         </NextLink>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />

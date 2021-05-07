@@ -4,7 +4,7 @@ const Footer = () => (
   <footer>
     <div>
       <div>
-        © 2021 <span className="fire">Fire Bot</span>. All Rights Reserved.
+        © 2021 <span className="fire">Fire Bot</span>.
       </div>
       <div>
         Website Made by{" "}

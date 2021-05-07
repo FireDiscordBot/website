@@ -41,7 +41,8 @@ body {
 }
 
 .navbar {
-	background: linear-gradient(25deg, #f04e33, #c52035);
+	/* background: linear-gradient(25deg, #f04e33, #c52035); */
+	background: linear-gradient(25deg, #7289DA, #6066FE);
 }
 
 #logo {
