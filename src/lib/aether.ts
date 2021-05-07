@@ -37,8 +37,8 @@ export const fetchPremiumGuilds = async (accessToken: string) => {
   return await requestWithAuth<string[]>(accessToken, `guilds/premium`)
 }
 
-export const toggleGuildPremium = async (accessToken: string, guildId: string) => {
-  return await requestWithAuth<string[]>(accessToken, `guilds/${guildId}/premium`, "PUT")
+export const toggleGuildPremium = async (accessToken: string, guildId: string, method: "PUT" | "DELETE") => {
+  return await requestWithAuth<string[]>(accessToken, `guilds/${guildId}/premium`, method)
 }
 
 export const createDataArchive = async (accessToken: string) => {

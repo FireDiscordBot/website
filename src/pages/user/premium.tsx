@@ -125,7 +125,7 @@ const PremiumPage = () => {
 
     try {
       premiumGuilds = await fetcher(`/api/user/guilds/${guild.id}/premium`, {
-        method: "PUT",
+        method: guild.premium ? "DELETE" : "PUT",
       })
     } catch (e) {
       const errorResponse = createErrorResponse(e)
