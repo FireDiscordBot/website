@@ -90,7 +90,7 @@ const AccountPage = () => {
     event.preventDefault()
     await revalidate()
 
-    if (dataRequest && dataRequest.status != 0) {
+    if (typeof dataRequest?.status == "number" && dataRequest.status != 0) {
       const link = document.createElement("a")
       link.href = dataRequest.url
       link.download = `${handler.session}.zip`

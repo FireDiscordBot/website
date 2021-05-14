@@ -1,6 +1,8 @@
 import { NextApiHandler } from "next"
 import { NextApiRequest, NextApiResponse } from "next/dist/next-server/lib/utils"
 
+import { NetworkErrorData } from "./utils/fetcher"
+
 import { Reminder, UserGuild } from "@/interfaces/aether"
 import { Plan } from "@/interfaces/fire"
 import { AuthSession } from "@/interfaces/auth"
@@ -12,7 +14,7 @@ export type ApiHandler<T = AnyObject> = NextApiHandler<ApiResponseBody<T>>
 export type AuthenticatedApiHandler<T = AnyObject> = (
   session: AuthSession & { accessToken: string },
   req: NextApiRequest,
-  res: NextApiResponse<ApiResponseBody<T>>,
+  res: NextApiResponse<ApiResponseBody<T | NetworkErrorData>>,
 ) => void | Promise<void>
 
 export type ApiErrorResponse = {

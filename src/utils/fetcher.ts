@@ -2,9 +2,11 @@ import { getReasonPhrase, StatusCodes } from "http-status-codes"
 
 import { ApiErrorResponse } from "@/types"
 
+export type NetworkErrorData = unknown
+
 export class NetworkError extends Error {
+  data?: NetworkErrorData
   code: number
-  data?: unknown
 
   constructor(code: number, data?: unknown, message = "An error occurred while fetching the data.") {
     super(message)
@@ -37,7 +39,8 @@ const fetcher = async <R = unknown>(url: string, options?: RequestInit): Promise
   const response = await fetch(url, options)
 
   if (!response.ok) {
-    const data = await response.json()
+    const data =
+      response.headers.get("Content-Type") == "application/json" ? await response.json() : await response.text()
     throw new NetworkError(response.status, data, data.error)
   }
 
