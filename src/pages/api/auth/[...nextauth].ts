@@ -2,7 +2,7 @@ import { NextApiHandler } from "next"
 import NextAuth, { InitOptions } from "next-auth"
 import Providers from "next-auth/providers"
 
-import type { AuthSession, AuthToken, AuthUser } from "@/interfaces/auth"
+import type { AccessTokenResponse, AuthSession, AuthToken, AuthUser } from "@/interfaces/auth"
 import type { APIUser } from "@/interfaces/discord"
 import { getUserImage } from "@/utils/discord"
 import { discord } from "@/constants"
@@ -22,23 +22,57 @@ const discordProvider = Providers.Discord({
   clientSecret: discord.clientSecret,
 })
 
+const refreshToken = async (token: AuthToken): Promise<AuthToken> => {
+  if (!token.refreshToken) return token
+
+  const data = {
+    client_id: discord.clientId,
+    client_secret: discord.clientSecret,
+    grant_type: "refresh_token",
+    refresh_token: token.refreshToken,
+  }
+
+  const response = await fetch(`https://discord.com/api/v8/oauth2/token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams(data),
+  })
+
+  if (!response.ok) return token
+
+  const refreshed = (await response.json()) as AccessTokenResponse
+  token.accessToken = refreshed.access_token
+  token.refreshToken = refreshed.refresh_token ?? token.refreshToken
+  token.expiresAt = +new Date() + refreshed.expires_in * 1000 - 3600000
+
+  return token
+}
+
 const nextAuthConfig: InitOptions = {
   providers: [discordProvider],
   callbacks: {
     async jwt(token: AuthToken, user: AuthUser, account) {
       if (account?.accessToken) {
         token.accessToken = account.accessToken
+        token.refreshToken = account.refreshToken
+        token.expiresAt = +new Date() + account.expires_in * 1000 - 3600000
       }
       if (user) {
         token.discriminator = user.discriminator
         token.publicFlags = user.publicFlags
         token.premiumType = user.premiumType
       }
-      return token
+
+      if (typeof token.expiresAt == "number" && +new Date() > token.expiresAt)
+        return await refreshToken(token).catch(() => token)
+      else return token
     },
     async session(session: AuthSession, token: AuthToken) {
       if (token?.accessToken) {
         session.accessToken = token.accessToken
+        session.refreshToken = token.refreshToken
       }
       session.user.id = token.sub ?? ""
       session.user.discriminator = token.discriminator

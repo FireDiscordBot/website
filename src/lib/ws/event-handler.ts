@@ -188,6 +188,15 @@ export class EventHandler {
                 const ws = new Websocket(`${this.websocket.url}?encoding=zlib`)
                 return this.setWebsocket(ws)
               }
+            } else {
+              delete this.auth
+              window.sessionStorage.removeItem("aether_session")
+              window.sessionStorage.removeItem("aether_seq")
+              delete this._session
+              delete this._seq
+              if (!this.websocket) throw new Error("what the fuck")
+              const ws = new Websocket(`${this.websocket.url}?encoding=zlib`)
+              return this.setWebsocket(ws)
             }
           })
           .catch(() => {
