@@ -70,7 +70,7 @@ const AccountPage = () => {
       autoHideDuration: 5000,
     })
 
-  const { data: dataRequest, revalidate } = useSWR<GetCollectData>(session ? "/api/user/collect-data" : null, {
+  const { data: dataRequest, revalidate } = useSWR<GetCollectData>(session ? "/api/user/data-archive" : null, {
     revalidateOnReconnect: false,
     revalidateOnFocus: false,
   })
@@ -100,7 +100,7 @@ const AccountPage = () => {
 
     // let json: PostCollectData
     // try {
-    //   json = await fetcher<PostCollectData>("/api/user/collect-data", {
+    //   json = await fetcher<PostCollectData>("/api/user/data-archive", {
     //     method: "POST",
     //   })
     // } catch (e) {
