@@ -9,7 +9,7 @@ import { Websocket } from "./websocket"
 
 import { IdentifyResponse, EventType, ResumeResponse } from "@/interfaces/aether"
 import { AuthSession } from "@/interfaces/auth"
-import { fetchUser } from "@/utils/discord"
+import { fetchUser, getUserImage } from "@/utils/discord"
 import { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
 import { getGateway } from "@/utils/aether"
 
@@ -332,6 +332,12 @@ export class EventHandler {
       this.websocket?.close(4001, "Mismatched identities")
     if (this.auth?.user?.id) this.send(new Message(EventType.GUILD_SYNC, {}))
     this.identified = true
+    if (
+      this.auth?.user?.image &&
+      identified.auth?.user?.avatar &&
+      !this.auth?.user?.image.includes(identified.auth?.user?.avatar)
+    )
+      this.auth.user.image = getUserImage(identified.auth.user)
     while (this.queue.length) this.send(this.queue.pop())
     setTimeout(() => {
       if (!this.heartbeat && this.websocket && this.websocket.readyState == this.websocket.OPEN)
