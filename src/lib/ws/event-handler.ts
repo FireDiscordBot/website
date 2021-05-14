@@ -84,7 +84,7 @@ export class EventHandler {
     return this.oauth?.user
   }
 
-  setWebsocket(websocket: Websocket, reconnect?: boolean) {
+  setWebsocket(websocket: Websocket) {
     if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
       // easy access for debugging
       (globalThis as { [key: string]: unknown }).eventHandler = this
@@ -96,14 +96,6 @@ export class EventHandler {
     }
     this.websocket = websocket
     this.websocket.onopen = () => {
-      reconnect &&
-        this.emitter.emit("NOTIFICATION", {
-          text: "Websocket connected",
-          severity: "success",
-          horizontal: "right",
-          vertical: "top",
-          autoHideDuration: 3000,
-        })
       console.info(
         `%c WS %c Connection %c Websocket connected! `,
         "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
@@ -153,7 +145,7 @@ export class EventHandler {
           window.sessionStorage.removeItem("aether_session")
           window.sessionStorage.removeItem("aether_seq")
         }
-      } else
+      } else if (event.code != 4001)
         this.emitter.emit("NOTIFICATION", {
           text: event.reason ? event.reason : "Websocket error occurred",
           severity: "error",
@@ -194,7 +186,7 @@ export class EventHandler {
                 delete this._seq
                 if (!this.websocket) throw new Error("what the fuck")
                 const ws = new Websocket(`${this.websocket.url}?encoding=zlib`)
-                return this.setWebsocket(ws, true)
+                return this.setWebsocket(ws)
               }
             }
           })
@@ -247,7 +239,7 @@ export class EventHandler {
         )
         if (!this.websocket) throw new Error("what the fuck")
         const ws = new Websocket(`${this.websocket.url}?sessionId=${this.session}&seq=${this.seq}&encoding=zlib`)
-        return this.setWebsocket(ws, true)
+        return this.setWebsocket(ws)
       } catch {
         console.error(
           "%c WS %c Connection %c Websocket failed to reconnect! ",
