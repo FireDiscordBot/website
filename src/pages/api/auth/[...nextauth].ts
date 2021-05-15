@@ -13,7 +13,7 @@ const discordProvider = Providers.Discord({
     id: profile.id,
     name: profile.username,
     discriminator: profile.discriminator,
-    image: getUserImage(profile),
+    image: getUserImage(profile, process.env.USE_MOD_SIX == "true"),
     email: profile.email,
     publicFlags: profile.public_flags,
     premiumType: profile.premium_type,

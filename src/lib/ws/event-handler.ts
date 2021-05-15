@@ -337,7 +337,7 @@ export class EventHandler {
       identified.auth?.user?.avatar &&
       !this.auth?.user?.image.includes(identified.auth?.user?.avatar)
     )
-      this.auth.user.image = getUserImage(identified.auth.user)
+      this.auth.user.image = getUserImage(identified.auth.user, process.env.USE_MOD_SIX == "true")
     while (this.queue.length) this.send(this.queue.pop())
     setTimeout(() => {
       if (!this.heartbeat && this.websocket && this.websocket.readyState == this.websocket.OPEN)
