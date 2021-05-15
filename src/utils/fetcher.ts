@@ -1,14 +1,12 @@
 import { getReasonPhrase, StatusCodes } from "http-status-codes"
 
-import { ApiErrorResponse } from "@/types"
-
-export type NetworkErrorData = unknown
+import { AnyObject, ApiErrorResponse } from "@/types"
 
 export class NetworkError extends Error {
-  data?: NetworkErrorData
+  data?: AnyObject
   code: number
 
-  constructor(code: number, data?: unknown, message = "An error occurred while fetching the data.") {
+  constructor(code: number, data?: AnyObject, message = "An error occurred while fetching the data.") {
     super(message)
     this.code = code
     this.data = data
