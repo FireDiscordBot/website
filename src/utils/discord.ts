@@ -75,11 +75,6 @@ export const getGuildIcon = (guild: UserGuild) => {
 export const parseFlags = (flagsValue: number, premiumType: number) => {
   const parsedFlags: DiscordFlag[] = []
 
-  if (premiumType > 0) {
-    const nitroFlag = flags.find((flag) => flag.key === "nitro")
-    if (nitroFlag) parsedFlags.push(nitroFlag)
-  }
-
   while (flagsValue >= 1) {
     const modBits = flagsValue & (~flagsValue + 1)
     const flag = flags.find((flag) => flag.value == modBits)
@@ -87,7 +82,12 @@ export const parseFlags = (flagsValue: number, premiumType: number) => {
     flagsValue ^= modBits
   }
 
-  return parsedFlags
+  if (premiumType > 0) {
+    const nitroFlag = flags.find((flag) => flag.key === "nitro")
+    if (nitroFlag) parsedFlags.push(nitroFlag)
+  }
+
+  return parsedFlags.sort((a, b) => flags.indexOf(a) - flags.indexOf(b))
 }
 
 export const getMatches = (string: string, index: number) => {
