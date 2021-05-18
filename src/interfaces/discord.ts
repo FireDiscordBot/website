@@ -193,6 +193,11 @@ export const flags: DiscordFlag[] = [
     value: 1 << 17,
     name: "Early Verified Bot Developer",
   },
+  {
+    key: "certifiedModerator",
+    value: 1 << 18,
+    name: "Discord Certified Moderator",
+  },
 ]
 
 export interface Invite {
