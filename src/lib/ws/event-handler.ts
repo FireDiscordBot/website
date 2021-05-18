@@ -7,11 +7,10 @@ import { Message } from "./message"
 import { MessageUtil } from "./message-util"
 import { Websocket } from "./websocket"
 
-import { IdentifyResponse, EventType, ResumeResponse } from "@/interfaces/aether"
+import { IdentifyResponse, EventType, ResumeResponse, WebsiteGateway } from "@/interfaces/aether"
 import { AuthSession } from "@/interfaces/auth"
 import { fetchUser, getUserImage } from "@/utils/discord"
 import { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
-import { getGateway } from "@/utils/aether"
 import routeBuilder from "@/utils/api-router"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -236,7 +235,7 @@ export class EventHandler {
       )
         return
       if (event.code == 4029) {
-        const gateway = await getGateway(this.auth?.accessToken)
+        const gateway = await this.api.gateway.website.get<WebsiteGateway>({ version: 2 })
         if (!gateway.limits.connect.remaining) {
           console.error(
             `%c WS %c Rate Limit %c Waiting for ${gateway.limits.connect.resetAfter / 1000} seconds... `,

@@ -10,6 +10,8 @@ import Box from "@material-ui/core/Box"
 import Grid from "@material-ui/core/Grid"
 import useMediaQuery from "@material-ui/core/useMediaQuery"
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles"
+import { withStyles } from "@material-ui/core"
+import { red } from "@material-ui/core/colors"
 
 import { emitter } from "./_app"
 
@@ -18,8 +20,6 @@ import { fire } from "@/constants"
 import { Category } from "@/interfaces/aether"
 import DefaultLayout from "@/layouts/default"
 import CommandAccordion from "@/components/CommandAccordion"
-import {withStyles} from "@material-ui/core";
-import {red} from "@material-ui/core/colors";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -43,7 +43,7 @@ const CategoriesTabs = withStyles({
   indicator: {
     backgroundColor: red[700],
   },
-})(Tabs);
+})(Tabs)
 
 const CommandsPage = ({ initialCategories }: Props) => {
   const classes = useStyles()
