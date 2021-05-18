@@ -76,8 +76,7 @@ body {
 .btn-fire {
   color: white;
   background: linear-gradient(25deg, #f04e33, #c52035);
-  /* border-color: #c52035; */
-  border-color: #6066fe;
+  border-color: #c52035;
   border-radius: 10px;
 }
 
@@ -490,8 +489,7 @@ a:hover {
 
 .page-item.active .page-link {
   background: -webkit-linear-gradient(25deg, #f04e33, #c52035);
-  /* border-color: #c52035; */
-	border-color: #6066fe;
+  border-color: #c52035;
 }
 
 .page-link {
