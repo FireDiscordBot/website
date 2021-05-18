@@ -6,6 +6,7 @@ import type { AccessTokenResponse, AuthSession, AuthToken, AuthUser } from "@/in
 import type { APIUser } from "@/interfaces/discord"
 import { fetchUser, getUserImage } from "@/utils/discord"
 import { discord } from "@/constants"
+import { handler as eventHandler } from "@/pages/_app"
 
 const discordProvider = Providers.Discord({
   scope: "identify email guilds",
@@ -92,6 +93,9 @@ const nextAuthConfig: InitOptions = {
       session.user.publicFlags = token.publicFlags
       session.user.premiumType = token.premiumType
       session.user.image = token.image
+
+      if (eventHandler && eventHandler?.auth?.accessToken == token.accessToken) eventHandler.auth = session
+
       return session
     },
   },

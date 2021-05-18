@@ -282,7 +282,7 @@ export class EventHandler {
     this.session = data.sessionId
   }
 
-  RESUME_CLIENT(data: ResumeResponse) {
+  async RESUME_CLIENT(data: ResumeResponse) {
     if (this.auth?.user?.id != data.auth?.user?.id) {
       delete this._session
       delete this._seq
@@ -297,6 +297,8 @@ export class EventHandler {
       this.guilds = []
     }
     this.identified = true // should already be true but just in case
+    const session = await getSession()
+    if (session) this.auth = session
     if (this.auth?.user?.image && data.auth?.user?.avatar && !this.auth?.user?.image.includes(data.auth?.user?.avatar))
       this.auth.user.image = getUserImage(data.auth.user, process.env.USE_MOD_SIX == "true")
     while (this.queue.length) this.send(this.queue.pop())
@@ -334,6 +336,8 @@ export class EventHandler {
       this.websocket?.close(4001, "Mismatched identities")
     if (this.auth?.user?.id) this.send(new Message(EventType.GUILD_SYNC, {}))
     this.identified = true
+    const session = await getSession()
+    if (session) this.auth = session
     if (
       this.auth?.user?.image &&
       identified.auth?.user?.avatar &&
