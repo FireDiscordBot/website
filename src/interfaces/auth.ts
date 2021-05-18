@@ -34,6 +34,7 @@ export type AuthSession = {
   accessToken?: string
   refreshToken?: string
   expires: string
+  refresh?: () => Promise<AuthSession>
 }
 
 declare module "next-auth/client" {

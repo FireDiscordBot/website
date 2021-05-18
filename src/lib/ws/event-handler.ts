@@ -49,7 +49,10 @@ export class EventHandler {
   acked?: boolean
 
   constructor(session: AuthSession | null, emitter: EventEmitter) {
-    if (session) this.auth = session
+    if (session) {
+      this.auth = session
+      this.auth.refresh = this.getSession.bind(this)
+    } else this.getSession()
     this.subscribed = typeof window != "undefined" ? window.location.pathname : "/"
     this.identified = false
     this.emitter = emitter
@@ -82,6 +85,15 @@ export class EventHandler {
 
   get user() {
     return this.oauth?.user
+  }
+
+  async getSession(): Promise<AuthSession> {
+    const session = await getSession().catch(() => null)
+    if (session) {
+      this.auth = session
+      this.auth.refresh = this.getSession.bind(this)
+    }
+    return this.auth as AuthSession
   }
 
   setWebsocket(websocket: Websocket) {
@@ -297,8 +309,7 @@ export class EventHandler {
       this.guilds = []
     }
     this.identified = true // should already be true but just in case
-    const session = await getSession()
-    if (session) this.auth = session
+    if (typeof this.auth?.refresh == "function") await this.auth.refresh()
     if (this.auth?.user?.image && data.auth?.user?.avatar && !this.auth?.user?.image.includes(data.auth?.user?.avatar))
       this.auth.user.image = getUserImage(data.auth.user, process.env.USE_MOD_SIX == "true")
     while (this.queue.length) this.send(this.queue.pop())
@@ -336,8 +347,7 @@ export class EventHandler {
       this.websocket?.close(4001, "Mismatched identities")
     if (this.auth?.user?.id) this.send(new Message(EventType.GUILD_SYNC, {}))
     this.identified = true
-    const session = await getSession()
-    if (session) this.auth = session
+    if (typeof this.auth?.refresh == "function") await this.auth.refresh()
     if (
       this.auth?.user?.image &&
       identified.auth?.user?.avatar &&
