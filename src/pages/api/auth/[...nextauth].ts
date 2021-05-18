@@ -4,7 +4,7 @@ import Providers from "next-auth/providers"
 
 import type { AccessTokenResponse, AuthSession, AuthToken, AuthUser } from "@/interfaces/auth"
 import type { APIUser } from "@/interfaces/discord"
-import { getUserImage } from "@/utils/discord"
+import { fetchUser, getUserImage } from "@/utils/discord"
 import { discord } from "@/constants"
 
 const discordProvider = Providers.Discord({
@@ -65,6 +65,19 @@ const nextAuthConfig: InitOptions = {
         token.premiumType = user.premiumType
       }
 
+      if (token.accessToken) {
+        const user = await fetchUser(token.accessToken).catch(() => {
+          return null
+        })
+        if (user) {
+          token.discriminator = user.discriminator
+          token.publicFlags = user.public_flags
+          token.image = getUserImage(user)
+          token.name = user.username
+          token.email = user.email
+        }
+      }
+
       if (typeof token.expiresAt == "number" && +new Date() > token.expiresAt)
         return await refreshToken(token).catch(() => token)
       else return token
@@ -78,6 +91,7 @@ const nextAuthConfig: InitOptions = {
       session.user.discriminator = token.discriminator
       session.user.publicFlags = token.publicFlags
       session.user.premiumType = token.premiumType
+      session.user.image = token.image
       return session
     },
   },

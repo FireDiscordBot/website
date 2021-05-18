@@ -27,10 +27,15 @@ export const fetchGuilds = async (accessToken: string): Promise<DiscordGuild[]> 
   return guilds
 }
 
+const userCache = new Map<string, APIUser>()
+
 export const fetchUser = async (accessToken: string): Promise<APIUser> => {
+  if (userCache.has(accessToken)) return userCache.get(accessToken) as APIUser
   const user: APIUser = await fetcher("https://discord.com/api/v8/users/@me", {
     headers: { Authorization: `Bearer ${accessToken}` },
   })
+  userCache.set(accessToken, user)
+  setTimeout(() => userCache.delete(accessToken), 30000)
 
   return user
 }

@@ -297,6 +297,8 @@ export class EventHandler {
       this.guilds = []
     }
     this.identified = true // should already be true but just in case
+    if (this.auth?.user?.image && data.auth?.user?.avatar && !this.auth?.user?.image.includes(data.auth?.user?.avatar))
+      this.auth.user.image = getUserImage(data.auth.user, process.env.USE_MOD_SIX == "true")
     while (this.queue.length) this.send(this.queue.pop())
     this.session = data.session
     this.config = { ...this.config, ...data.config }
