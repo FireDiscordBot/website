@@ -83,7 +83,10 @@ const AccountPage = () => {
     return <Loading />
   }
 
-  const flags = parseFlags(session.user.publicFlags, session.user.premiumType)
+  const flags = parseFlags(
+    handler?.auth?.user.publicFlags ?? session.user.publicFlags,
+    handler?.auth?.user.premiumType ?? session.user.premiumType,
+  )
   const flagsElements = flags.map((flag, index) => <DiscordFlagImage flag={flag} key={index} />)
 
   const onClickRequestData = async (event: React.MouseEvent) => {
