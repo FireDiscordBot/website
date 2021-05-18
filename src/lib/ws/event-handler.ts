@@ -12,6 +12,7 @@ import { AuthSession } from "@/interfaces/auth"
 import { fetchUser, getUserImage } from "@/utils/discord"
 import { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
 import { getGateway } from "@/utils/aether"
+import routeBuilder from "@/utils/api-router"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -94,6 +95,10 @@ export class EventHandler {
       this.auth.refresh = this.getSession.bind(this)
     }
     return this.auth as AuthSession
+  }
+
+  get api() {
+    return routeBuilder(this)
   }
 
   setWebsocket(websocket: Websocket) {

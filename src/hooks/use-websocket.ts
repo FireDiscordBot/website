@@ -5,7 +5,7 @@ import { getSession } from "next-auth/client"
 
 import { EventHandler } from "@/lib/ws/event-handler"
 import { Websocket } from "@/lib/ws/websocket"
-import { getGateway } from "@/utils/aether"
+import { WebsiteGateway } from "@/interfaces/aether"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -16,7 +16,7 @@ const useWebsocket = (emitter: EventEmitter) => {
     const initHandler = async () => {
       const session = await getSession()
       const handler = new EventHandler(session, emitter)
-      const gateway = await getGateway(session?.accessToken)
+      const gateway = await handler.api.gateway.website.get<WebsiteGateway>({ version: 2 })
       if (!gateway.limits.connect.remaining) {
         console.error(
           `%c WS %c Rate Limit %c Waiting for ${gateway.limits.connect.resetAfter / 1000} seconds... `,

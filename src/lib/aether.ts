@@ -3,7 +3,7 @@ import fetcher from "@/utils/fetcher"
 import { BuildOverride, Reminder } from "@/interfaces/aether"
 import { GetCollectData } from "@/types"
 
-const requestWithAuth = <R = never>(accessToken: string, path: string, method?: string, body?: unknown) =>
+export const requestWithAuth = <R = never>(accessToken: string, path: string, method?: string, body?: unknown) =>
   fetcher<R>(`${fire.aetherApiUrl}/${path}`, {
     body: body as BodyInit,
     method: method ?? "GET",
