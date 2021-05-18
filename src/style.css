@@ -11,14 +11,12 @@
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  /* background: linear-gradient(25deg, #f04e33, #c52035); */
-  background: linear-gradient(25deg, #7289da, #6066fe);
+  background: linear-gradient(25deg, #f04e33, #c52035);
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  /* background: linear-gradient(25deg, #c52035, #f04e33); */
-  background: linear-gradient(25deg, #7289da, #6066fe);
+  background: linear-gradient(25deg, #c52035, #f04e33);
 }
 
 html {
@@ -35,8 +33,7 @@ body {
 }
 
 .fire {
-  /* background: -webkit-linear-gradient(25deg, #f04e33, #c52035); */
-  background: -webkit-linear-gradient(25deg, #7289da, #6066fe);
+  background: -webkit-linear-gradient(25deg, #f04e33, #c52035);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -44,8 +41,7 @@ body {
 }
 
 .navbar {
-  /* background: linear-gradient(25deg, #f04e33, #c52035); */
-  background: linear-gradient(25deg, #7289da, #6066fe);
+  background: linear-gradient(25deg, #f04e33, #c52035);
 }
 
 #logo {
@@ -70,8 +66,7 @@ body {
 }
 
 #invite-btn {
-  /* background: linear-gradient(25deg, #f04e33, #c52035); */
-  background: linear-gradient(25deg, #7289da, #6066fe);
+  background: linear-gradient(25deg, #f04e33, #c52035);
   border-radius: 10px;
   opacity: 90%;
   text-align: center;
@@ -80,8 +75,7 @@ body {
 
 .btn-fire {
   color: white;
-  /* background: linear-gradient(25deg, #f04e33, #c52035); */
-  background: linear-gradient(25deg, #7289da, #6066fe);
+  background: linear-gradient(25deg, #f04e33, #c52035);
   /* border-color: #c52035; */
   border-color: #6066fe;
   border-radius: 10px;
@@ -134,8 +128,7 @@ body {
 
 #categories-list li:hover {
   cursor: pointer;
-  /* background: linear-gradient(25deg, #f04e33, #c52035); */
-  background: linear-gradient(25deg, #7289da, #6066fe);
+  background: linear-gradient(25deg, #f04e33, #c52035);
 }
 
 .table {
@@ -164,8 +157,7 @@ body {
 }
 
 .c-active {
-  /* background: linear-gradient(25deg, #f04e33, #c52035) !important; */
-  background: linear-gradient(25deg, #7289da, #6066fe) !important;
+  background: linear-gradient(25deg, #f04e33, #c52035) !important;
 }
 
 .bot-info-box {
@@ -179,8 +171,7 @@ body {
 }
 
 .bot-info-box h4 {
-  /* background: -webkit-linear-gradient(25deg, #f04e33, #c52035); */
-  background: -webkit-linear-gradient(25deg, #7289da, #6066fe);
+  background: -webkit-linear-gradient(25deg, #f04e33, #c52035);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -196,8 +187,7 @@ body {
 }
 
 .about-text strong {
-  /* background: -webkit-linear-gradient(25deg, #f04e33, #c52035); */
-	background: -webkit-linear-gradient(25deg, #7289da, #6066fe);
+  background: -webkit-linear-gradient(25deg, #f04e33, #c52035);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -499,8 +489,7 @@ a:hover {
 }
 
 .page-item.active .page-link {
-  /* background: -webkit-linear-gradient(25deg, #f04e33, #c52035); */
-	background: -webkit-linear-gradient(25deg, #7289da, #6066fe);
+  background: -webkit-linear-gradient(25deg, #f04e33, #c52035);
   /* border-color: #c52035; */
 	border-color: #6066fe;
 }
@@ -519,10 +508,8 @@ a:hover {
 
 .page-link:hover {
   color: #fff;
-  /* background: -webkit-linear-gradient(25deg, #f04e33, #c52035); */
-	background: -webkit-linear-gradient(25deg, #7289da, #6066fe);
-  /* border-color: #f04e33; */
-	border-color: #7289da;
+  background: -webkit-linear-gradient(25deg, #f04e33, #c52035);
+  border-color: #f04e33;
 }
 
 .page-link:focus {
