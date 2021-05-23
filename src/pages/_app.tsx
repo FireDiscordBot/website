@@ -11,16 +11,16 @@ import { EventHandler } from "../../lib/ws/event-handler";
 import { Emitter } from "../../lib/ws/event-emitter";
 import useWebsocket from "../hooks/use-websocket";
 
-export const emitter = new Emitter();
+// export const emitter = new Emitter();
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
-  const [handler] = useWebsocket(
-    "wss://aether-ws.gaminggeek.dev/website?encoding=zlib",
-    emitter
-  );
-  if (handler) {
-    initHandler(handler);
-  }
+  // const [handler] = useWebsocket(
+  //   "wss://aether-ws.gaminggeek.dev/website?encoding=zlib",
+  //   emitter
+  // );
+  // if (handler) {
+  //   initHandler(handler);
+  // }
 
   return (
     <>
@@ -31,20 +31,20 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   );
 };
 
-const initHandler = async (handler: EventHandler) => {
-  const events = ["SUBSCRIBE"]; // may be populated with more in the future
-  for (const event of events) emitter.removeAllListeners(event);
-  emitter.on("SUBSCRIBE", (route, extra) => {
-    handler.handleSubscribe(route, extra);
-  });
-  if (!handler.identified) handler.identify();
-  const devToolsCheck = /./;
-  devToolsCheck.toString = () => {
-    // dev tools is open
-    handler.devToolsWarning();
-    return "";
-  };
-  console.log("%c", devToolsCheck);
-};
+// const initHandler = async (handler: EventHandler) => {
+//   const events = ["SUBSCRIBE"]; // may be populated with more in the future
+//   for (const event of events) emitter.removeAllListeners(event);
+//   emitter.on("SUBSCRIBE", (route, extra) => {
+//     handler.handleSubscribe(route, extra);
+//   });
+//   if (!handler.identified) handler.identify();
+//   const devToolsCheck = /./;
+//   devToolsCheck.toString = () => {
+//     // dev tools is open
+//     handler.devToolsWarning();
+//     return "";
+//   };
+//   console.log("%c", devToolsCheck);
+// };
 
 export default MyApp;

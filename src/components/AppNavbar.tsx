@@ -5,7 +5,7 @@ import Navbar from "react-bootstrap/Navbar";
 import { useRouter } from "next/router";
 import Nav from "react-bootstrap/Nav";
 
-import { emitter } from "../pages/_app";
+// import { emitter } from "../pages/_app";
 
 interface NavLinkProps {
   href: string;
@@ -30,7 +30,7 @@ const NavLink = ({ href, children }: React.PropsWithChildren<NavLinkProps>) => {
 
 const AppNavbar = () => {
   const router = useRouter();
-  emitter.emit("SUBSCRIBE", router.route);
+  // emitter.emit("SUBSCRIBE", router.route);
 
   return (
     <Navbar bg="dark" expand="md">

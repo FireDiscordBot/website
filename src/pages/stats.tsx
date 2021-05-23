@@ -8,7 +8,7 @@ import Head from "../components/Head";
 import { FireStats } from "../../lib/interfaces/aether";
 import ClusterModal from "../components/ClusterModal";
 
-import { emitter } from "./_app";
+// import { emitter } from "./_app";
 
 interface Props {
   initialStats: FireStats;
@@ -31,10 +31,10 @@ const StatsPage: NextPage<Props> = ({ initialStats }) => {
     );
   };
 
-  React.useEffect(() => {
-    emitter.removeAllListeners("REALTIME_STATS")
-    emitter.on("REALTIME_STATS", setStats)
-  }, [])
+  // React.useEffect(() => {
+  //   emitter.removeAllListeners("REALTIME_STATS")
+  //   emitter.on("REALTIME_STATS", setStats)
+  // }, [])
 
   let clusterModal = undefined;
 
