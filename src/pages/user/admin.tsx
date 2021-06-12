@@ -1,23 +1,65 @@
 import * as React from "react"
-import { Button, Card, CardContent, Grid, Typography } from "@material-ui/core"
-import useSWR from "swr"
+import {
+  Box,
+  Button,
+  createStyles,
+  FormControl,
+  Grid,
+  InputLabel,
+  makeStyles,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from "@material-ui/core"
+
+import { handler } from "../_app"
 
 import SuperuserLayout, { SuperuserPageTypes } from "@/layouts/superuser-page"
-import { BuildOverride } from "@/interfaces/aether"
 import useSession from "@/hooks/use-session"
 import Loading from "@/components/loading"
-import { fire } from "@/constants"
+
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    formControl: {
+      margin: theme.spacing(1),
+      minWidth: 180,
+    },
+    selectEmpty: {
+      marginTop: theme.spacing(2),
+    },
+  }),
+)
+
+const snowflakeRegex = /\d{15,21}/
 
 const AdminPage = () => {
+  const classes = useStyles()
   const [session, loading] = useSession({ redirectTo: "/" })
-  const { data: buildOverrides, error: buildOverridesError } = useSWR<BuildOverride[]>(
-    session ? "/api/admin/overrides" : null,
-    {
-      revalidateOnFocus: true,
-    },
-  )
+  const [experiment, setExperiment] = React.useState("")
+  const [experimentType, setExperimentType] = React.useState("")
+  const [applyToID, setID] = React.useState("")
+  const [bucket, setBucket] = React.useState(0)
 
-  if (!session || loading || (!buildOverridesError && !buildOverrides)) {
+  const handleExperimentChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setExperiment(event.target.value as string)
+  }
+
+  const handleExperimentTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    if (experiment && handler?.experiments.find((e) => e.id == experiment)?.kind != event.target.value)
+      setExperiment("")
+    setExperimentType(event.target.value as string)
+  }
+
+  const handleBucketChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setBucket(event.target.value as number)
+  }
+
+  const handleApplyToIDChange = (value: string) => {
+    if (snowflakeRegex.test(value)) setID(value)
+  }
+
+  if (!session || loading) {
     return <Loading />
   }
 
@@ -27,75 +69,125 @@ const AdminPage = () => {
         <Grid item>
           <Grid container>
             <Grid item>
-              <Typography variant="h4">Build Overrides</Typography>
-            </Grid>
-            {/* TODO move button over to the right somehow */}
-            <Grid item style={{ display: "flex", flexDirection: "row-reverse" }}>
-              <Button
-                variant={"outlined"}
-                onClick={() => {
-                  return /* TODO make this open a modal */
-                }}
-              >
-                Generate Build Override
-              </Button>
+              <Typography variant="h4">Experiments</Typography>
             </Grid>
           </Grid>
         </Grid>
       </Grid>
 
       <Grid>
-        {(buildOverrides || []).map((override) => {
-          return (
-            <Card key={override.id}>
-              <CardContent>
-                <h3
-                  onClick={() => {
-                    window.open(
-                      process.env.NODE_ENV == "development"
-                        ? `${fire.aetherApiUrl}/__development/link?s=${override.hash}`
-                        : `https://inv.wtf/__development/link?s=${override.hash}`,
-                      "_blank",
-                    )
-                  }}
-                  style={{ cursor: "pointer", display: "inline", wordWrap: "break-word" }}
-                >
-                  {override.hash}
-                </h3>
-                <Grid container spacing={2}>
-                  <Grid item>
-                    <h5>Override ID</h5>
-                    {override.id}
-                  </Grid>
-
-                  <Grid item>
-                    <h5>Experiment ID</h5>
-                    {override.experiment}
-                  </Grid>
-
-                  <Grid item>
-                    <h5>Treatment ID</h5>
-                    {override.treatment}
-                  </Grid>
-
-                  {override.validForUserIds?.length && (
-                    <Grid item>
-                      <h5>Valid For User IDs</h5>
-                      {override.validForUserIds.join(", ")}
-                    </Grid>
-                  )}
-
-                  {override.expiresAt && (
-                    <Grid item>
-                      <h5>Expires At</h5>
-                      {new Date(override.expiresAt).toLocaleString()}
-                    </Grid>
-                  )}
-                </Grid>
-              </CardContent>
-            </Card>
-          )
-        })}
+        <Grid item>
+          <Typography variant="h6">Apply Experiment</Typography>
+          <FormControl className={classes.formControl}>
+            <InputLabel id="experiment-kind-select-label">Experiment Kind</InputLabel>
+            <Select
+              labelId="experiment-kind-select-label"
+              id="experiment-kind-select-label"
+              value={experimentType}
+              onChange={handleExperimentTypeChange}
+              required
+            >
+              <MenuItem key="guild" value="guild">
+                Guild
+              </MenuItem>
+              <MenuItem key="user" value="user">
+                User
+              </MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl className={classes.formControl}>
+            <InputLabel id="experiment-list-select-label">Experiment Name</InputLabel>
+            <Select
+              labelId="experiment-list-select-label"
+              id="experiment-list-select-label"
+              value={experiment}
+              onChange={handleExperimentChange}
+              required
+            >
+              {handler?.experiments
+                .filter((exp) => exp.kind == experimentType)
+                .map((exp) => (
+                  <MenuItem key={exp.id} value={exp.id}>
+                    {exp.label}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+          <FormControl className={classes.formControl}>
+            <InputLabel id="experiment-bucket-select-label">Treatment</InputLabel>
+            <Select
+              labelId="experiment-bucket-select-label"
+              id="experiment-bucket-select-label"
+              value={bucket}
+              onChange={handleBucketChange}
+              disabled={experiment ? false : true}
+              required
+            >
+              {handler?.experiments
+                .find((exp) => exp.id == experiment)
+                ?.treatments.map((t) => (
+                  <MenuItem key={t.id} value={t.id}>
+                    {t.label}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+          <FormControl className={classes.formControl}>
+            <Box mb={2}>
+              <TextField
+                id="apply-to-id"
+                onChange={(value) => handleApplyToIDChange(value.target.value)}
+                fullWidth
+                required
+                label={experimentType == "guild" ? "Guild ID" : "User ID"}
+              />
+            </Box>
+          </FormControl>
+          <Box mb={2}>
+            <Button
+              variant={"outlined"}
+              onClick={() => {
+                if (!experiment)
+                  handler?.emitter.emit("NOTIFICATION", {
+                    text: "You must select an experiment",
+                    severity: "error",
+                    horizontal: "right",
+                    vertical: "top",
+                    autoHideDuration: 3000,
+                  })
+                else if (!bucket)
+                  handler?.emitter.emit("NOTIFICATION", {
+                    text: "You must select a treatment",
+                    severity: "error",
+                    horizontal: "right",
+                    vertical: "top",
+                    autoHideDuration: 3000,
+                  })
+                else if (!applyToID)
+                  handler?.emitter.emit("NOTIFICATION", {
+                    text: `You must input a valid ${experimentType} id`,
+                    severity: "error",
+                    horizontal: "right",
+                    vertical: "top",
+                    autoHideDuration: 3000,
+                  })
+                else if (handler) {
+                  handler.applyExperiment(experiment, applyToID, bucket)
+                  setExperiment("")
+                  setExperimentType("")
+                  setID("")
+                  setBucket(0)
+                  if (typeof document != "undefined" && !!document.getElementById("apply-to-id"))
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    document.getElementById("apply-to-id").value = ""
+                }
+              }}
+            >
+              Submit
+            </Button>
+          </Box>
+        </Grid>
       </Grid>
     </SuperuserLayout>
   )

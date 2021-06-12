@@ -80,7 +80,6 @@ const initHandler = async (handler: EventHandler) => {
     const session = await getSession()
     if (session) handler.auth = session
   }
-  if (!handler.identified) await handler.identify()
   handler.devToolsWarning()
   handler.initialised = true
 }

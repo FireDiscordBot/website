@@ -7,7 +7,7 @@ import { Message } from "./message"
 import { MessageUtil } from "./message-util"
 import { Websocket } from "./websocket"
 
-import { IdentifyResponse, EventType, ResumeResponse, WebsiteGateway } from "@/interfaces/aether"
+import { IdentifyResponse, EventType, ResumeResponse, WebsiteGateway, ExperimentConfig } from "@/interfaces/aether"
 import { AuthSession } from "@/interfaces/auth"
 import { fetchUser, getUserImage } from "@/utils/discord"
 import { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
@@ -33,6 +33,7 @@ const getReconnectTime = (code: number) => {
 export class EventHandler {
   identified: "identifying" | boolean
   config?: Record<string, unknown>
+  experiments: ExperimentConfig[]
   heartbeat?: NodeJS.Timeout
   private _session?: string
   oauth?: AuthorizationInfo
@@ -56,6 +57,7 @@ export class EventHandler {
     this.subscribed = typeof window != "undefined" ? window.location.pathname : "/"
     this.identified = false
     this.emitter = emitter
+    this.experiments = []
     this.guilds = []
     this.queue = []
     this._seq = 0
@@ -120,7 +122,6 @@ export class EventHandler {
         { url: websocket.url },
       )
       while (this.queue.length) this.send(this.queue.pop())
-      this.identify()
     }
     this.websocket.onclose = async (event: CloseEvent) => {
       console.error(
@@ -285,7 +286,12 @@ export class EventHandler {
     this.subscribed = route
   }
 
-  HELLO(data: { sessionId: string; interval: number }) {
+  HELLO(data: {
+    guildExperiments: ExperimentConfig[]
+    userExperiments: ExperimentConfig[]
+    sessionId: string
+    interval: number
+  }) {
     if (this.heartbeat) clearInterval(this.heartbeat)
     this.heartbeat = setInterval(() => {
       if (this.acked == false) {
@@ -296,6 +302,8 @@ export class EventHandler {
       this.send(new Message(EventType.HEARTBEAT, this.seq || null))
     }, data.interval)
     this.session = data.sessionId
+    this.experiments = [...data.guildExperiments, ...data.userExperiments]
+    this.identify()
   }
 
   async RESUME_CLIENT(data: ResumeResponse) {
@@ -398,6 +406,16 @@ export class EventHandler {
 
   requestData(nonce: string) {
     this.send(new Message(EventType.DATA_REQUEST, {}, nonce))
+  }
+
+  applyExperiment(label: string, id: string, bucket: number) {
+    this.send(
+      new Message(EventType.APPLY_EXPERIMENT, {
+        label,
+        id,
+        bucket,
+      }),
+    )
   }
 
   CONFIG_UPDATE(data: { name: string; value: unknown }) {

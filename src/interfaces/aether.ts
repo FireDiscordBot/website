@@ -119,6 +119,7 @@ export enum EventType {
   GUILD_JOIN_REQUEST,
   DATA_REQUEST,
   PUSH_ROUTE,
+  APPLY_EXPERIMENT,
 }
 
 export type Notification = {
@@ -150,6 +151,22 @@ export type ResumeResponse = {
   replayed: number
   session: string
   config: Record<string, unknown>
+}
+
+type Config = Record<string, boolean>
+
+interface TreatmentConfig {
+  id: number
+  label: string
+  config: Config
+}
+
+export interface ExperimentConfig {
+  id: string
+  label: string
+  kind: "user" | "guild"
+  defaultConfig: Config
+  treatments: TreatmentConfig[]
 }
 
 export type BuildOverride = {
