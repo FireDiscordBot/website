@@ -82,6 +82,12 @@ export type DiscoverableGuild = {
   key?: number
 }
 
+export enum DiscoveryUpdateOp {
+  SYNC = 1,
+  REMOVE = 2,
+  ADD = 3,
+}
+
 export type UserGuild = DiscordGuild & {
   premium: boolean
 }

@@ -1,18 +1,17 @@
 import * as React from "react"
-import { GetStaticProps } from "next"
 import Container from "@material-ui/core/Container"
 import Grid from "@material-ui/core/Grid"
 
 import { emitter } from "./_app"
 
-import fetcher from "@/utils/fetcher"
+import Loading from "@/components/loading"
 import DefaultLayout from "@/layouts/default"
 import DiscoverableGuildCard from "@/components/DiscoverableGuildCard"
-import { DiscoverableGuild } from "@/interfaces/aether"
-import { fire } from "@/constants"
+import { DiscoverableGuild, DiscoveryUpdateOp } from "@/interfaces/aether"
 
-type Props = {
-  initialGuilds: DiscoverableGuild[]
+interface DiscoverySync {
+  op: DiscoveryUpdateOp
+  guilds: DiscoverableGuild[]
 }
 
 export function shuffleArray<T>(array: T[]): T[] {
@@ -31,15 +30,44 @@ const getSortedGuilds = (guilds: DiscoverableGuild[], sortIds: string[]) =>
 
 // TODO: implement pagination or infinite scrolling
 // maybe add error message when no guilds are found?
-const DiscoverPage = ({ initialGuilds }: Props) => {
-  shuffleArray(initialGuilds)
-  const [sortIds, setSortIds] = React.useState<string[]>(initialGuilds.map((guild) => guild.id))
-  const [guilds, setGuilds] = React.useState<DiscoverableGuild[]>(initialGuilds)
+const DiscoverPage = () => {
+  const [sortIds, setSortIds] = React.useState<string[] | null>(null)
+  const [guilds, setGuilds] = React.useState<DiscoverableGuild[] | null>(null)
 
   React.useEffect(() => {
-    const setGuildsWithSort = (guilds: DiscoverableGuild[]) => {
-      setGuilds(getSortedGuilds(guilds, sortIds))
-      setSortIds(guilds.map((guild) => guild.id))
+    const setGuildsWithSort = (updated: DiscoverySync | DiscoverableGuild[]) => {
+      if (Array.isArray(updated)) {
+        setGuilds(getSortedGuilds(updated, sortIds ?? []))
+        setSortIds(updated?.map((guild) => guild.id) ?? [])
+      } else if (guilds && sortIds) {
+        switch (updated.op) {
+          case DiscoveryUpdateOp.SYNC: {
+            const newGuilds = [...guilds]
+            for (const guild of updated.guilds) {
+              const index = guilds?.findIndex((g) => g.id == guild.id)
+              if (typeof index == "number") newGuilds[index] = guild
+            }
+            setGuilds(newGuilds)
+            break
+          }
+          case DiscoveryUpdateOp.ADD: {
+            const newGuilds = [...guilds]
+            const newSortIds = [...sortIds]
+            newGuilds?.push(...updated.guilds)
+            newSortIds?.push(...updated.guilds.map((guild) => guild.id))
+            setGuilds(newGuilds)
+            setSortIds(newSortIds)
+            break
+          }
+          case DiscoveryUpdateOp.REMOVE: {
+            let newGuilds = [...guilds]
+            for (const guild of updated.guilds) newGuilds = newGuilds.filter((g) => g.id != guild.id)
+            setGuilds(newGuilds)
+            setSortIds(newGuilds.map((guild) => guild.id) ?? [])
+            break
+          }
+        }
+      }
     }
     emitter.removeAllListeners("DISCOVERY_UPDATE")
     emitter.on("DISCOVERY_UPDATE", setGuildsWithSort)
@@ -48,35 +76,20 @@ const DiscoverPage = ({ initialGuilds }: Props) => {
   return (
     <DefaultLayout title="Discover">
       <Container>
-        <Grid container spacing={4}>
-          {getSortedGuilds(guilds, sortIds).map((guild, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <DiscoverableGuildCard guild={guild} />
-            </Grid>
-          ))}
-        </Grid>
+        {guilds == null || sortIds == null ? (
+          <Loading />
+        ) : (
+          <Grid container spacing={4}>
+            {getSortedGuilds(guilds, sortIds).map((guild, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <DiscoverableGuildCard guild={guild} />
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </Container>
     </DefaultLayout>
   )
-}
-
-export const getStaticProps: GetStaticProps<Props> = async () => {
-  let guilds: DiscoverableGuild[]
-
-  try {
-    guilds = await fetcher(`${fire.aetherApiUrl}/v2/discoverable`, {
-      mode: "cors",
-      headers: { "User-Agent": "Fire Website" },
-    })
-  } catch (e) {
-    guilds = []
-  }
-
-  return {
-    props: {
-      initialGuilds: guilds,
-    },
-  }
 }
 
 export default DiscoverPage
