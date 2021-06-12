@@ -308,7 +308,7 @@ export class EventHandler {
       }
       return this.websocket?.close(4005, "Invalid Session")
     } else if (this.auth && data.auth) this.oauth = data.auth
-    if (!data.guilds.length || data.guilds.length != this.guilds.length) {
+    if (this.auth?.user?.id && (!data.guilds.length || data.guilds.length != this.guilds.length)) {
       this.send(new Message(EventType.GUILD_SYNC, { existing: this.guilds }))
       this.guilds = []
     }
