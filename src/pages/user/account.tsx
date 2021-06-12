@@ -30,7 +30,7 @@ type DataRequestResponse =
       data: {
         type: "Buffer"
         data: number[]
-      }
+      } | null
     }
 
 const useStyles = makeStyles((theme) =>
@@ -134,9 +134,8 @@ const AccountPage = () => {
       })
     else {
       const link = document.createElement("a")
-      const file = new Blob([Buffer.from(dataResponse.data)], { type: "application/zip" })
-      // link.href = dataResponse.url
-      link.href = URL.createObjectURL(file)
+      const file = dataResponse.data ? new Blob([Buffer.from(dataResponse.data)], { type: "application/zip" }) : null
+      link.href = file ? URL.createObjectURL(file) : dataResponse.url
       link.download = `${handler.session}.zip`
       link.click()
       link.remove()
