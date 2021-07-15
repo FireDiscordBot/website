@@ -53,4 +53,8 @@ export class Websocket extends WebSocket {
       }
     }
   }
+
+  get open() {
+    return this.readyState === this.OPEN
+  }
 }
