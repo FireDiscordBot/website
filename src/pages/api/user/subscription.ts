@@ -60,13 +60,17 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _r
   // @ts-ignore
   const product: Stripe.Product = subscription.plan.product
 
+  let servers = parseInt(product.metadata.servers ?? "0", 10)
+  if (subscription.metadata?.custom_limit)
+    servers = parseInt(subscription.metadata?.custom_limit ?? servers.toString(), 10)
+
   res.json({
     hasSubscription: true,
     subscription: {
       id: subscription.id,
       name: product.name,
       status: subscription.status,
-      servers: parseInt(product.metadata.servers ?? "0", 10),
+      servers,
       start: subscription.start_date * 1000,
       periodStart: subscription.current_period_start * 1000,
       periodEnd: subscription.current_period_end * 1000,
