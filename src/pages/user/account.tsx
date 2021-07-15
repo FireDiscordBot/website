@@ -74,7 +74,7 @@ const AccountPage = () => {
     revalidateOnReconnect: false,
     revalidateOnFocus: false,
   })
-  const [aliases, setAliases] = React.useState<string[]>([])
+  const [aliases, setAliases] = React.useState<string[]>((handler?.config?.aliases as string[]) ?? [])
 
   React.useEffect(() => {
     setErrorMessage(error?.message)
