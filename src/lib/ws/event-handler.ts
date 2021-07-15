@@ -31,6 +31,7 @@ const getReconnectTime = (code: number) => {
 }
 
 export class EventHandler {
+  configListeners: Record<string, (value: unknown) => void>
   identified: "identifying" | boolean
   config?: Record<string, unknown>
   experiments: ExperimentConfig[]
@@ -55,6 +56,7 @@ export class EventHandler {
       this.auth.refresh = this.getSession.bind(this)
     } else this.getSession()
     this.subscribed = typeof window != "undefined" ? window.location.pathname : "/"
+    this.configListeners = {}
     this.identified = false
     this.emitter = emitter
     this.experiments = []
@@ -280,7 +282,12 @@ export class EventHandler {
     return this
   }
 
+  registerConfigListener(key: string, listener: (value: unknown) => void) {
+    this.configListeners[key] = listener
+  }
+
   handleSubscribe(route: string, extra?: unknown) {
+    this.configListeners = {} // these are set inside pages so if we're changing page, we clear it
     if (route == this.subscribed && (!extra || extra == { shallow: false })) return
     this.send(new Message(EventType.SUBSCRIBE, { route, extra }))
     this.subscribed = route
@@ -329,6 +336,8 @@ export class EventHandler {
     while (this.queue.length) this.send(this.queue.pop())
     this.session = data.session
     this.config = { ...this.config, ...data.config }
+    for (const [key, value] of Object.entries(this.config))
+      if (key in this.configListeners) this.configListeners[key](value)
     this.oauth = data.auth
     if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
       (globalThis as { [key: string]: unknown }).eventHandler = this // easy access for debugging
@@ -352,6 +361,8 @@ export class EventHandler {
     })
     if (!identified) return
     this.config = { ...this.config, ...identified.config }
+    for (const [key, value] of Object.entries(this.config))
+      if (key in this.configListeners) this.configListeners[key](value)
     this.oauth = identified.auth
     if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
       // easy access for debugging
@@ -359,8 +370,8 @@ export class EventHandler {
     else delete (globalThis as { [key: string]: unknown }).eventHandler
     if (this.auth && this.auth?.user?.id != identified.auth?.user?.id)
       this.websocket?.close(4001, "Mismatched identities")
-    if (this.auth?.user?.id) this.send(new Message(EventType.GUILD_SYNC, {}))
     this.identified = true
+    if (this.auth?.user?.id) this.send(new Message(EventType.GUILD_SYNC, {}))
     if (typeof this.auth?.refresh == "function") await this.auth.refresh()
     if (
       this.auth?.user?.image &&
@@ -434,6 +445,7 @@ export class EventHandler {
     if (!this.config) return
     if (data.value == "deleteSetting") return delete this.config[data.name]
     this.config[data.name] = data.value
+    if (data.name in this.configListeners) this.configListeners[data.name](data.value)
   }
 
   GUILD_CREATE(guild: DiscordGuild & { bot?: APIMember }) {

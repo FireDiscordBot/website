@@ -74,6 +74,7 @@ const AccountPage = () => {
     revalidateOnReconnect: false,
     revalidateOnFocus: false,
   })
+  const [aliases, setAliases] = React.useState<string[]>([])
 
   React.useEffect(() => {
     setErrorMessage(error?.message)
@@ -88,6 +89,8 @@ const AccountPage = () => {
     handler?.auth?.user.premiumType ?? session.user.premiumType,
   )
   const flagsElements = flags.map((flag, index) => <DiscordFlagImage flag={flag} key={index} />)
+
+  handler?.registerConfigListener("aliases", setAliases as (value: unknown) => void)
 
   const onClickRequestData = async (event: React.MouseEvent) => {
     event.preventDefault()
@@ -178,6 +181,21 @@ const AccountPage = () => {
             <div className={classes.flags}>{flagsElements}</div>
           </Box>
         </CardContent>
+        <CardActions className={classes.flex}>
+          {aliases.length ? (
+            <Box>
+              <Typography variant="body1" component="span">
+                Aliases (WIP):
+              </Typography>
+              <br></br>
+              <Typography variant="body1" color="textSecondary" component="span">
+                {aliases.join(", ")}
+              </Typography>
+            </Box>
+          ) : (
+            <Box></Box>
+          )}
+        </CardActions>
         <CardActions>
           {dataRequest && dataRequest.status != 0 && (
             <Tooltip
