@@ -124,7 +124,7 @@ const PremiumPage = () => {
     let premiumGuilds: string[]
 
     try {
-      premiumGuilds = await fetcher(`/api/user/guilds/${guild.id}/premium`, {
+      premiumGuilds = await fetcher(`/api/user/subscriptions/${subscription.id}/guilds/${guild.id}/premium`, {
         method: guild.premium ? "DELETE" : "PUT",
       })
     } catch (e) {

@@ -12,14 +12,15 @@ const handler: AuthenticatedApiHandler<PutTogglePremiumGuildResponse> = async (s
   }
 
   const guildId = req.query.id
+  const subId = req.query.sub
 
-  if (typeof guildId !== "string") {
+  if (typeof guildId !== "string" || typeof subId !== "string") {
     error(res, StatusCodes.BAD_REQUEST)
     return
   }
 
   try {
-    const premiumGuilds = await toggleGuildPremium(session.accessToken, guildId, req.method)
+    const premiumGuilds = await toggleGuildPremium(session.accessToken, subId, guildId, req.method)
 
     res.json(premiumGuilds)
   } catch (e) {
