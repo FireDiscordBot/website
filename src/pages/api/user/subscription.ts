@@ -44,7 +44,9 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _r
   })
 
   const subscriptions = response.data.sort(subscriptionComparator)
-  const hasSubscription = subscriptions.some((subscription) => ["trialing", "active"].includes(subscription.status))
+  const hasSubscription = subscriptions.some((subscription) =>
+    ["trialing", "active", "past_due"].includes(subscription.status),
+  )
 
   if (!hasSubscription) {
     res.json({
