@@ -44,7 +44,7 @@ export const fetchUser = async (accessToken: string): Promise<APIUser & { cached
   return user
 }
 
-export const getUserImage = (user: APIUser | PartialOAuthUser, useModSix = false) => {
+export const getAvatarImage = (user: APIUser | PartialOAuthUser, useModSix = false) => {
   if (user.avatar === null) {
     const defaultAvatarNumber = useModSix ? parseInt(user.discriminator) % 6 : parseInt(user.discriminator) % 5
     return `https://cdn.discordapp.com/embed/avatars/${defaultAvatarNumber}.png?ts=${+new Date()}`
@@ -52,6 +52,13 @@ export const getUserImage = (user: APIUser | PartialOAuthUser, useModSix = false
     const format = user.avatar.startsWith("a_") ? "gif" : "png"
     return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${format}`
   }
+}
+
+export const getBannerImage = (user: APIUser | PartialOAuthUser) => {
+  if (user.banner) {
+    const format = user.banner?.startsWith("a_") ? "gif" : "png"
+    return `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.${format}?size=1024`
+  } else return null
 }
 
 export const getGuildIcon = (guild: UserGuild) => {

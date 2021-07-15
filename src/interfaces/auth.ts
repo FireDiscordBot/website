@@ -15,6 +15,7 @@ export type AuthUser = {
   name: string
   discriminator: string
   image: string
+  banner: string | null
   publicFlags: number
   premiumType: number
 }

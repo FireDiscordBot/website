@@ -58,6 +58,8 @@ export interface PartialOAuthUser {
   id: string
   username: string
   avatar: string
+  banner: string
+  banner_color: string
   discriminator: string
   public_flags: number
   email: undefined
@@ -72,6 +74,8 @@ export type APIUser = {
   username: string
   discriminator: string
   avatar: string
+  banner: string
+  banner_color: string
   mfa_enabled: boolean
   locale: string
   verified: boolean
@@ -85,6 +89,8 @@ export type APIUserPartial = {
   id: string
   username: string
   avatar: string
+  banner: string
+  banner_color: string
   discriminator: string
   public_flags: number
 }

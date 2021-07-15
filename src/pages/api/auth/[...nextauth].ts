@@ -4,7 +4,7 @@ import Providers from "next-auth/providers"
 
 import type { AccessTokenResponse, AuthSession, AuthToken, AuthUser } from "@/interfaces/auth"
 import type { APIUser } from "@/interfaces/discord"
-import { fetchUser, getUserImage } from "@/utils/discord"
+import { fetchUser, getBannerImage, getAvatarImage } from "@/utils/discord"
 import { discord } from "@/constants"
 import { handler as eventHandler } from "@/pages/_app"
 
@@ -14,7 +14,8 @@ const discordProvider = Providers.Discord({
     id: profile.id,
     name: profile.username,
     discriminator: profile.discriminator,
-    image: getUserImage(profile, process.env.USE_MOD_SIX == "true"),
+    image: getAvatarImage(profile, process.env.USE_MOD_SIX == "true"),
+    banner: getBannerImage(profile),
     email: profile.email,
     publicFlags: profile.public_flags,
     premiumType: profile.premium_type,
@@ -73,7 +74,7 @@ const nextAuthConfig: InitOptions = {
         if (user) {
           token.discriminator = user.discriminator
           token.publicFlags = user.public_flags
-          token.image = getUserImage(user)
+          token.image = getAvatarImage(user)
           token.name = user.username
           token.email = user.email
         }
