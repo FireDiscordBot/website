@@ -120,6 +120,7 @@ export enum EventType {
   DATA_REQUEST,
   PUSH_ROUTE,
   APPLY_EXPERIMENT,
+  SCHEMA_VALIDATION_ERROR,
 }
 
 export type Notification = {
