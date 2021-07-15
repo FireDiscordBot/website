@@ -49,6 +49,12 @@ const refreshToken = async (token: AuthToken): Promise<AuthToken> => {
   token.refreshToken = refreshed.refresh_token ?? token.refreshToken
   token.expiresAt = +new Date() + refreshed.expires_in * 1000 - 3600000
 
+  // here we will check if a ws connection is open and if so, close it since we need to reconnect with the new token
+  if (eventHandler.websocket?.open) {
+    if (eventHandler.auth?.refresh) eventHandler.auth.refresh()
+    eventHandler.websocket.close(4000, "Reconnecting due to refreshed token")
+  }
+
   return token
 }
 
@@ -80,7 +86,7 @@ const nextAuthConfig: InitOptions = {
         }
       }
 
-      if (typeof token.expiresAt == "number" && +new Date() > token.expiresAt)
+      if (typeof token.expiresAt == "number" && +new Date() > token.expiresAt - 86400000)
         return await refreshToken(token).catch(() => token)
       else return token
     },
