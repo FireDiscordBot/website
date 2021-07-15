@@ -16,6 +16,7 @@ const reflectors = [
 ]
 
 interface RequestOptions {
+  query?: string[][] | Record<string, string | number | boolean> | string | URLSearchParams
   headers?: Record<string, unknown>
   version?: 1 | 2
   data?: BodyInit
@@ -36,15 +37,28 @@ const routeBuilder = (eventHandler: EventHandler) => {
     get(_: typeof noop, name: string): unknown {
       if (reflectors.includes(name)) return () => route.join("/")
       if (methods.includes(name)) {
-        return <T>(options?: RequestOptions) =>
-          fetcher<T>(`${fire.aetherApiUrl}${options?.version ? `/v${options.version}` : "/v2"}${route.join("/")}`, {
-            method: name.toUpperCase() ?? "GET",
-            body: options?.data ?? null,
-            headers: {
-              ...(options?.headers ?? {}),
-              Authorization: `Bearer ${eventHandler.auth?.accessToken}`,
+        return <T>(options?: RequestOptions) => {
+          let queryString = ""
+          if (options?.query) {
+            const query = Object.entries(options.query)
+              .filter(([, value]) => value !== null && typeof value !== "undefined")
+              .flatMap(([key, value]) => (Array.isArray(value) ? value.map((v) => [key, v]) : [[key, value]]))
+            queryString = new URLSearchParams(query).toString()
+          }
+          return fetcher<T>(
+            `${fire.aetherApiUrl}${options?.version ? `/v${options.version}` : "/v2"}${route.join("/")}${
+              queryString && `?${queryString}`
+            }`,
+            {
+              method: name.toUpperCase() ?? "GET",
+              body: options?.data ?? null,
+              headers: {
+                ...(options?.headers ?? {}),
+                Authorization: `Bearer ${eventHandler.auth?.accessToken}`,
+              },
             },
-          })
+          )
+        }
       }
       if (/v\d/g.test(name)) return new Proxy(noop, handler)
       route.push(name)
