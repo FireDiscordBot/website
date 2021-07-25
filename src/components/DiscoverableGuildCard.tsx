@@ -6,6 +6,7 @@ import CardMedia from "@material-ui/core/CardMedia"
 import Typography from "@material-ui/core/Typography"
 import Avatar from "@material-ui/core/Avatar"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
+import Skeleton from "@material-ui/lab/Skeleton"
 
 import { DiscoverableGuild } from "@/interfaces/aether"
 import { formatNumber } from "@/utils/formatting"
@@ -32,7 +33,7 @@ const useStyles = makeStyles((theme) =>
 )
 
 type Props = {
-  guild: DiscoverableGuild
+  guild?: DiscoverableGuild
 }
 
 type JoinRequestResponse = { error: string; code: number } | { error: null; invite: Invite }
@@ -41,6 +42,25 @@ const domain = process.env.NODE_ENV == "development" ? "test.inv.wtf/join" : "di
 
 const DiscoverableGuildCard = ({ guild }: Props) => {
   const classes = useStyles()
+  if (!guild)
+    return (
+      <Skeleton animation="wave">
+        <Card className={classes.fullHeight}>
+          <CardMedia className={classes.media} image={""} title={"Unavailable Guild"} />
+          <CardContent className={classes.content}>
+            <Avatar />
+            <div className={classes.cardText}>
+              <Typography variant="h6" component="h2" noWrap>
+                Long string of text to make the card wider lol
+              </Typography>
+              <Typography variant="body2" color="textSecondary" component="p">
+                0 Members
+              </Typography>
+            </div>
+          </CardContent>
+        </Card>
+      </Skeleton>
+    )
   return (
     <Card className={classes.fullHeight}>
       <CardActionArea
