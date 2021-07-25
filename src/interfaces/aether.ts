@@ -79,6 +79,7 @@ export type DiscoverableGuild = {
   splash: string
   vanity: string
   members: number
+  featured: boolean
   key?: number
 }
 
@@ -86,6 +87,7 @@ export enum DiscoveryUpdateOp {
   SYNC = 1,
   REMOVE = 2,
   ADD = 3,
+  ADD_OR_SYNC = 4,
 }
 
 export type UserGuild = DiscordGuild & {
