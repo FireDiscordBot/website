@@ -1,7 +1,7 @@
 import fetcher from "./fetcher"
 
 import { fire } from "@/constants"
-import { EventHandler } from "@/lib/ws/event-handler"
+import { AetherClient } from "@/lib/ws/aether-client"
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noop = () => {}
@@ -31,7 +31,7 @@ type Execute = Record<RequestMethod, Handler> & Record<string, Executor>
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface Executor extends Execute {}
 
-const routeBuilder = (eventHandler: EventHandler) => {
+const routeBuilder = (eventHandler: AetherClient) => {
   const route = [""]
   const handler = {
     get(_: typeof noop, name: string): unknown {

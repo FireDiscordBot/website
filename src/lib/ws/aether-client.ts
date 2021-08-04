@@ -7,7 +7,14 @@ import { Message } from "./message"
 import { MessageUtil } from "./message-util"
 import { Websocket } from "./websocket"
 
-import { IdentifyResponse, EventType, ResumeResponse, WebsiteGateway, ExperimentConfig } from "@/interfaces/aether"
+import {
+  ExperimentConfig,
+  IdentifyResponse,
+  ResumeResponse,
+  WebsiteGateway,
+  EventType,
+  SessionInfo,
+} from "@/interfaces/aether"
 import { AuthSession } from "@/interfaces/auth"
 import { fetchUser, getBannerImage, getAvatarImage } from "@/utils/discord"
 import { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
@@ -30,25 +37,26 @@ const getReconnectTime = (code: number) => {
   }
 }
 
-export class EventHandler {
+export class AetherClient {
   configListeners: Record<string, (value: unknown) => void>
   identified: "identifying" | boolean
   config?: Record<string, unknown>
   experiments: ExperimentConfig[]
   heartbeat?: NodeJS.Timeout
-  private _session?: string
   oauth?: AuthorizationInfo
+  sessions: SessionInfo[]
   logIgnore: EventType[]
   guilds: DiscordGuild[]
   initialised?: boolean
   websocket?: Websocket
   emitter: EventEmitter
-  private _seq?: number
   router?: RouterType
   auth?: AuthSession
   subscribed: string
+  session?: string
   queue: Message[]
   acked?: boolean
+  seq?: number
 
   constructor(session: AuthSession | null, emitter: EventEmitter) {
     if (session) {
@@ -60,31 +68,14 @@ export class EventHandler {
     this.identified = false
     this.emitter = emitter
     this.experiments = []
+    this.sessions = []
     this.guilds = []
     this.queue = []
-    this._seq = 0
+    this.seq = 0
 
     this.logIgnore = [EventType.HEARTBEAT, EventType.HEARTBEAT_ACK]
     this.router = Router.router ?? undefined
     if (this.router) this.router.events.on("routeChangeStart", this.handleSubscribe.bind(this))
-  }
-
-  get seq() {
-    return this._seq || 0
-  }
-
-  set seq(seq: number) {
-    this._seq = seq
-    if (typeof window != "undefined") window.sessionStorage.setItem("aether_seq", seq.toString())
-  }
-
-  get session() {
-    return this._session || ""
-  }
-
-  set session(session: string) {
-    this._session = session
-    if (typeof window != "undefined") window.sessionStorage.setItem("aether_session", session)
   }
 
   get user() {
@@ -158,12 +149,8 @@ export class EventHandler {
             vertical: "top",
             autoHideDuration: 5000,
           })
-        delete this._session
-        delete this._seq
-        if (typeof window != "undefined") {
-          window.sessionStorage.removeItem("aether_session")
-          window.sessionStorage.removeItem("aether_seq")
-        }
+        delete this.session
+        delete this.seq
       } else if (event.code != 4001)
         this.emitter.emit("NOTIFICATION", {
           text: event.reason ? event.reason : "Websocket error occurred",
@@ -199,20 +186,16 @@ export class EventHandler {
                   "background: #353A47; color: white; border-radius: 0 3px 3px 0",
                   user,
                 )
-                window.sessionStorage.removeItem("aether_session")
-                window.sessionStorage.removeItem("aether_seq")
-                delete this._session
-                delete this._seq
+                delete this.session
+                delete this.seq
                 if (!this.websocket) throw new Error("what the fuck")
                 const ws = new Websocket(`${this.websocket.url}?encoding=zlib`)
                 return this.setWebsocket(ws)
               }
             } else {
               delete this.auth
-              window.sessionStorage.removeItem("aether_session")
-              window.sessionStorage.removeItem("aether_seq")
-              delete this._session
-              delete this._seq
+              delete this.session
+              delete this.seq
               if (!this.websocket) throw new Error("what the fuck")
               const ws = new Websocket(`${this.websocket.url}?encoding=zlib`)
               return this.setWebsocket(ws)
@@ -226,6 +209,9 @@ export class EventHandler {
             )
             window.document.getElementById("user-menu-logout")?.click()
           })
+      } else if (event.code == 1012) {
+        delete this.session
+        delete this.seq
       }
       // cannot recover from codes below (4001 is special and handled above but if we're here, it didn't work)
       if (
@@ -266,7 +252,11 @@ export class EventHandler {
           "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         )
         if (!this.websocket) throw new Error("what the fuck")
-        const ws = new Websocket(`${this.websocket.url}?sessionId=${this.session}&seq=${this.seq}&encoding=zlib`)
+        const ws = new Websocket(
+          this.session
+            ? `${this.websocket.url}?sessionId=${this.session}&seq=${this.seq}&encoding=zlib`
+            : `${this.websocket.url}?encoding=zlib`,
+        )
         return this.setWebsocket(ws)
       } catch {
         console.error(
@@ -315,12 +305,8 @@ export class EventHandler {
 
   async RESUME_CLIENT(data: ResumeResponse) {
     if (this.auth?.user?.id != data.auth?.user?.id) {
-      delete this._session
-      delete this._seq
-      if (typeof window != "undefined") {
-        window.sessionStorage.removeItem("aether_session")
-        window.sessionStorage.removeItem("aether_seq")
-      }
+      delete this.session
+      delete this.seq
       return this.websocket?.close(4005, "Invalid Session")
     } else if (this.auth && data.auth) this.oauth = data.auth
     if (this.auth?.user?.id && (!data.guilds.length || data.guilds.length != this.guilds.length)) {
@@ -336,6 +322,11 @@ export class EventHandler {
     while (this.queue.length) this.send(this.queue.pop())
     this.session = data.session
     this.config = { ...this.config, ...data.config }
+    // const removedSessions = this.sessions.filter(
+    //   (session) => !data.sessions.find((s) => s.sessionId == session.sessionId),
+    // )
+    // const newSessions = data.sessions.filter((session) => !this.sessions.find((s) => s.sessionId == session.sessionId))
+    this.sessions = data.sessions
     for (const [key, value] of Object.entries(this.config))
       if (key in this.configListeners) this.configListeners[key](value)
     this.oauth = data.auth
@@ -361,6 +352,7 @@ export class EventHandler {
     })
     if (!identified) return
     this.config = { ...this.config, ...identified.config }
+    this.sessions = identified.sessions
     for (const [key, value] of Object.entries(this.config))
       if (key in this.configListeners) this.configListeners[key](value)
     this.oauth = identified.auth
@@ -392,6 +384,10 @@ export class EventHandler {
     return new Promise((resolve, reject) => {
       const nonce = (+new Date()).toString()
       this.websocket?.handlers.set(nonce, resolve)
+      const navigator = typeof window != "undefined" ? window.navigator : null
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const userAgentData = navigator?.userAgentData
       this.send(
         new Message(
           EventType.IDENTIFY_CLIENT,
@@ -403,6 +399,13 @@ export class EventHandler {
                 refreshToken: this.auth?.refreshToken,
                 expires: this.auth?.expires,
                 user: this.auth?.user,
+              },
+              client: {
+                referrer: typeof window != "undefined" ? window.document?.referrer : "",
+                platform: userAgentData?.platform,
+                userAgent: navigator?.userAgent,
+                mobile: userAgentData?.mobile,
+                language: navigator?.language,
               },
             },
             env: process.env.NODE_ENV,

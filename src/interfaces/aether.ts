@@ -123,6 +123,7 @@ export enum EventType {
   PUSH_ROUTE,
   APPLY_EXPERIMENT,
   SCHEMA_VALIDATION_ERROR,
+  SESSIONS_REPLACE,
 }
 
 export type Notification = {
@@ -142,21 +143,42 @@ export type Reminder = {
 }
 
 export type IdentifyResponse = {
-  guilds?: { id: string; unavailable: true }[]
   config?: Record<string, unknown>
+  guilds?: UnavailableGuild[]
   auth?: AuthorizationInfo
+  sessions: SessionInfo[]
+  rateLimit: WSRateLimit
   session: string
 }
 
 export type ResumeResponse = {
-  guilds: DiscordGuild[]
+  config: Record<string, unknown>
+  guilds: UnavailableGuild[]
   auth?: AuthorizationInfo
+  sessions: SessionInfo[]
+  rateLimit: WSRateLimit
   replayed: number
   session: string
-  config: Record<string, unknown>
+}
+
+export type SessionInfo = {
+  clientInfo: ClientInfo
+  readyState: number
+  sessionId: string
+  ip: string // hashed ip
+}
+
+export type ClientInfo = {
+  referrer: string
+  platform: string
+  userAgent: string
+  mobile: boolean
+  language: string
 }
 
 type Config = Record<string, boolean>
+
+type UnavailableGuild = { id: string; unavailable: true }
 
 interface TreatmentConfig {
   id: number

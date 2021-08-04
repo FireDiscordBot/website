@@ -1,4 +1,4 @@
-import { EventHandler } from "./event-handler"
+import { AetherClient } from "./aether-client"
 import { MessageUtil } from "./message-util"
 
 import { EventType } from "@/interfaces/aether"
@@ -13,13 +13,12 @@ else {
 export class Websocket extends WebSocket {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handlers: Map<string, (value: any) => void>
-  eventHandler?: EventHandler
+  eventHandler?: AetherClient
   url: string
 
-  constructor(url: string, eventHandler?: EventHandler) {
+  constructor(url: string, eventHandler?: AetherClient) {
     super(url)
     this.url = url.split("?")[0]
-    if (eventHandler) this.eventHandler = eventHandler
     this.handlers = new Map()
     this.onmessage = (event: MessageEvent) => {
       const message = MessageUtil.decode(event.data)
@@ -51,6 +50,10 @@ export class Websocket extends WebSocket {
         if (handler) handler(message.d)
         this.handlers.delete(message.n)
       }
+    }
+    if (eventHandler) {
+      this.eventHandler = eventHandler
+      this.eventHandler.setWebsocket(this)
     }
   }
 

@@ -3,19 +3,19 @@ import { EventEmitter } from "events"
 import * as React from "react"
 import { getSession } from "next-auth/client"
 
-import { EventHandler } from "@/lib/ws/event-handler"
+import { AetherClient } from "@/lib/ws/aether-client"
 import { Websocket } from "@/lib/ws/websocket"
 import { WebsiteGateway } from "@/interfaces/aether"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const useWebsocket = (emitter: EventEmitter) => {
-  const [handler, setHandler] = React.useState<EventHandler>()
+  const [handler, setHandler] = React.useState<AetherClient>()
   React.useEffect(() => {
     let ws: Websocket
     const initHandler = async () => {
       const session = await getSession()
-      const handler = new EventHandler(session, emitter)
+      const handler = new AetherClient(session, emitter)
       const gateway = await handler.api.gateway.website.get<WebsiteGateway>({ version: 2 })
       if (!gateway.limits.connect.remaining) {
         console.error(
@@ -46,17 +46,7 @@ const useWebsocket = (emitter: EventEmitter) => {
         })
         await sleep(gateway.limits.connectGlobal.resetAfter)
       }
-      ws = new Websocket(
-        typeof window == "undefined"
-          ? gateway.url
-          : `${gateway.url}?sessionId=${window.sessionStorage.getItem("aether_session") || ""}&seq=${
-              window.sessionStorage.getItem("aether_seq") || "0"
-            }&encoding=zlib`,
-        handler,
-      )
-      handler.setWebsocket(ws)
-      if (typeof window != "undefined" && window.sessionStorage.getItem("aether_session")?.length == 32)
-        handler.session = window.sessionStorage.getItem("aether_session") as string
+      ws = new Websocket(`${gateway.url}?encoding=zlib`, handler)
       setHandler(handler)
     }
     initHandler().catch(() => {

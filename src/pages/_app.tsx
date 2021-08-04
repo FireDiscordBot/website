@@ -16,7 +16,7 @@ import { isBrowser } from "@/utils/is-browser"
 import "../nprogress.css"
 import useWebsocket from "@/hooks/use-websocket"
 import { Emitter } from "@/lib/ws/socket-emitter"
-import { EventHandler } from "@/lib/ws/event-handler"
+import { AetherClient } from "@/lib/ws/aether-client"
 import SimpleSnackbar from "@/components/SimpleSnackbar"
 import { Notification } from "@/interfaces/aether"
 
@@ -25,7 +25,7 @@ if (isBrowser()) {
 }
 
 export const emitter = new Emitter()
-export let handler: EventHandler
+export let handler: AetherClient
 
 function FireApp(props: AppProps) {
   const { Component, pageProps } = props
@@ -36,7 +36,7 @@ function FireApp(props: AppProps) {
     jssStyles?.parentElement?.removeChild(jssStyles)
   }, [])
 
-  handler = useWebsocket(emitter) as EventHandler
+  handler = useWebsocket(emitter) as AetherClient
   if (handler && !handler.initialised) {
     initHandler(handler)
   }
@@ -75,7 +75,7 @@ function FireApp(props: AppProps) {
   )
 }
 
-const initHandler = async (handler: EventHandler) => {
+const initHandler = async (handler: AetherClient) => {
   if (!handler.auth) {
     const session = await getSession()
     if (session) handler.auth = session
