@@ -6,12 +6,10 @@ import { EventType } from "@/interfaces/aether"
 let WebSocket
 if (typeof window != "undefined") WebSocket = window.WebSocket
 else {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   WebSocket = require("ws") // for typings since otherwise it screams about shit being missing
 }
 
 export class Websocket extends WebSocket {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handlers: Map<string, (value: any) => void>
   eventHandler?: AetherClient
   url: string

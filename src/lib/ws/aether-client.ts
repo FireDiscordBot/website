@@ -86,7 +86,9 @@ export class AetherClient {
     const session = await getSession().catch(() => null)
     if (session) {
       this.auth = session
-      this.auth.refresh = this.getSession.bind(this)
+      if (this.auth) {
+        this.auth.refresh = this.getSession.bind(this)
+      }
     }
     return this.auth as AuthSession
   }
@@ -385,7 +387,6 @@ export class AetherClient {
       const nonce = (+new Date()).toString()
       this.websocket?.handlers.set(nonce, resolve)
       const navigator = typeof window != "undefined" ? window.navigator : null
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const userAgentData = navigator?.userAgentData
       this.send(

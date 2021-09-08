@@ -71,7 +71,7 @@ const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
         Cluster {clusterStats.id} ({clusterStats.name})
       </DialogTitle>
       <DialogContent dividers className={classes.dialogCardContent}>
-        <Grid container spacing={2} justify="center" className={classes.chartsContainer}>
+        <Grid container spacing={2} justifyContent="center" className={classes.chartsContainer}>
           <Grid item xs={6} sm={5} md={3}>
             <CircularProgressCard title="CPU" value={clusterStats.cpu} />
           </Grid>

@@ -10,7 +10,7 @@ const handler: AuthenticatedApiHandler<GetGuildsResponse> = async (session, _req
 
   try {
     userGuilds = await fetchGuilds(session.accessToken)
-  } catch (e) {
+  } catch (e: any) {
     const errorResponse = createErrorResponse(e)
     error(res, errorResponse.code, errorResponse.error)
     return
@@ -20,7 +20,7 @@ const handler: AuthenticatedApiHandler<GetGuildsResponse> = async (session, _req
 
   try {
     premiumGuilds = await fetchPremiumGuilds(session.accessToken)
-  } catch (e) {
+  } catch (e: any) {
     const errorResponse = createErrorResponse(e)
     if (!errorResponse.error.includes("No Subscription Found")) {
       error(res, errorResponse.code, errorResponse.error)

@@ -1,5 +1,5 @@
 import { NextApiHandler } from "next"
-import NextAuth, { InitOptions } from "next-auth"
+import NextAuth, { NextAuthOptions } from "next-auth"
 import Providers from "next-auth/providers"
 
 import type { AccessTokenResponse, AuthSession, AuthToken, AuthUser } from "@/interfaces/auth"
@@ -58,14 +58,14 @@ const refreshToken = async (token: AuthToken): Promise<AuthToken> => {
   return token
 }
 
-const nextAuthConfig: InitOptions = {
+const nextAuthConfig: NextAuthOptions = {
   providers: [discordProvider],
   callbacks: {
     async jwt(token: AuthToken, user: AuthUser, account) {
       if (account?.accessToken) {
         token.accessToken = account.accessToken
         token.refreshToken = account.refreshToken
-        token.expiresAt = +new Date() + account.expires_in * 1000 - 3600000
+        token.expiresAt = +new Date() + (account.expires_in ?? 1) * 1000 - 3600000
       }
       if (user) {
         token.discriminator = user.discriminator

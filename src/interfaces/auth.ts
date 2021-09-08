@@ -1,5 +1,3 @@
-import { IncomingMessage } from "http"
-
 type JwtToken = {
   accessToken?: string
   refreshToken?: string
@@ -38,17 +36,12 @@ export type AuthSession = {
   refresh?: () => Promise<AuthSession>
 }
 
-declare module "next-auth/client" {
-  type NextContext = {
-    req?: IncomingMessage
-    ctx?: { req: IncomingMessage }
+declare module "next-auth" {
+  interface Session {
+    user: AuthUser
+    accessToken?: string
+    refreshToken?: string
+    expires: string
+    refresh?: () => Promise<AuthSession>
   }
-
-  function useSession(): [AuthSession | null | undefined, boolean]
-
-  function session(
-    context?: NextContext & {
-      triggerEvent?: boolean
-    },
-  ): Promise<AuthSession | null>
 }

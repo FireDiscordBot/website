@@ -1,5 +1,4 @@
-import { NextApiHandler } from "next"
-import { NextApiRequest, NextApiResponse } from "next/dist/next-server/lib/utils"
+import { NextApiHandler, NextApiRequest, NextApiResponse } from "next"
 
 // import { NetworkErrorData } from "./utils/fetcher"
 

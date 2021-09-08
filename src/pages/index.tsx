@@ -74,11 +74,11 @@ const IndexPage = () => {
   return (
     <DefaultLayout>
       <Container>
-        <Grid container justify="center" className={classes.banner}>
+        <Grid container justifyContent="center" className={classes.banner}>
           <Grid item xs={3} md={2} className={classes.logoGridItem}>
             <Image src="/logo-gr.svg" width={256} height={256} layout="responsive" alt="Fire's logo" />
           </Grid>
-          <Grid item xs={12} container justify="center">
+          <Grid item xs={12} container justifyContent="center">
             <Grid item xs={12} sm={7} md={5}>
               <Typography variant="h5" component="h2" align="center">
                 A Discord bot for all your needs. With memes, utilities, moderation and more. Fire is the only bot you
@@ -101,7 +101,7 @@ const IndexPage = () => {
             </Grid>
           </Grid>
         </Grid>
-        <Grid container spacing={4} justify="center">
+        <Grid container spacing={4} justifyContent="center">
           {FEATURES.map((feature, index) => (
             <Grid item md={4} key={index}>
               <Card className={classes.featureCard}>

@@ -94,7 +94,7 @@ const StatsPage = ({ initialFireStats }: Props) => {
   return (
     <DefaultLayout title="Stats">
       <Container>
-        <Grid container spacing={4} justify="center" className={classes.chartsContainer}>
+        <Grid container spacing={4} justifyContent="center" className={classes.chartsContainer}>
           <Grid item xs={6} sm={5} md={3}>
             <CircularProgressCard title="CPU" value={fireStats.cpu} />
           </Grid>
@@ -133,7 +133,7 @@ const StatsPage = ({ initialFireStats }: Props) => {
             </Card>
           </Grid>
         </Grid>
-        <Grid container spacing={2} justify="center">
+        <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12}>
             <Typography variant="h4" align="center" color="primary">
               Clusters

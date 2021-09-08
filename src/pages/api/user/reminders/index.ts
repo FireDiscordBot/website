@@ -9,7 +9,7 @@ const handler: AuthenticatedApiHandler<GetRemindersResponse> = async (session, _
 
   try {
     reminders = await fetchUserReminders(session.accessToken)
-  } catch (e) {
+  } catch (e: any) {
     const errorResponse = createErrorResponse(e)
     error(res, errorResponse.code, errorResponse.error)
     return

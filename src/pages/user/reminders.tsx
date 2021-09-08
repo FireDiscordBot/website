@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Box, Button, Card, Grid, IconButton, LinearProgress, TextField } from "@material-ui/core"
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles"
 import { Delete } from "@material-ui/icons"
-import useSWR, { cache } from "swr"
+import useSWR from "swr"
 import Tooltip from "@material-ui/core/Tooltip"
 import { withStyles } from "@material-ui/styles"
 import { KeyboardDateTimePicker } from "@material-ui/pickers"
@@ -65,7 +65,7 @@ const Reminders = () => {
   const classes = useStyles()
 
   const { data } = useSWR<Reminder[]>(session ? "/api/user/reminders" : null, {
-    revalidateOnMount: !cache.has(session ? "/api/user/reminders" : null),
+    revalidateOnMount: true,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   })
@@ -188,7 +188,7 @@ const Reminders = () => {
                       <Grid item xs={12} sm={11}>
                         <Typography color="textPrimary">{reminder.text}</Typography>
                       </Grid>
-                      <Grid container item xs={12} sm={1} alignContent={"flex-start"} justify={"flex-end"}>
+                      <Grid container item xs={12} sm={1} alignContent={"flex-start"} justifyContent={"flex-end"}>
                         <IconButton
                           className={classes.trashButton}
                           onClick={() => {

@@ -3,7 +3,6 @@ import fetcher from "./fetcher"
 import { fire } from "@/constants"
 import { AetherClient } from "@/lib/ws/aether-client"
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 const noop = () => {}
 const methods = ["get", "post", "delete", "patch", "put"]
 const reflectors = [
@@ -26,9 +25,7 @@ interface RequestOptions {
 type RequestMethod = "get" | "post" | "delete" | "patch" | "put"
 type Handler = <T>(options?: RequestOptions) => Promise<T>
 type Execute = Record<RequestMethod, Handler> & Record<string, Executor>
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface Executor extends Execute {}
 
 const routeBuilder = (eventHandler: AetherClient) => {

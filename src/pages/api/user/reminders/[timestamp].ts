@@ -16,9 +16,7 @@ const handler: AuthenticatedApiHandler = async (session, req, res) => {
   }
 
   const deleted = await deleteUserReminder(session.accessToken, req.query.timestamp as string).catch((e) => e)
-  if (deleted instanceof NetworkError)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return res.status(deleted.code).json(deleted.data as any)
+  if (deleted instanceof NetworkError) return res.status(deleted.code).json(deleted.data as any)
   res.status(200).json({})
   return
 }

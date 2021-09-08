@@ -32,7 +32,9 @@ const SimpleSnackbar = ({
   return (
     <Snackbar
       onClose={handleClose}
-      onExited={onFinishCloseAnimation}
+      TransitionProps={{
+        onExited: onFinishCloseAnimation,
+      }}
       open={open}
       autoHideDuration={autoHideDuration}
       message={!severity ? message : undefined}

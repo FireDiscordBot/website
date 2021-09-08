@@ -70,7 +70,7 @@ const AccountPage = () => {
       autoHideDuration: 5000,
     })
 
-  const { data: dataRequest, revalidate } = useSWR<GetCollectData>(session ? "/api/user/data-archive" : null, {
+  const { data: dataRequest, mutate } = useSWR<GetCollectData>(session ? "/api/user/data-archive" : null, {
     revalidateOnReconnect: false,
     revalidateOnFocus: false,
   })
@@ -94,7 +94,7 @@ const AccountPage = () => {
 
   const onClickRequestData = async (event: React.MouseEvent) => {
     event.preventDefault()
-    await revalidate()
+    await mutate(undefined, true)
 
     if (typeof dataRequest?.status == "number" && dataRequest.status != 0) {
       const link = document.createElement("a")
@@ -137,7 +137,9 @@ const AccountPage = () => {
       })
     else {
       const link = document.createElement("a")
-      const file = dataResponse.data ? new Blob([Buffer.from(dataResponse.data)], { type: "application/zip" }) : null
+      const file = dataResponse.data
+        ? new Blob([Buffer.from(dataResponse.data.data)], { type: "application/zip" })
+        : null
       link.href = file ? URL.createObjectURL(file) : dataResponse.url
       link.download = `${handler.session}.zip`
       link.click()

@@ -33,9 +33,7 @@ const handler: AuthenticatedApiHandler = async (session, req, res) => {
   }
 
   const reminder = await createUserReminder(session.accessToken, req.body).catch((e) => e)
-  if (reminder instanceof NetworkError)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return res.status(reminder.code).json(reminder.data as any)
+  if (reminder instanceof NetworkError) return res.status(reminder.code).json(reminder.data as any)
   res.json(body)
   return
 }

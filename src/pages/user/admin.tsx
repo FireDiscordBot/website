@@ -178,7 +178,6 @@ const AdminPage = () => {
                   setID("")
                   setBucket(0)
                   if (typeof document != "undefined" && !!document.getElementById("apply-to-id"))
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     document.getElementById("apply-to-id").value = ""
                 }

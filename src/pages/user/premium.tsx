@@ -127,7 +127,7 @@ const PremiumPage = () => {
       premiumGuilds = await fetcher(`/api/user/subscriptions/${subscription.id}/guilds/${guild.id}/premium`, {
         method: guild.premium ? "DELETE" : "PUT",
       })
-    } catch (e) {
+    } catch (e: any) {
       const errorResponse = createErrorResponse(e)
       if (errorResponse.code == 404) {
         openUrl(discord.inviteUrl(guild.id), true)
@@ -171,7 +171,7 @@ const PremiumPage = () => {
       json = await fetcher(`/api/user/subscription?servers=${plan.servers}`, {
         method: "POST",
       })
-    } catch (e) {
+    } catch (e: any) {
       setErrorMessage(createErrorResponse(e).error)
       return
     }

@@ -26,7 +26,7 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _r
 
   try {
     customerId = await fetchCustomerId(session.accessToken)
-  } catch (e) {
+  } catch (e: any) {
     const errorResponse = createErrorResponse(e)
     if (errorResponse.error.includes("Customer Not Found")) {
       res.json({
@@ -56,7 +56,6 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _r
   }
 
   const subscription = subscriptions[0]
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const product: Stripe.Product = subscription.plan.product
 

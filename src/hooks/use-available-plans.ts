@@ -1,8 +1,8 @@
-import useSWR, { ConfigInterface } from "swr"
+import useSWR, { SWRConfiguration } from "swr"
 
 import { Plan } from "@/interfaces/fire"
 
-const useAvailablePlans = (load = true, config?: ConfigInterface<Plan[]>) => {
+const useAvailablePlans = (load = true, config?: SWRConfiguration<Plan[]>) => {
   const { data, error } = useSWR<Plan[]>(load ? "/api/stripe/subscriptions" : null, config)
 
   return {
