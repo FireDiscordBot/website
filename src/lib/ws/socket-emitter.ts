@@ -1,7 +1,7 @@
 import { EventEmitter } from "events"
 
 import {
-  Category,
+  Command,
   DiscoverableGuild,
   FireStats,
   IdentifyResponse,
@@ -16,7 +16,7 @@ interface EmitterEvents {
   REALTIME_STATS: (stats: FireStats) => void
   SUBSCRIBE: (route: string, extra?: unknown) => void
   HELLO: (hello: { interval: number }) => void
-  COMMANDS_UPDATE: (categories: Category[]) => void
+  COMMANDS_UPDATE: (update: { categories?: string[], commands: Command[] }) => void
   DISCOVERY_UPDATE: (guilds: DiscoverableGuild[]) => void
   NOTIFICATION: (notification?: Notification) => void
   REMINDERS_UPDATE: (reminders: Reminder[]) => void

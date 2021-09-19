@@ -1,7 +1,6 @@
 import * as React from "react"
 import clsx from "clsx"
 import { useRouter } from "next/router"
-import { GetStaticProps } from "next"
 import Paper from "@material-ui/core/Paper"
 import Container from "@material-ui/core/Container"
 import Tabs from "@material-ui/core/Tabs"
@@ -13,13 +12,13 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles"
 import { withStyles } from "@material-ui/core"
 import { red } from "@material-ui/core/colors"
 
-import { emitter } from "./_app"
+import { emitter, handler } from "./_app"
 
-import fetcher from "@/utils/fetcher"
 import { fire } from "@/constants"
-import { Category } from "@/interfaces/aether"
+import { Command } from "@/interfaces/aether"
 import DefaultLayout from "@/layouts/default"
 import CommandAccordion from "@/components/CommandAccordion"
+import Loading from "@/components/loading"
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -35,33 +34,44 @@ const useStyles = makeStyles((theme) =>
   }),
 )
 
-type Props = {
-  initialCategories: Category[]
-}
-
 const CategoriesTabs = withStyles({
   indicator: {
     backgroundColor: red[700],
   },
 })(Tabs)
 
-const CommandsPage = ({ initialCategories }: Props) => {
+const CommandsPage = () => {
   const classes = useStyles()
   const router = useRouter()
 
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"))
   const [prefix, setPrefix] = React.useState(fire.defaultPrefix)
   const [selectedCategoryIndex, setSelectedCategoryIndex] = React.useState<number>(0)
-  const [categories, setCategories] = React.useState<Category[]>(initialCategories)
+  const [commands, setCommandsState] = React.useState<Command[]>(
+    handler?.commands
+      ? handler.commands.filter((c) => c.category == handler.commandCategories[selectedCategoryIndex])
+      : [],
+  )
 
   const onChangeSelectedTab = (_event: React.ChangeEvent<unknown>, index: number) => {
     setSelectedCategoryIndex(index)
+    if (!handler?.commands.find((c) => c.category === handler?.commandCategories[index]))
+      handler.handleSubscribe("/commands", {
+        category: handler.commandCategories[index],
+      })
   }
 
   React.useEffect(() => {
+    const setCommands = (commands: Command[]) => {
+      if (handler) handler.commands = [...handler.commands, ...commands]
+      setCommandsState(commands.filter((c) => c.category == handler.commandCategories[selectedCategoryIndex]))
+    }
+
     emitter.removeAllListeners("COMMANDS_UPDATE")
-    emitter.on("COMMANDS_UPDATE", setCategories)
-  }, [categories])
+    emitter.on("COMMANDS_UPDATE", (update) => {
+      setCommands(update.commands)
+    })
+  }, [commands, selectedCategoryIndex])
 
   React.useEffect(() => {
     if (typeof router.query.prefix === "string") {
@@ -71,7 +81,9 @@ const CommandsPage = ({ initialCategories }: Props) => {
       const categoryIndex = parseInt(router.query.category, 10)
       setSelectedCategoryIndex(categoryIndex)
     }
-  }, [router.query])
+  }, [router.query, commands])
+
+  if (!handler?.commandCategories?.length) return <Loading />
 
   return (
     <DefaultLayout title="Commands">
@@ -88,48 +100,25 @@ const CommandsPage = ({ initialCategories }: Props) => {
                   [classes.borderRight]: !isMobile,
                 })}
               >
-                {categories.map((category, index) => (
-                  <Tab label={category.name} key={index} />
+                {handler.commandCategories.map((category, index) => (
+                  <Tab label={category} key={index} />
                 ))}
               </CategoriesTabs>
             </Paper>
           </Grid>
           <Grid item xs={12} md={12}>
-            {categories.map(
-              (category, index) =>
-                selectedCategoryIndex == index && (
-                  <Box paddingTop={3} width="100%" key={index}>
-                    {category.commands.map((command, index) => (
-                      <CommandAccordion command={command} prefix={prefix} key={index} />
-                    ))}
-                  </Box>
-                ),
-            )}
+            <Box paddingTop={3} width="100%" key={0}>
+              {commands.length ? (
+                commands.map((command, index) => <CommandAccordion command={command} prefix={prefix} key={index} />)
+              ) : (
+                <Loading />
+              )}
+            </Box>
           </Grid>
         </Grid>
       </Container>
     </DefaultLayout>
   )
-}
-
-export const getStaticProps: GetStaticProps<Props> = async () => {
-  let categories: Category[]
-
-  try {
-    categories = await fetcher(`${fire.aetherApiUrl}/commands`, {
-      mode: "cors",
-      headers: { "User-Agent": "Fire Website" },
-    })
-  } catch (e) {
-    categories = []
-  }
-
-  return {
-    props: {
-      initialCategories: categories,
-    },
-    revalidate: 1800,
-  }
 }
 
 export default CommandsPage

@@ -11,7 +11,7 @@ else {
 
 export class Websocket extends WebSocket {
   handlers: Map<string, (value: any) => void>
-  eventHandler?: AetherClient
+  aether?: AetherClient
   url: string
 
   constructor(url: string, eventHandler?: AetherClient) {
@@ -28,10 +28,10 @@ export class Websocket extends WebSocket {
           "background: #353A47; color: white; border-radius: 0 3px 3px 0",
           { data: event.data },
         )
-      if (this.eventHandler) {
-        if (typeof message.s == "number") this.eventHandler.seq = message.s
+      if (this.aether) {
+        if (typeof message.s == "number") this.aether.seq = message.s
         // heartbeats acks can be spammy and have a null body anyways
-        if (!this.eventHandler.logIgnore.includes(message.op))
+        if (!this.aether.logIgnore.includes(message.op))
           console.debug(
             `%c WS %c Incoming %c ${EventType[message.op]} `,
             "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
@@ -39,9 +39,9 @@ export class Websocket extends WebSocket {
             "background: #353A47; color: white; border-radius: 0 3px 3px 0",
             message,
           )
-        this.eventHandler.emitter.emit(EventType[message.op], message.d)
+        this.aether.emitter.emit(EventType[message.op], message.d)
         // @ts-expect-error This is needed to ensure this[string] works
-        if (EventType[message.op] in this.eventHandler) this.eventHandler[EventType[message.op]](message.d)
+        if (EventType[message.op] in this.aether) this.aether[EventType[message.op]](message.d)
       }
       if (message.n && this.handlers.has(message.n)) {
         const handler = this.handlers.get(message.n)
@@ -50,8 +50,8 @@ export class Websocket extends WebSocket {
       }
     }
     if (eventHandler) {
-      this.eventHandler = eventHandler
-      this.eventHandler.setWebsocket(this)
+      this.aether = eventHandler
+      this.aether.setWebsocket(this)
     }
   }
 

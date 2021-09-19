@@ -14,6 +14,7 @@ import {
   WebsiteGateway,
   EventType,
   SessionInfo,
+  Command,
 } from "@/interfaces/aether"
 import { AuthSession } from "@/interfaces/auth"
 import { fetchUser, getBannerImage, getAvatarImage } from "@/utils/discord"
@@ -42,6 +43,7 @@ export class AetherClient {
   identified: "identifying" | boolean
   config?: Record<string, unknown>
   experiments: ExperimentConfig[]
+  commandCategories: string[]
   heartbeat?: NodeJS.Timeout
   oauth?: AuthorizationInfo
   sessions: SessionInfo[]
@@ -51,6 +53,7 @@ export class AetherClient {
   websocket?: Websocket
   emitter: EventEmitter
   router?: RouterType
+  commands: Command[]
   auth?: AuthSession
   subscribed: string
   session?: string
@@ -64,11 +67,13 @@ export class AetherClient {
       this.auth.refresh = this.getSession.bind(this)
     } else this.getSession()
     this.subscribed = typeof window != "undefined" ? window.location.pathname : "/"
+    this.commandCategories = []
     this.configListeners = {}
     this.identified = false
     this.emitter = emitter
     this.experiments = []
     this.sessions = []
+    this.commands = []
     this.guilds = []
     this.queue = []
     this.seq = 0
@@ -100,9 +105,9 @@ export class AetherClient {
   setWebsocket(websocket: Websocket) {
     if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
       // easy access for debugging
-      (globalThis as { [key: string]: unknown }).eventHandler = this
+      (globalThis as { [key: string]: unknown }).aether = this
     delete this.acked
-    websocket.eventHandler = this
+    websocket.aether = this
     if (this.websocket) {
       this.websocket.close(1000, "Reconnecting")
       delete this.websocket
@@ -288,6 +293,8 @@ export class AetherClient {
   HELLO(data: {
     guildExperiments: ExperimentConfig[]
     userExperiments: ExperimentConfig[]
+    commandCategories: string[]
+    firstCategory: Command[]
     sessionId: string
     interval: number
   }) {
@@ -302,6 +309,8 @@ export class AetherClient {
     }, data.interval)
     this.session = data.sessionId
     this.experiments = [...data.guildExperiments, ...data.userExperiments]
+    this.commandCategories = data.commandCategories
+    this.commands = data.firstCategory
     this.identify()
   }
 
@@ -333,7 +342,7 @@ export class AetherClient {
       if (key in this.configListeners) this.configListeners[key](value)
     this.oauth = data.auth
     if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
-      (globalThis as { [key: string]: unknown }).eventHandler = this // easy access for debugging
+      (globalThis as { [key: string]: unknown }).aether = this // easy access for debugging
     console.info(
       `%c WS %c Sessions %c Successfully resumed${data.replayed ? " with " + data.replayed + " replayed events" : ""} `,
       "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
@@ -360,8 +369,8 @@ export class AetherClient {
     this.oauth = identified.auth
     if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
       // easy access for debugging
-      (globalThis as { [key: string]: unknown }).eventHandler = this
-    else delete (globalThis as { [key: string]: unknown }).eventHandler
+      (globalThis as { [key: string]: unknown }).aether = this
+    else delete (globalThis as { [key: string]: unknown }).aether
     if (this.auth && this.auth?.user?.id != identified.auth?.user?.id)
       this.websocket?.close(4001, "Mismatched identities")
     this.identified = true
@@ -515,8 +524,8 @@ IT'S BEST TO JUST CLOSE THIS WINDOW AND PRETEND IT DOES NOT EXIST.`,
       return message && this.queue.push(message)
     if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
       // easy access for debugging
-      (globalThis as { [key: string]: unknown }).eventHandler = this
-    else delete (globalThis as { [key: string]: unknown }).eventHandler
+      (globalThis as { [key: string]: unknown }).aether = this
+    else delete (globalThis as { [key: string]: unknown }).aether
     // heartbeats can be spammy and just have the sequence anyways
     if (!this.logIgnore.includes(message.type))
       console.debug(
