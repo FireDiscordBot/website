@@ -10,6 +10,7 @@ import { emitter } from "./_app"
 import DefaultLayout from "@/layouts/default"
 import DiscoverableGuildCard from "@/components/DiscoverableGuildCard"
 import { DiscoverableGuild, DiscoveryUpdateOp } from "@/interfaces/aether"
+import Loading from "@/components/loading"
 
 interface DiscoverySync {
   op: DiscoveryUpdateOp
@@ -66,10 +67,11 @@ const DiscoverPage = () => {
 
         if (sortIds == null) {
           updated = shuffleArray(updated)
-          setSortIds(updated.map((guild) => guild.id))
+            setSortIds(updated.map((guild) => guild.id))
         }
-        setInitialGuilds(getSortedGuilds(updated, sortIds ?? [], true))
-        setGuilds(getSortedGuilds(updated, sortIds ?? []))
+        const sorted = getSortedGuilds(updated, sortIds ?? [], true)
+        setInitialGuilds(sorted)
+        setGuilds(sorted)
 
         // if a filter is currently applied, this will reset the list to be unfiltered
         // so we reset the textbox value too
@@ -135,10 +137,6 @@ const DiscoverPage = () => {
     emitter.on("DISCOVERY_UPDATE", setGuildsWithSort)
   }, [guilds, initialGuilds, sortIds])
 
-  const getFeaturedGuilds = () => {
-    return initialGuilds.filter((g) => g.featured)
-  }
-
   const handleTextChange = (value: string | null | undefined) => {
     if (!value) return setGuilds(getSortedGuilds(initialGuilds ?? [], sortIds ?? []))
 
@@ -159,30 +157,28 @@ const DiscoverPage = () => {
             placeholder={"Find a server..."}
           />
         </Box>
-        {getFeaturedGuilds().length > 0 &&
+        {guilds.filter((g) => g.featured).length > 0 &&
           !(document.getElementById("guild-filter") as HTMLInputElement)?.value.length && (
             <Box mb={2}>
               <Typography variant="h4" gutterBottom>
                 Featured Servers
               </Typography>
               <Grid container spacing={4}>
-                {getFeaturedGuilds().map((guild, index) => (
-                  <Grid item xs={12} sm={6} md={4} key={index}>
-                    <DiscoverableGuildCard guild={guild} />
-                  </Grid>
-                ))}
+                {guilds
+                  .filter((g) => g.featured)
+                  .map((guild, index) => (
+                    <Grid item xs={12} sm={6} md={4} key={index}>
+                      <DiscoverableGuildCard guild={guild} />
+                    </Grid>
+                  ))}
               </Grid>
             </Box>
           )}
         {sortIds == null ? (
-          [...Array(6)].map((_, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-              <DiscoverableGuildCard />
-            </Grid>
-          ))
+          <Loading />
         ) : (
           <Box mb={2}>
-            {guilds.length > 0 && (
+            {guilds.filter((g) => !g.featured).length > 0 && (
               <Typography variant="h4" gutterBottom>
                 {(document.getElementById("guild-filter") as HTMLInputElement)?.value.length
                   ? "Matching Servers"
@@ -190,7 +186,11 @@ const DiscoverPage = () => {
               </Typography>
             )}
             <Grid container spacing={4}>
-              {paginate(guilds, page, 9).map((guild, index) => (
+              {paginate(
+                guilds.filter((g) => !g.featured),
+                page,
+                9,
+              ).map((guild, index) => (
                 <Grid item xs={12} sm={6} md={4} key={index}>
                   <DiscoverableGuildCard guild={guild} />
                 </Grid>
