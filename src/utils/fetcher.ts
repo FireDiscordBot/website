@@ -37,7 +37,7 @@ const fetcher = async <R = unknown>(url: string, options?: RequestInit): Promise
   const response = await fetch(url, options)
 
   if (!response.ok) {
-    const data = response.headers.get("Content-Type")?.startsWith("application/json")
+    const data = response.headers?.get("Content-Type")?.startsWith("application/json")
       ? await response.json()
       : await response.text()
     throw new NetworkError(response.status, data, data.error)
