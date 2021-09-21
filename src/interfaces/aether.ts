@@ -1,4 +1,4 @@
-import { AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
+import { APIUser, AuthorizationInfo, DiscordGuild, PartialOAuthUser } from "@/interfaces/discord"
 
 export type ShardStats = {
   id: number
@@ -170,9 +170,10 @@ export type SessionInfo = {
 
 export type ClientInfo = {
   referrer: string
-  platform: string
+  platform: { name: string; version: string; arch: string }
+  browser: { name: string; version: string }
+  device: { mobile?: boolean; model?: string }
   userAgent: string
-  mobile: boolean
   language: string
 }
 
@@ -218,4 +219,25 @@ export type WebsiteGateway = {
     connectGlobal: WSRateLimit
     identify?: WSRateLimit
   }
+}
+
+export type AdminSessionData = {
+  open: boolean
+  closeCode: number
+  closeData: string
+  readyState: number
+  replayable?: number
+  lastPing?: string
+  willKill?: string
+  killer: boolean
+  identified: boolean
+  sessionId: string
+  guilds: string[] | DiscordGuild[]
+  client: ClientInfo
+  ip?: string
+  user: PartialOAuthUser | APIUser
+  type: "cluster" | "website"
+  seq: number
+  pid: number
+  id: number
 }

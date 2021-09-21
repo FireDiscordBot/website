@@ -1,6 +1,6 @@
 import { fire } from "@/constants"
 import fetcher from "@/utils/fetcher"
-import { BuildOverride, Reminder } from "@/interfaces/aether"
+import { AdminSessionData, BuildOverride, Reminder } from "@/interfaces/aether"
 import { GetCollectData } from "@/types"
 
 export const requestWithAuth = <R = never>(accessToken: string, path: string, method?: string, body?: unknown) =>
@@ -70,4 +70,8 @@ export const deleteUserReminder = async (accessToken: string, timestamp: string)
 
 export const getBuildOverrides = async (accessToken: string) => {
   return await requestWithAuth<BuildOverride[]>(accessToken, `__development/overrides`, "GET")
+}
+
+export const getSessions = async (accessToken: string) => {
+  return await requestWithAuth<AdminSessionData[]>(accessToken, `sessions`)
 }
