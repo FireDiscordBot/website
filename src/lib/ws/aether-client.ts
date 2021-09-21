@@ -21,6 +21,8 @@ import { fetchUser, getBannerImage, getAvatarImage } from "@/utils/discord"
 import { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
 import routeBuilder from "@/utils/api-router"
 
+import { UAParser } from "ua-parser-js"
+
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const getReconnectTime = (code: number) => {
@@ -338,6 +340,7 @@ export class AetherClient {
     // )
     // const newSessions = data.sessions.filter((session) => !this.sessions.find((s) => s.sessionId == session.sessionId))
     this.sessions = data.sessions
+    this.emitter.emit("SESSIONS_REPLACE", this.sessions)
     for (const [key, value] of Object.entries(this.config))
       if (key in this.configListeners) this.configListeners[key](value)
     this.oauth = data.auth
@@ -364,6 +367,7 @@ export class AetherClient {
     if (!identified) return
     this.config = { ...this.config, ...identified.config }
     this.sessions = identified.sessions
+    this.emitter.emit("SESSIONS_REPLACE", this.sessions)
     for (const [key, value] of Object.entries(this.config))
       if (key in this.configListeners) this.configListeners[key](value)
     this.oauth = identified.auth
@@ -396,8 +400,33 @@ export class AetherClient {
       const nonce = (+new Date()).toString()
       this.websocket?.handlers.set(nonce, resolve)
       const navigator = typeof window != "undefined" ? window.navigator : null
-      // @ts-ignore
-      const userAgentData = navigator?.userAgentData
+      const client = {
+        referrer: typeof window != "undefined" ? window.document?.referrer : "",
+        platform: { name: "Unknown", version: "Unknown", arch: "Unknown" },
+        browser: { name: "Unknown", version: "Unknown" },
+        device: { mobile: null, model: null },
+        userAgent: navigator?.userAgent,
+        language: navigator?.language,
+      } as any
+      if (navigator?.userAgent) {
+        const userAgentData = new UAParser(navigator?.userAgent ?? "")
+
+        client.platform = userAgentData.getOS()
+
+        const device = userAgentData.getDevice()
+        client.device = {
+          mobile:
+            typeof device.type == "string"
+              ? device.type == "mobile" || device.type == "tablet" || device.type == "wearable"
+              : null,
+          model: device.model,
+        }
+
+        client.browser = userAgentData.getBrowser()
+
+        const arch = userAgentData.getCPU().architecture
+        if (arch) client.platform.arch = arch
+      }
       this.send(
         new Message(
           EventType.IDENTIFY_CLIENT,
@@ -410,13 +439,7 @@ export class AetherClient {
                 expires: this.auth?.expires,
                 user: this.auth?.user,
               },
-              client: {
-                referrer: typeof window != "undefined" ? window.document?.referrer : "",
-                platform: userAgentData?.platform,
-                userAgent: navigator?.userAgent,
-                mobile: userAgentData?.mobile,
-                language: navigator?.language,
-              },
+              client,
             },
             env: process.env.NODE_ENV,
           },

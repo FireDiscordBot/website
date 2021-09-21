@@ -170,6 +170,7 @@ __metadata:
     "@types/nprogress": ^0.2.0
     "@types/react": ^17.0.20
     "@types/react-dom": ^17.0.9
+    "@types/ua-parser-js": ^0.7.36
     clsx: ^1.1.1
     eslint: ^7.32.0
     eslint-config-next: 11.1.2
@@ -188,6 +189,7 @@ __metadata:
     stripe: ^8.174.0
     swr: ^1.0.0
     typescript: ^4.4.2
+    ua-parser-js: ^0.7.28
     ws: ^8.2.1
   languageName: unknown
   linkType: soft
@@ -729,6 +731,13 @@ __metadata:
   dependencies:
     "@types/react": "*"
   checksum: 6f1e5d893da847595a625c0281a78350d03c0650a7abb7aedbf5a20ccb085d925185823df611f6aff45fa908904bc3736f8d8bafd7b990b1563d25d92339904f
+  languageName: node
+  linkType: hard
+
+"@types/ua-parser-js@npm:^0.7.36":
+  version: 0.7.36
+  resolution: "@types/ua-parser-js@npm:0.7.36"
+  checksum: 8c24d4dc12ed1b8b98195838093391c358c81bf75e9cae0ecec8f7824b441e069daaa17b974a3e257172caddb671439f0c0b44bf43bfcf409b7a574a25aab948
   languageName: node
   linkType: hard
 
@@ -6378,6 +6387,13 @@ typescript@^4.4.2:
   version: 0.7.24
   resolution: "ua-parser-js@npm:0.7.24"
   checksum: 722e0291fe6ad0d439cd29c4cd919f4e1b7262fe78e4c2149756180f8ad723ae04713839115eeb8738aca6d6258a743668090fb1e1417bc1fba27acc815a84e2
+  languageName: node
+  linkType: hard
+
+"ua-parser-js@npm:^0.7.28":
+  version: 0.7.28
+  resolution: "ua-parser-js@npm:0.7.28"
+  checksum: a7da4ad54527211e878ee016c2ef64efad5c2f5a31277d36c9da93b4c89ecaa64f391ad4cf158ada76a9ad8e53004a950705ff1c2f27a52ca8bfb3f1381c39ff
   languageName: node
   linkType: hard
 

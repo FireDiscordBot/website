@@ -8,6 +8,7 @@ import {
   Notification,
   Reminder,
   ResumeResponse,
+  SessionInfo,
 } from "@/interfaces/aether"
 
 interface EmitterEvents {
@@ -16,11 +17,12 @@ interface EmitterEvents {
   REALTIME_STATS: (stats: FireStats) => void
   SUBSCRIBE: (route: string, extra?: unknown) => void
   HELLO: (hello: { interval: number }) => void
-  COMMANDS_UPDATE: (update: { categories?: string[], commands: Command[] }) => void
+  COMMANDS_UPDATE: (update: { categories?: string[]; commands: Command[] }) => void
   DISCOVERY_UPDATE: (guilds: DiscoverableGuild[]) => void
   NOTIFICATION: (notification?: Notification) => void
   REMINDERS_UPDATE: (reminders: Reminder[]) => void
   CONFIG_UPDATE: (update: { name: string; value: unknown }) => void
+  SESSIONS_REPLACE: (sessions: SessionInfo[]) => void
 }
 
 export declare interface Emitter {
