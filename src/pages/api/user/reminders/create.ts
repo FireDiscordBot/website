@@ -1,5 +1,4 @@
 import { StatusCodes } from "http-status-codes"
-import moment from "moment"
 
 import { createUserReminder } from "@/lib/aether"
 import { AuthenticatedApiHandler } from "@/types"
@@ -16,19 +15,6 @@ const handler: AuthenticatedApiHandler = async (session, req, res) => {
     body = JSON.parse(req.body)
   } catch {
     error(res, StatusCodes.BAD_REQUEST)
-    return
-  }
-
-  const minutes = moment(body.timestamp).diff(moment(), "minutes")
-  if (!minutes || minutes < 2) {
-    error(res, StatusCodes.PRECONDITION_FAILED, "Time is too short!")
-    return
-  }
-
-  const largestTime = new Date()
-  largestTime.setMinutes(largestTime.getMinutes() + minutes)
-  if (moment(largestTime).diff(moment(), "months") >= 7) {
-    error(res, StatusCodes.PRECONDITION_FAILED, "Reminders cannot currently be set for over 6 months in the future")
     return
   }
 
