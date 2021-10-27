@@ -28,7 +28,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 const getReconnectTime = (code: number) => {
   switch (code) {
     case 1012: {
-      return process.env.NODE_ENV == "development" ? 12000 : 3000
+      return process.env.NODE_ENV == "development" ? 15000 : 3000
     }
     case 4005:
     case 4999: {
@@ -80,7 +80,7 @@ export class AetherClient {
     this.queue = []
     this.seq = 0
 
-    this.logIgnore = [EventType.HEARTBEAT, EventType.HEARTBEAT_ACK]
+    this.logIgnore = [EventType.HEARTBEAT, EventType.HEARTBEAT_ACK, EventType.REALTIME_STATS]
     this.router = Router.router ?? undefined
     if (this.router) this.router.events.on("routeChangeStart", this.handleSubscribe.bind(this))
   }

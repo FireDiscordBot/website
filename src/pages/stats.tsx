@@ -1,6 +1,5 @@
 import { useRouter } from "next/router"
 import * as React from "react"
-import { GetStaticProps } from "next"
 import Container from "@material-ui/core/Container"
 import Grid from "@material-ui/core/Grid"
 import Card from "@material-ui/core/Card"
@@ -10,13 +9,11 @@ import { createStyles, makeStyles } from "@material-ui/core/styles"
 import PeopleIcon from "@material-ui/icons/People"
 import StorageIcon from "@material-ui/icons/Storage"
 
-import { emitter } from "./_app"
+import { emitter, handler } from "./_app"
 
-import fetcher from "@/utils/fetcher"
 import ClusterStatsDialog from "@/components/ClusterStatsDialog"
 import DefaultLayout from "@/layouts/default"
-import { fire } from "@/constants"
-import { ClusterStats, FireStats } from "@/interfaces/aether"
+import { ClusterStats, InitialStats } from "@/interfaces/aether"
 import { formatBytes, formatNumber } from "@/utils/formatting"
 import ClusterCard from "@/components/ClusterCard"
 import CircularProgressCard from "@/components/CircularProgressCard"
@@ -45,22 +42,19 @@ const useStyles = makeStyles((theme) =>
   }),
 )
 
-type Props = {
-  initialFireStats: FireStats
-}
-
-const StatsPage = ({ initialFireStats }: Props) => {
+const StatsPage = () => {
   const classes = useStyles()
   const router = useRouter()
 
-  const [fireStats, setFireStats] = React.useState<FireStats>(initialFireStats)
+  const [initialStats, setInitialStats] = React.useState<InitialStats | undefined>(undefined)
+  const [clusterStats, setClusterStats] = React.useState<ClusterStats[]>([])
   const [selectedClusterStats, setSelectedClusterStats] = React.useState<ClusterStats | undefined>(undefined)
 
   const findClusterStats = React.useCallback(
     (id: number) => {
-      return fireStats.clusters.find((cluster) => cluster.id === id)
+      return clusterStats.find((cluster) => cluster.id === id)
     },
-    [fireStats.clusters],
+    [clusterStats],
   )
   const onClickClusterCard = (id: number) => setSelectedClusterStats(findClusterStats(id))
   const onClickClusterError = (id: number) =>
@@ -71,39 +65,88 @@ const StatsPage = ({ initialFireStats }: Props) => {
       vertical: "top",
       autoHideDuration: 5000,
     })
-  const onCloseClusterDialog = () => setSelectedClusterStats(undefined)
+  const onCloseClusterDialog = () => {
+    setSelectedClusterStats(undefined)
+    delete router.query.cluster
+    window?.history.replaceState(null, "", "/stats")
+  }
 
   React.useEffect(() => {
     emitter.removeAllListeners("REALTIME_STATS")
-    emitter.on("REALTIME_STATS", setFireStats)
-  }, [])
+    emitter.on("REALTIME_STATS", (stats) => {
+      const clusterStatsCopy = [...clusterStats]
+      if (stats.id == -1) {
+        setInitialStats(stats as InitialStats)
+        if (!clusterStats.length)
+          setClusterStats(
+            Array.from({ length: (stats as InitialStats).clusterCount ?? 1 }).map((_, index) => ({
+              id: index,
+              error: true,
+              name: "",
+              env: "",
+              uptime: "",
+              cpu: 0,
+              ramBytes: 0,
+              totalRamBytes: 0,
+              version: "",
+              versions: "",
+              guilds: 0,
+              unavailableGuilds: 0,
+              users: 0,
+              commands: 0,
+              restPing: 0,
+            })),
+          )
+        else if (clusterStats.length > (stats as InitialStats).clusterCount)
+          setClusterStats(clusterStats.slice(0, (stats as InitialStats).clusterCount))
+      } else {
+        const index = clusterStatsCopy.findIndex((cluster) => cluster.id === stats.id)
+        if (index == -1) {
+          clusterStatsCopy.push(stats as ClusterStats)
+          setClusterStats(clusterStatsCopy)
+        } else {
+          clusterStatsCopy[index] = stats as ClusterStats
+          setClusterStats(clusterStatsCopy)
+        }
+      }
+      // @ts-ignore
+      if (handler) handler.cachedStats = clusterStats
+    })
+  }, [clusterStats, initialStats?.clusterCount])
 
   React.useEffect(() => {
     if (typeof router.query.cluster === "string") {
       const clusterId = parseInt(router.query.cluster, 10)
       setSelectedClusterStats(findClusterStats(clusterId))
+      window?.history.replaceState(null, "", `/stats?cluster=${clusterId}`)
     }
-  }, [findClusterStats, router.query])
+  }, [findClusterStats, router.query, selectedClusterStats])
 
   React.useEffect(() => {
     if (selectedClusterStats) {
       setSelectedClusterStats(findClusterStats(selectedClusterStats.id))
+      window?.history.replaceState(null, "", `/stats?cluster=${selectedClusterStats.id}`)
     }
-  }, [findClusterStats, fireStats, selectedClusterStats])
+  }, [findClusterStats, clusterStats, selectedClusterStats])
 
   return (
     <DefaultLayout title="Stats">
       <Container>
         <Grid container spacing={4} justifyContent="center" className={classes.chartsContainer}>
           <Grid item xs={6} sm={5} md={3}>
-            <CircularProgressCard title="CPU" value={fireStats.cpu} />
+            <CircularProgressCard title="CPU" value={clusterStats.map((c) => c.cpu).reduce((a, b) => a + b, 0)} />
           </Grid>
           <Grid item xs={6} sm={5} md={3}>
             <CircularProgressCard
               title="RAM"
-              value={fireStats.ramBytes}
-              valueLabel={formatBytes(fireStats.ramBytes, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
-              max={fireStats.totalRamBytes}
+              value={clusterStats.map((c) => c.ramBytes ?? 0).reduce((a, b) => a + b, 0)}
+              valueLabel={formatBytes(
+                clusterStats.map((c) => c.ramBytes ?? 0).reduce((a, b) => a + b, 0),
+                { minimumFractionDigits: 1, maximumFractionDigits: 1 },
+              )}
+              max={
+                clusterStats.find((s) => typeof s.totalRamBytes == "number" && !!s.totalRamBytes)?.totalRamBytes ?? 1
+              }
             />
           </Grid>
           <Grid item xs={6} sm={5} md={3}>
@@ -111,7 +154,7 @@ const StatsPage = ({ initialFireStats }: Props) => {
               <CardContent className={classes.cardContent}>
                 <StorageIcon className={classes.icon} color="primary" />
                 <Typography variant="h5" color="textPrimary">
-                  {formatNumber(fireStats.guilds)}
+                  {formatNumber(clusterStats.map((c) => c.guilds).reduce((a, b) => a + b, 0))}
                 </Typography>
                 <Typography variant="body1" color="textSecondary">
                   Servers
@@ -124,7 +167,7 @@ const StatsPage = ({ initialFireStats }: Props) => {
               <CardContent className={classes.cardContent}>
                 <PeopleIcon className={classes.icon} color="primary" />
                 <Typography variant="h5" color="textPrimary">
-                  {formatNumber(fireStats.users)}
+                  {formatNumber(clusterStats.map((c) => c.users).reduce((a, b) => a + b, 0))}
                 </Typography>
                 <Typography variant="body1" color="textSecondary">
                   Users
@@ -140,7 +183,7 @@ const StatsPage = ({ initialFireStats }: Props) => {
             </Typography>
           </Grid>
 
-          {fireStats.clusters.map((cluster) => (
+          {clusterStats.map((cluster) => (
             <Grid item key={cluster.id}>
               <ClusterCard cluster={cluster} onClick={cluster.error ? onClickClusterError : onClickClusterCard} />
             </Grid>
@@ -157,35 +200,6 @@ const StatsPage = ({ initialFireStats }: Props) => {
       )}
     </DefaultLayout>
   )
-}
-
-export const getStaticProps: GetStaticProps<Props> = async () => {
-  let initialFireStats: FireStats
-
-  try {
-    initialFireStats = await fetcher(`${fire.aetherApiUrl}/stats`, {
-      mode: "cors",
-      headers: { "User-Agent": "Fire Website" },
-    })
-  } catch (e) {
-    initialFireStats = {
-      cpu: 0,
-      ramBytes: 0,
-      totalRamBytes: 0,
-      clusterCount: 0,
-      shardCount: 0,
-      guilds: 0,
-      users: 0,
-      clusters: [],
-    }
-  }
-
-  return {
-    props: {
-      initialFireStats,
-    },
-    revalidate: 120,
-  }
 }
 
 export default StatsPage

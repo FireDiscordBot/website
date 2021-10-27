@@ -1,10 +1,11 @@
 import { EventEmitter } from "events"
 
 import {
+  ClusterStats,
   Command,
   DiscoverableGuild,
-  FireStats,
   IdentifyResponse,
+  InitialStats,
   Notification,
   Reminder,
   ResumeResponse,
@@ -14,7 +15,7 @@ import {
 interface EmitterEvents {
   IDENTIFY_CLIENT: (response: IdentifyResponse) => void
   RESUME_CLIENT: (response: ResumeResponse) => void
-  REALTIME_STATS: (stats: FireStats) => void
+  REALTIME_STATS: (stats: ClusterStats | InitialStats) => void
   SUBSCRIBE: (route: string, extra?: unknown) => void
   HELLO: (hello: { interval: number }) => void
   COMMANDS_UPDATE: (update: { categories?: string[]; commands: Command[] }) => void

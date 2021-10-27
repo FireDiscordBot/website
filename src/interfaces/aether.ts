@@ -8,46 +8,53 @@ export type ShardStats = {
   status: number
 }
 
-export type ClusterStats = {
-  id: number
-  name: string
-  env: string
-  user: string
-  userId: string
-  uptime: string
-  started: string
-  cpu: number
-  ram: string
-  ramBytes: number
-  totalRam: string
-  totalRamBytes: number
-  pid: number
-  version: string
-  versions: string
-  guilds: number
-  unavailableGuilds: number
-  users: number
-  commands: number
-  restPing: number
-  shards: ShardStats[]
-  error?: string
-  reason?: string
-  code?: number
-}
+export type ClusterStats =
+  | {
+      id: number
+      name: string
+      env: string
+      user: string
+      userId: string
+      uptime: string
+    //   started: string
+      cpu: number
+    //   ram: string
+      ramBytes: number
+    //   totalRam: string
+      totalRamBytes: number
+      pid: number
+      version: string
+      versions: string
+      guilds: number
+      unavailableGuilds: number
+      users: number
+      commands: number
+      restPing: number
+    //   shards: ShardStats[]
+      error: never
+    }
+  | {
+      id: number
+      error: boolean
+      name: ""
+      env: ""
+      uptime: ""
+      cpu: 0
+      ramBytes: 0
+      totalRamBytes: 0
+      version: ""
+      versions: ""
+      guilds: 0
+      unavailableGuilds: 0
+      users: 0
+      commands: 0
+      restPing: 0
+    }
 
-export type FireStats = {
-  cpu: number
-  ramBytes: number
-  totalRamBytes: number
-  aetherStats?: {
-    ramBytes: number
-    restLatency: number
-  }
+export type InitialStats = {
+  id: -1
   clusterCount: number
   shardCount: number
-  guilds: number
-  users: number
-  clusters: ClusterStats[]
 }
 
 export type Command = {
