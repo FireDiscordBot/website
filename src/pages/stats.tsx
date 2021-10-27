@@ -95,6 +95,7 @@ const StatsPage = () => {
               users: 0,
               commands: 0,
               restPing: 0,
+              shards: [],
             })),
           )
         else if (clusterStats.length > (stats as InitialStats).clusterCount)

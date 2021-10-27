@@ -30,7 +30,7 @@ export type ClusterStats =
       users: number
       commands: number
       restPing: number
-    //   shards: ShardStats[]
+      shards: ShardStats[]
       error: never
     }
   | {
@@ -49,6 +49,7 @@ export type ClusterStats =
       users: 0
       commands: 0
       restPing: 0
+      shards: ShardStats[]
     }
 
 export type InitialStats = {
