@@ -23,7 +23,7 @@ const Footer = () => (
     <statuspage-widget
       title="Status"
       appearance="badge"
-      src="https://status.gaminggeek.dev"
+      src="https://firestatus.link"
     />
   </footer>
 );
