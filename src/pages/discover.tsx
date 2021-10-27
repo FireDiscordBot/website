@@ -41,11 +41,13 @@ const paginate = function (array: DiscoverableGuild[], index: number, size: numb
   size = size < 1 ? 1 : size
 
   // filter
-  return [
+  const paginated = [
     ...array.filter((_, n) => {
       return n >= index * size && n < (index + 1) * size
     }),
   ]
+  if (paginated.length) return paginated
+  else return null
 }
 
 const DiscoverPage = () => {
@@ -67,7 +69,7 @@ const DiscoverPage = () => {
 
         if (sortIds == null) {
           updated = shuffleArray(updated)
-            setSortIds(updated.map((guild) => guild.id))
+          setSortIds(updated.map((guild) => guild.id))
         }
         const sorted = getSortedGuilds(updated, sortIds ?? [], true)
         setInitialGuilds(sorted)
@@ -138,7 +140,7 @@ const DiscoverPage = () => {
   }, [guilds, initialGuilds, sortIds])
 
   const handleTextChange = (value: string | null | undefined) => {
-    if (!value) return setGuilds(getSortedGuilds(initialGuilds ?? [], sortIds ?? []))
+    if (!value) return setGuilds(getSortedGuilds(initialGuilds ?? [], sortIds ?? [], true))
 
     const filteredGuilds =
       initialGuilds?.filter((guild) => guild.name.toLowerCase().includes(value.toLowerCase())) || []
@@ -178,19 +180,25 @@ const DiscoverPage = () => {
           <Loading />
         ) : (
           <Box mb={2}>
-            {guilds.filter((g) => !g.featured).length > 0 && (
+            {guilds.filter((g) => !g.featured).length > 0 ? (
               <Typography variant="h4" gutterBottom>
                 {(document.getElementById("guild-filter") as HTMLInputElement)?.value.length
                   ? "Matching Servers"
                   : "All Servers"}
               </Typography>
+            ) : (
+              <Typography variant="h2" align="center" color="error" gutterBottom>
+                No servers found
+              </Typography>
             )}
             <Grid container spacing={4}>
               {paginate(
-                guilds.filter((g) => !g.featured),
+                guilds.filter((g) =>
+                  (document.getElementById("guild-filter") as HTMLInputElement)?.value.length ? true : !g.featured,
+                ),
                 page,
                 9,
-              ).map((guild, index) => (
+              )?.map((guild, index) => (
                 <Grid item xs={12} sm={6} md={4} key={index}>
                   <DiscoverableGuildCard guild={guild} />
                 </Grid>
