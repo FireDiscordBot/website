@@ -59,6 +59,7 @@ const CommandsPage = () => {
       handler.handleSubscribe("/commands", {
         category: handler.commandCategories[index],
       })
+    else if (handler) setCommandsState(handler.commands.filter((c) => c.category == handler.commandCategories[index]))
   }
 
   React.useEffect(() => {
