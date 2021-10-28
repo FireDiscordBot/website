@@ -36,10 +36,10 @@ const snowflakeRegex = /\d{15,21}/
 const AdminPage = () => {
   const classes = useStyles()
   const [session, loading] = useSession({ redirectTo: "/" })
-  const [experiment, setExperiment] = React.useState("")
-  const [experimentType, setExperimentType] = React.useState("")
-  const [applyToID, setID] = React.useState("")
-  const [bucket, setBucket] = React.useState(0)
+  const [experiment, setExperiment] = React.useState<string>("")
+  const [experimentType, setExperimentType] = React.useState<string>("")
+  const [applyToID, setID] = React.useState<string>("")
+  const [bucket, setBucket] = React.useState<number>(0)
 
   const handleExperimentChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setExperiment(event.target.value as string)
@@ -155,9 +155,12 @@ const AdminPage = () => {
                     vertical: "top",
                     autoHideDuration: 3000,
                   })
-                else if (!bucket)
+                else if (
+                  typeof bucket != "number" ||
+                  !handler?.experiments.find((e) => e.id == experiment)?.treatments.find((t) => t.id == bucket)
+                )
                   handler?.emitter.emit("NOTIFICATION", {
-                    text: "You must select a treatment",
+                    text: "You must select a valid treatment",
                     severity: "error",
                     horizontal: "right",
                     vertical: "top",
