@@ -185,21 +185,17 @@ export type ClientInfo = {
   language: string
 }
 
-type Config = Record<string, boolean>
-
 type UnavailableGuild = { id: string; unavailable: true }
 
 interface TreatmentConfig {
   id: number
   label: string
-  config: Config
 }
 
 export interface ExperimentConfig {
   id: string
   label: string
   kind: "user" | "guild"
-  defaultConfig: Config
   treatments: TreatmentConfig[]
 }
 
