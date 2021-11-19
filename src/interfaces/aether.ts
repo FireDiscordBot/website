@@ -16,11 +16,11 @@ export type ClusterStats =
       user: string
       userId: string
       uptime: string
-    //   started: string
+      //   started: string
       cpu: number
-    //   ram: string
+      //   ram: string
       ramBytes: number
-    //   totalRam: string
+      //   totalRam: string
       totalRamBytes: number
       pid: number
       version: string
@@ -132,6 +132,7 @@ export enum EventType {
   APPLY_EXPERIMENT,
   SCHEMA_VALIDATION_ERROR,
   SESSIONS_REPLACE,
+  RESTART_CLUSTER,
 }
 
 export type Notification = {

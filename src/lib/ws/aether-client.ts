@@ -340,7 +340,6 @@ export class AetherClient {
     // )
     // const newSessions = data.sessions.filter((session) => !this.sessions.find((s) => s.sessionId == session.sessionId))
     this.sessions = data.sessions
-    this.emitter.emit("SESSIONS_REPLACE", this.sessions)
     for (const [key, value] of Object.entries(this.config))
       if (key in this.configListeners) this.configListeners[key](value)
     this.oauth = data.auth
@@ -367,7 +366,6 @@ export class AetherClient {
     if (!identified) return
     this.config = { ...this.config, ...identified.config }
     this.sessions = identified.sessions
-    this.emitter.emit("SESSIONS_REPLACE", this.sessions)
     for (const [key, value] of Object.entries(this.config))
       if (key in this.configListeners) this.configListeners[key](value)
     this.oauth = identified.auth
@@ -514,6 +512,10 @@ export class AetherClient {
 
   PUSH_ROUTE(data: { route: string }) {
     this.navigate(data.route)
+  }
+
+  SESSIONS_REPLACE(sessions: SessionInfo[]) {
+    this.sessions = sessions
   }
 
   navigate(route: string, extra?: unknown) {
