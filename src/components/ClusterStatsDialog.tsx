@@ -1,20 +1,20 @@
-import * as React from "react"
-import Dialog from "@material-ui/core/Dialog"
-import DialogContent from "@material-ui/core/DialogContent"
-import Typography from "@material-ui/core/Typography"
+import { ClusterStats } from "@/interfaces/aether"
+import { handler } from "@/pages/_app"
+import { formatBytes, formatNumber } from "@/utils/formatting"
 import Box from "@material-ui/core/Box"
+import Button from "@material-ui/core/Button"
 import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
+import Dialog from "@material-ui/core/Dialog"
+import DialogContent from "@material-ui/core/DialogContent"
 import Grid from "@material-ui/core/Grid"
 import { createStyles, makeStyles } from "@material-ui/core/styles"
+import Typography from "@material-ui/core/Typography"
 import PeopleIcon from "@material-ui/icons/People"
 import StorageIcon from "@material-ui/icons/Storage"
-
-import DialogTitle from "./DialogTitle"
+import * as React from "react"
 import CircularProgressCard from "./CircularProgressCard"
-
-import { ClusterStats } from "@/interfaces/aether"
-import { formatBytes, formatNumber } from "@/utils/formatting"
+import DialogTitle from "./DialogTitle"
 
 type StatLineProps = {
   title: string
@@ -65,11 +65,24 @@ const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
   const classes = useStyles()
   const open = props.open ?? false
 
+  const restartCluster = () => {
+    if (!handler) return
+    handler.restartCluster({
+      id: clusterStats.id,
+      reason: `Restart requested by ${handler.user?.username}#${handler.user?.discriminator}`,
+    })
+  }
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md">
       <DialogTitle onClose={onClose}>
         Cluster {clusterStats.id} ({clusterStats.name})
       </DialogTitle>
+      {handler?.isSuperuser() && (
+        <Button color="default" size="small" onClick={restartCluster}>
+          Restart
+        </Button>
+      )}
       <DialogContent dividers className={classes.dialogCardContent}>
         <Grid container spacing={2} justifyContent="center" className={classes.chartsContainer}>
           <Grid item xs={6} sm={5} md={3}>

@@ -89,6 +89,10 @@ export class AetherClient {
     return this.oauth?.user
   }
 
+  isSuperuser() {
+    return this.config && this.config["utils.superuser"] == true
+  }
+
   async getSession(): Promise<AuthSession> {
     const session = await getSession().catch(() => null)
     if (session) {
@@ -105,7 +109,7 @@ export class AetherClient {
   }
 
   setWebsocket(websocket: Websocket) {
-    if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
+    if (process.env.NODE_ENV == "development" || this.isSuperuser())
       // easy access for debugging
       (globalThis as { [key: string]: unknown }).aether = this
     delete this.acked
@@ -312,7 +316,8 @@ export class AetherClient {
     this.session = data.sessionId
     this.experiments = [...data.guildExperiments, ...data.userExperiments]
     this.commandCategories = data.commandCategories
-    this.commands = data.firstCategory
+    this.commands = [...this.commands, ...data.firstCategory] // prevent clearing commands when reconnecting
+    this.commands = this.commands.filter((c, index) => this.commands.findIndex((c2) => c2.name === c.name) === index)
     this.identify()
   }
 
@@ -343,7 +348,7 @@ export class AetherClient {
     for (const [key, value] of Object.entries(this.config))
       if (key in this.configListeners) this.configListeners[key](value)
     this.oauth = data.auth
-    if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
+    if (process.env.NODE_ENV == "development" || this.isSuperuser())
       (globalThis as { [key: string]: unknown }).aether = this // easy access for debugging
     console.info(
       `%c WS %c Sessions %c Successfully resumed${data.replayed ? " with " + data.replayed + " replayed events" : ""} `,
@@ -369,7 +374,7 @@ export class AetherClient {
     for (const [key, value] of Object.entries(this.config))
       if (key in this.configListeners) this.configListeners[key](value)
     this.oauth = identified.auth
-    if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
+    if (process.env.NODE_ENV == "development" || this.isSuperuser())
       // easy access for debugging
       (globalThis as { [key: string]: unknown }).aether = this
     else delete (globalThis as { [key: string]: unknown }).aether
@@ -475,6 +480,11 @@ export class AetherClient {
     )
   }
 
+  restartCluster(options: { id?: number; pid?: number; shards?: number[]; all?: boolean; reason?: string }) {
+    if (!this.isSuperuser()) return
+    this.send(new Message(EventType.RESTART_CLUSTER, options))
+  }
+
   CONFIG_UPDATE(data: { name: string; value: unknown }) {
     if (!this.config) return
     if (data.value == "deleteSetting") return delete this.config[data.name]
@@ -547,7 +557,7 @@ IT'S BEST TO JUST CLOSE THIS WINDOW AND PRETEND IT DOES NOT EXIST.`,
       (message.type != EventType.IDENTIFY_CLIENT && !this.identified)
     )
       return message && this.queue.push(message)
-    if (process.env.NODE_ENV == "development" || (this.config && this.config["utils.superuser"] == true))
+    if (process.env.NODE_ENV == "development" || this.isSuperuser())
       // easy access for debugging
       (globalThis as { [key: string]: unknown }).aether = this
     else delete (globalThis as { [key: string]: unknown }).aether

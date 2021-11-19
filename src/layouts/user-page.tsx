@@ -60,8 +60,7 @@ const UserPageLayout = ({ children, ...restProps }: Props) => {
                   </ListItemIcon>
                   <ListItemText primary="Reminders" />
                 </ListItemLink>
-                {((handler?.config && handler.config["utils.superuser"] == true) ||
-                  handler?.router?.route == "/user/admin") && (
+                {(handler?.isSuperuser() || handler?.router?.route == "/user/admin") && (
                   <ListItemLink href="/user/admin" router={router}>
                     <ListItemIcon>
                       <Code />

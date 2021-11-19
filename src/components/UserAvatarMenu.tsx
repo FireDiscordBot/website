@@ -42,7 +42,7 @@ const UserAvatarMenu = ({ onClickLogout, ...props }: Props) => (
       </ListItemIcon>
       <ListItemText primary="Reminders" />
     </MenuItemLink>
-    {handler?.config && handler.config["utils.superuser"] == true && (
+    {handler?.isSuperuser() && (
       <MenuItemLink href="/user/admin">
         <ListItemIcon>
           <Code />

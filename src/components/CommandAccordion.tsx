@@ -46,7 +46,7 @@ const CommandAccordion = ({ command, prefix }: Props) => {
         <Typography variant="body1" gutterBottom>
           Usage: {command.usage.replace("{prefix}", prefix)}
         </Typography>
-        <Typography variant="body1">Aliases: {command.aliases.length == 0 ? "None" : command.aliases}</Typography>
+        {/* <Typography variant="body1">Aliases: {command.aliases.length == 0 ? "None" : command.aliases}</Typography> */}
       </AccordionDetails>
     </Accordion>
   )

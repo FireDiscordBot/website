@@ -10,6 +10,7 @@ import Grid from "@material-ui/core/Grid"
 import useMediaQuery from "@material-ui/core/useMediaQuery"
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles"
 import { withStyles } from "@material-ui/core"
+import { TextField } from "@material-ui/core"
 import { red } from "@material-ui/core/colors"
 
 import { emitter, handler } from "./_app"
@@ -52,27 +53,74 @@ const CommandsPage = () => {
       ? handler.commands.filter((c) => c.category == handler.commandCategories[selectedCategoryIndex])
       : [],
   )
+  const [filter, setFilter] = React.useState<string>("")
+  const [filterTimeout, setFilterTimeout] = React.useState<NodeJS.Timeout | null>(null)
+  const [cachedCategories, setCachedCategories] = React.useState<string[]>([])
 
-  const onChangeSelectedTab = (_event: React.ChangeEvent<unknown>, index: number) => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const getCategories = () => {
+    if (!handler) return []
+    return filter
+      ? [
+          "All",
+          ...handler.commandCategories.filter((cat) =>
+            handler.commands.find((c) => c.category == cat && c.name.includes(filter)),
+          ),
+        ]
+      : handler.commandCategories
+  }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const updateCommandsList = (category: string) => {
+    setCommandsState(
+      filter
+        ? category == "All"
+          ? handler.commands.filter((c) => c.name.includes(filter))
+          : handler.commands.filter((c) => c.category == category && c.name.includes(filter))
+        : handler.commands.filter((c) => c.category == category),
+    )
+  }
+
+  const onChangeSelectedTab = (event: React.ChangeEvent<unknown>, _: number) => {
+    const categoryName = (event.target as HTMLSpanElement).innerHTML
+    if (categoryName.startsWith("<")) return // we got actual html, yuck
+    let index = getCategories().indexOf(categoryName)
     setSelectedCategoryIndex(index)
-    if (!handler?.commands.find((c) => c.category === handler?.commandCategories[index]))
+    if (!cachedCategories.includes(categoryName) && categoryName != "All")
       handler.handleSubscribe("/commands", {
-        category: handler.commandCategories[index],
+        category: categoryName,
       })
-    else if (handler) setCommandsState(handler.commands.filter((c) => c.category == handler.commandCategories[index]))
+    if (handler) updateCommandsList(categoryName)
+  }
+
+  const handleTextChange = (f: string) => {
+    setFilter(f)
+    if (!filter) setSelectedCategoryIndex(0)
+    if (filterTimeout) clearTimeout(filterTimeout)
+    if (handler) {
+      if (filter) setFilterTimeout(setTimeout(() => handler.handleSubscribe("/commands", { filter }), 250))
+      updateCommandsList(getCategories()[selectedCategoryIndex])
+    }
   }
 
   React.useEffect(() => {
     const setCommands = (commands: Command[]) => {
-      if (handler) handler.commands = [...handler.commands, ...commands]
-      setCommandsState(commands.filter((c) => c.category == handler.commandCategories[selectedCategoryIndex]))
+      if (!handler) return
+      handler.commands = [...handler.commands, ...commands]
+      // remove duplicates
+      handler.commands = handler.commands.filter(
+        (c, index) => handler.commands.findIndex((c2) => c2.name === c.name) === index,
+      )
+      updateCommandsList(getCategories()[selectedCategoryIndex])
     }
 
     emitter.removeAllListeners("COMMANDS_UPDATE")
     emitter.on("COMMANDS_UPDATE", (update) => {
       setCommands(update.commands)
+      if (update.full && update.commands[0].category && !cachedCategories.includes(update.commands[0].category))
+        setCachedCategories([...cachedCategories, update.commands[0].category])
     })
-  }, [commands, selectedCategoryIndex])
+  }, [cachedCategories, commands, filter, getCategories, selectedCategoryIndex, updateCommandsList])
 
   React.useEffect(() => {
     if (typeof router.query.prefix === "string") {
@@ -90,6 +138,12 @@ const CommandsPage = () => {
     <DefaultLayout title="Commands">
       <Container>
         <Grid container>
+          <TextField
+            id="command-filter"
+            onChange={(value) => handleTextChange(value.target.value)}
+            fullWidth
+            placeholder={"Search Commands"}
+          />
           <Grid item xs={12} md={12}>
             <Paper className={classes.fullHeight}>
               <CategoriesTabs
@@ -101,7 +155,7 @@ const CommandsPage = () => {
                   [classes.borderRight]: !isMobile,
                 })}
               >
-                {handler.commandCategories.map((category, index) => (
+                {getCategories().map((category, index) => (
                   <Tab label={category} key={index} />
                 ))}
               </CategoriesTabs>

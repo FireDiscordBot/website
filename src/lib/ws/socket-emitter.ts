@@ -18,7 +18,7 @@ interface EmitterEvents {
   REALTIME_STATS: (stats: ClusterStats | InitialStats) => void
   SUBSCRIBE: (route: string, extra?: unknown) => void
   HELLO: (hello: { interval: number }) => void
-  COMMANDS_UPDATE: (update: { categories?: string[]; commands: Command[] }) => void
+  COMMANDS_UPDATE: (update: { commands: Command[]; full: boolean }) => void
   DISCOVERY_UPDATE: (guilds: DiscoverableGuild[]) => void
   NOTIFICATION: (notification?: Notification) => void
   REMINDERS_UPDATE: (reminders: Reminder[]) => void
