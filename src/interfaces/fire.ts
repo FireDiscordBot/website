@@ -5,4 +5,5 @@ export type Plan = {
   amount: number
   currency: string
   servers: number
+  hidden: boolean
 }

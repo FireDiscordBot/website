@@ -27,23 +27,25 @@ const SelectPlanCard = ({ open, onClose, onClickPlan, loadPlans }: Props) => {
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
       <DialogTitle onClose={onClose}>Plans</DialogTitle>
       <List>
-        {plans?.map((plan, index) => {
-          const onClick = () => onClickPlan(plan)
-          return (
-            <ListItem button key={index} onClick={onClick}>
-              <ListItemAvatar>
-                <Avatar src={plan.images[0]} />
-              </ListItemAvatar>
-              <ListItemText
-                primary={plan.name}
-                secondary={`${formatNumber(plan.amount / 100, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })} ${plan.currency.toUpperCase()}`}
-              />
-            </ListItem>
-          )
-        })}
+        {plans
+          ?.filter((plan) => !plan.hidden)
+          .map((plan, index) => {
+            const onClick = () => onClickPlan(plan)
+            return (
+              <ListItem button key={index} onClick={onClick}>
+                <ListItemAvatar>
+                  <Avatar src={plan.images[0]} />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={plan.name}
+                  secondary={`${formatNumber(plan.amount / 100, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })} ${plan.currency.toUpperCase()}`}
+                />
+              </ListItem>
+            )
+          })}
       </List>
     </Dialog>
   )

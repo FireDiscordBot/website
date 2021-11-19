@@ -23,6 +23,7 @@ export const fetchPlans = async () => {
         amount: price.unit_amount ?? 0,
         currency: price.currency,
         servers: parseInt(product.metadata.servers, 10),
+        hidden: product.metadata.hidden === "true",
       }
     })
     .sort((a, b) => a.servers - b.servers)
