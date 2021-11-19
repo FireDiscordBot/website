@@ -209,7 +209,7 @@ const DiscoverPage = () => {
         {(guilds?.length || 0) > 9 && (
           <Pagination
             style={{ marginTop: 15, display: "flex", alignItems: "center", justifyContent: "center" }}
-            count={Math.floor((guilds?.length || 0) / 9)}
+            count={Math.ceil((guilds?.filter((g) => !g.featured).length || 0) / 9)}
             onChange={handleChangePage}
             variant="outlined"
           />
