@@ -5,7 +5,7 @@ import Box from "@material-ui/core/Box"
 import { TextField, Typography } from "@material-ui/core"
 import { Pagination } from "@material-ui/lab"
 
-import { emitter } from "./_app"
+import { emitter, handler } from "./_app"
 
 import DefaultLayout from "@/layouts/default"
 import DiscoverableGuildCard from "@/components/DiscoverableGuildCard"
@@ -61,6 +61,13 @@ const DiscoverPage = () => {
     setPage(page)
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const setAndSubscribe = (set: DiscoverableGuild[]) => {
+    const shouldSendSub = set.length != guilds.length || !set.every((g) => guilds.includes(g))
+    setGuilds(set)
+    if (handler && shouldSendSub) handler.handleSubscribe("/discover", { guildIds: set.map((g) => g.id) })
+  }
+
   React.useEffect(() => {
     const setGuildsWithSort = (updated: DiscoverySync | DiscoverableGuild[]) => {
       if (Array.isArray(updated)) {
@@ -73,7 +80,7 @@ const DiscoverPage = () => {
         }
         const sorted = getSortedGuilds(updated, sortIds ?? [], true)
         setInitialGuilds(sorted)
-        setGuilds(sorted)
+        setAndSubscribe(sorted)
 
         // if a filter is currently applied, this will reset the list to be unfiltered
         // so we reset the textbox value too
@@ -87,7 +94,7 @@ const DiscoverPage = () => {
               const index = newGuilds?.findIndex((g) => g.id == guild.id)
               if (typeof index == "number") newGuilds[index] = guild
             }
-            setGuilds(newGuilds)
+            setAndSubscribe(newGuilds)
             break
           }
           case DiscoveryUpdateOp.ADD: {
@@ -96,7 +103,7 @@ const DiscoverPage = () => {
             // prevent duplicates
             setInitialGuilds(initialGuilds.filter((g) => !newGuilds.find((u) => u.id == g.id)))
 
-            setGuilds([...guilds.filter((g) => !newGuilds.find((u) => u.id == g.id)), ...newGuilds])
+            setAndSubscribe([...guilds.filter((g) => !newGuilds.find((u) => u.id == g.id)), ...newGuilds])
             if (sortIds) setSortIds([...sortIds, ...newGuilds.map((guild) => guild.id)])
             else setSortIds(newGuilds.map((guild) => guild.id))
             setInitialGuilds([...initialGuilds, ...newGuilds])
@@ -105,7 +112,7 @@ const DiscoverPage = () => {
           case DiscoveryUpdateOp.REMOVE: {
             const removeGuilds = updated.guilds
 
-            setGuilds(guilds.filter((g) => !removeGuilds.find((u) => u.id == g.id)))
+            setAndSubscribe(guilds.filter((g) => !removeGuilds.find((u) => u.id == g.id)))
             if (sortIds) setSortIds(sortIds.filter((id) => !removeGuilds.find((u) => u.id == id)) ?? [])
             setInitialGuilds(initialGuilds.filter((g) => !removeGuilds.find((u) => u.id == g.id)))
             break
@@ -127,7 +134,7 @@ const DiscoverPage = () => {
                 newSortIds.push(guild.id)
               }
             }
-            setGuilds(newGuilds)
+            setAndSubscribe(newGuilds)
             setInitialGuilds(newInitialGuilds)
             if (!sortIds || sortIds.length != newSortIds.length) setSortIds(newSortIds)
             break
@@ -137,15 +144,15 @@ const DiscoverPage = () => {
     }
     emitter.removeAllListeners("DISCOVERY_UPDATE")
     emitter.on("DISCOVERY_UPDATE", setGuildsWithSort)
-  }, [guilds, initialGuilds, sortIds])
+  }, [guilds, initialGuilds, setAndSubscribe, sortIds])
 
   const handleTextChange = (value: string | null | undefined) => {
-    if (!value) return setGuilds(getSortedGuilds(initialGuilds ?? [], sortIds ?? [], true))
+    if (!value) return setAndSubscribe(getSortedGuilds(initialGuilds ?? [], sortIds ?? [], true))
 
     const filteredGuilds =
       initialGuilds?.filter((guild) => guild.name.toLowerCase().includes(value.toLowerCase())) || []
     if (page > Math.ceil(filteredGuilds.length / 12)) setPage(Math.ceil(filteredGuilds.length / 12))
-    setGuilds(getSortedGuilds(filteredGuilds, sortIds ?? [], true))
+    setAndSubscribe(getSortedGuilds(filteredGuilds, sortIds ?? [], true))
   }
 
   return (
@@ -180,7 +187,7 @@ const DiscoverPage = () => {
           <Loading />
         ) : (
           <Box mb={2}>
-            {guilds.filter((g) => !g.featured).length > 0 ? (
+            {guilds.length > 0 ? (
               <Typography variant="h4" gutterBottom>
                 {(document.getElementById("guild-filter") as HTMLInputElement)?.value.length
                   ? "Matching Servers"
