@@ -91,6 +91,8 @@ const AccountPage = () => {
 
   const onClickRequestData = async (event: React.MouseEvent) => {
     event.preventDefault()
+    if (document?.getElementById("request-data")?.className) 
+        document.getElementById("request-data")!.className += " Mui-disabled"
     await mutate(undefined, true)
 
     if (typeof dataRequest?.status == "number" && dataRequest.status != 0) {
@@ -200,7 +202,7 @@ const AccountPage = () => {
           )}
           {!dataRequest ||
             (dataRequest && dataRequest.status == 0 && (
-              <Button color="primary" onClick={onClickRequestData}>
+              <Button id="request-data" color="primary" onClick={onClickRequestData}>
                 Request collected data
               </Button>
             ))}
