@@ -34,7 +34,7 @@ const refreshToken = async (token: AuthToken): Promise<AuthToken> => {
     refresh_token: token.refreshToken,
   }
 
-  const response = await fetch(`https://discord.com/api/v8/oauth2/token`, {
+  const response = await fetch(`https://discord.com/api/v9/oauth2/token`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -51,7 +51,7 @@ const refreshToken = async (token: AuthToken): Promise<AuthToken> => {
 
   // here we will check if a ws connection is open and if so, close it since we need to reconnect with the new token
   if (eventHandler.websocket?.open) {
-    if (eventHandler.auth?.refresh) eventHandler.auth.refresh()
+    if (typeof eventHandler.auth?.refresh == "function") eventHandler.auth.refresh()
     eventHandler.websocket.close(4000, "Reconnecting due to refreshed token")
   }
 
@@ -86,9 +86,7 @@ const nextAuthConfig: NextAuthOptions = {
         }
       }
 
-      if (typeof token.expiresAt == "number" && +new Date() > token.expiresAt - 86400000)
-        return await refreshToken(token).catch(() => token)
-      else return token
+      return await refreshToken(token).catch(() => token)
     },
     async session(session: AuthSession, token: AuthToken) {
       if (token?.accessToken) {

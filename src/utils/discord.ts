@@ -4,7 +4,7 @@ import { messageLinkRegex } from "@/constants"
 import fetcher from "@/utils/fetcher"
 
 export const fetchGuilds = async (accessToken: string): Promise<DiscordGuild[]> => {
-  const guilds: DiscordGuild[] = await fetcher("https://discord.com/api/v8/users/@me/guilds", {
+  const guilds: DiscordGuild[] = await fetcher("https://discord.com/api/v9/users/@me/guilds?with_counts=true", {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -14,7 +14,7 @@ export const fetchGuilds = async (accessToken: string): Promise<DiscordGuild[]> 
   if (guilds.length == 100) {
     // for the odd chance someone is in over 100
     const moreGuilds: DiscordGuild[] = await fetcher(
-      `https://discord.com/api/v8/users/@me/guilds?after=${guilds[guilds.length - 1].id}`,
+      `https://discord.com/api/v9/users/@me/guilds?after=${guilds[guilds.length - 1].id}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -35,7 +35,7 @@ export const fetchUser = async (accessToken: string): Promise<APIUser & { cached
     user.cached = true
     return user
   }
-  const user: APIUser = await fetcher("https://discord.com/api/v8/users/@me", {
+  const user: APIUser = await fetcher("https://discord.com/api/v9/users/@me", {
     headers: { Authorization: `Bearer ${accessToken}` },
   })
   userCache.set(accessToken, user)
