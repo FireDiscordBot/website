@@ -9,7 +9,7 @@ import { discord } from "@/constants"
 import { handler as eventHandler } from "@/pages/_app"
 
 const discordProvider = Providers.Discord({
-  scope: "identify email guilds guilds.members.reads",
+  scope: "identify email guilds guilds.members.read",
   profile: (profile: APIUser): AuthUser => ({
     id: profile.id,
     name: profile.username,
@@ -24,8 +24,20 @@ const discordProvider = Providers.Discord({
   clientSecret: discord.clientSecret,
 })
 
+discord.authUrl = discordProvider.authorizationUrl
+
+let refreshLock = false
+
 const refreshToken = async (token: AuthToken): Promise<AuthToken> => {
   if (!token.refreshToken) return token
+  if (refreshLock) {
+    if (!eventHandler) return token
+    else {
+      const refreshed = await eventHandler.refreshTokenPromise
+      if (refreshed) return refreshed
+      else while (refreshLock) {} // stall until false
+    }
+  } else refreshLock = true
 
   const data = {
     client_id: discord.clientId,
@@ -48,12 +60,10 @@ const refreshToken = async (token: AuthToken): Promise<AuthToken> => {
   token.accessToken = refreshed.access_token
   token.refreshToken = refreshed.refresh_token ?? token.refreshToken
   token.expiresAt = +new Date() + refreshed.expires_in * 1000 - 3600000
+  token.lastRefresh = +new Date()
 
   // here we will check if a ws connection is open and if so, close it since we need to reconnect with the new token
-  if (eventHandler.websocket?.open) {
-    if (typeof eventHandler.auth?.refresh == "function") eventHandler.auth.refresh()
-    eventHandler.websocket.close(4000, "Reconnecting due to refreshed token")
-  }
+  if (eventHandler?.websocket?.open) eventHandler.websocket.close(4000, "Reconnecting due to refreshed token")
 
   return token
 }
@@ -66,6 +76,7 @@ const nextAuthConfig: NextAuthOptions = {
         token.accessToken = account.accessToken
         token.refreshToken = account.refreshToken
         token.expiresAt = +new Date() + (account.expires_in ?? 1) * 1000 - 3600000
+        token.lastRefresh = +new Date() // we didn't refresh but the token is fresh out of the oven
       }
       if (user) {
         token.discriminator = user.discriminator
@@ -86,12 +97,31 @@ const nextAuthConfig: NextAuthOptions = {
         }
       }
 
-      return await refreshToken(token).catch(() => token)
+      if (token.lastRefresh && +new Date() - token.lastRefresh < 300000) return token
+
+      let resolve: (value: AuthToken | PromiseLike<AuthToken>) => void
+      const refreshTokenPromise = new Promise((r) => {
+        resolve = r
+      }) as Promise<AuthToken>
+      if (eventHandler) eventHandler.refreshTokenPromise = refreshTokenPromise
+
+      return await refreshToken(token)
+        .then((refreshed) => {
+          refreshLock = false
+          if (typeof eventHandler?.auth?.refresh == "function") eventHandler.auth.refresh()
+          resolve(refreshed)
+          return refreshed
+        })
+        .catch(() => {
+          refreshLock = false
+          return token
+        })
     },
     async session(session: AuthSession, token: AuthToken) {
       if (token?.accessToken) {
         session.accessToken = token.accessToken
         session.refreshToken = token.refreshToken
+        if (token.lastRefresh) session.lastRefresh = new Date(token.lastRefresh).toISOString()
       }
       session.user.id = token.sub ?? ""
       session.user.discriminator = token.discriminator

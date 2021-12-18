@@ -1,6 +1,6 @@
 import EventEmitter from "events"
 
-import { getSession } from "next-auth/client"
+import { getSession, signOut } from "next-auth/client"
 import Router, { Router as RouterType } from "next/router"
 
 import { Message } from "./message"
@@ -16,12 +16,13 @@ import {
   SessionInfo,
   Command,
 } from "@/interfaces/aether"
-import { AuthSession } from "@/interfaces/auth"
+import { AuthSession, AuthToken } from "@/interfaces/auth"
 import { fetchUser, getBannerImage, getAvatarImage } from "@/utils/discord"
 import { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
 import routeBuilder from "@/utils/api-router"
 
 import { UAParser } from "ua-parser-js"
+import { discord } from "@/constants"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -42,12 +43,14 @@ const getReconnectTime = (code: number) => {
 
 export class AetherClient {
   configListeners: Record<string, (value: unknown) => void>
+  refreshTokenPromise?: Promise<AuthToken>
   identified: "identifying" | boolean
   config?: Record<string, unknown>
   experiments: ExperimentConfig[]
   commandCategories: string[]
   heartbeat?: NodeJS.Timeout
   oauth?: AuthorizationInfo
+  auth?: AuthSession | null
   sessions: SessionInfo[]
   logIgnore: EventType[]
   guilds: DiscordGuild[]
@@ -56,7 +59,6 @@ export class AetherClient {
   emitter: EventEmitter
   router?: RouterType
   commands: Command[]
-  auth?: AuthSession
   subscribed: string
   session?: string
   queue: Message[]
@@ -89,19 +91,25 @@ export class AetherClient {
     return this.oauth?.user
   }
 
+  get oauthURL() {
+    return discord.authUrl
+  }
+
   isSuperuser() {
     return this.config && this.config["utils.superuser"] == true
   }
 
   async getSession(): Promise<AuthSession> {
-    const session = await getSession().catch(() => null)
-    if (session) {
-      this.auth = session
-      if (this.auth) {
-        this.auth.refresh = this.getSession.bind(this)
-      }
+    this.auth = (await getSession().catch(() => null)) as AuthSession
+    if (this.auth) {
+      this.auth.refresh = this.getSession.bind(this)
     }
     return this.auth as AuthSession
+  }
+
+  async signOut() {
+    if (typeof window == "undefined") return
+    await signOut().catch(() => {})
   }
 
   get api() {
@@ -180,7 +188,7 @@ export class AetherClient {
           "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         )
         // Failed to verify identify, check session
-        getSession()
+        this.getSession()
           .then(async (session) => {
             if (session && session.accessToken) {
               const user = await fetchUser(session.accessToken).catch()
@@ -190,7 +198,7 @@ export class AetherClient {
                   "background: #FFFD98; color: black; border-radius: 3px 0 0 3px;",
                   "background: #353A47; color: white; border-radius: 0 3px 3px 0",
                 )
-                window.document.getElementById("user-menu-logout")?.click()
+                return this.signOut()
               } else if (typeof window !== "undefined") {
                 console.info(
                   `%c WS %c Sessions %c Session is valid! `,
@@ -220,11 +228,18 @@ export class AetherClient {
               "background: #FFFD98; color: black; border-radius: 3px 0 0 3px;",
               "background: #353A47; color: white; border-radius: 0 3px 3px 0",
             )
-            window.document.getElementById("user-menu-logout")?.click()
+            return this.signOut()
           })
       } else if (event.code == 1012) {
         delete this.session
         delete this.seq
+      } else if (
+        event.code == 4003 &&
+        event.reason == "Required scopes are missing" &&
+        typeof window !== "undefined" &&
+        discord.authUrl
+      ) {
+        return (window.location.href = discord.authUrl)
       }
       // cannot recover from codes below (4001 is special and handled above but if we're here, it didn't work)
       if (
@@ -365,6 +380,8 @@ export class AetherClient {
   async identify() {
     if (this.identified) return
     this.identified = "identifying"
+    if (this.refreshTokenPromise) await this.refreshTokenPromise // resolves when token is refreshed
+    delete this.refreshTokenPromise
     const identified = await this.sendIdentify().catch((reason: string) => {
       this.websocket?.close(4008, reason)
     })

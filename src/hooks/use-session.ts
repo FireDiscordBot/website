@@ -1,23 +1,21 @@
-import { useEffect } from "react"
-import { useSession as useNextAuthSession } from "next-auth/client"
+import { handler } from "@/pages/_app"
 import Router from "next/router"
+import { useEffect } from "react"
 
 type Options = {
   redirectTo?: string
 }
 
 const useSession = ({ redirectTo }: Options = {}) => {
-  const [session, loading] = useNextAuthSession()
-
   useEffect(() => {
-    if (!redirectTo || loading) return
+    if (!redirectTo || typeof handler?.auth == "undefined") return
 
-    if (redirectTo && !session) {
+    if (redirectTo && !handler.auth) {
       Router.push(redirectTo)
     }
-  }, [session, loading, redirectTo])
+  }, [redirectTo])
 
-  return [session, loading] as const
+  return [handler?.auth, typeof handler?.auth == "undefined"] as const
 }
 
 export default useSession

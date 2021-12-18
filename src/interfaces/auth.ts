@@ -2,6 +2,7 @@ type JwtToken = {
   accessToken?: string
   refreshToken?: string
   expiresAt?: number
+  lastRefresh?: number
   sub?: string
   exp?: number
   iat?: number
@@ -33,6 +34,7 @@ export type AuthSession = {
   accessToken?: string
   refreshToken?: string
   expires: string
+  lastRefresh: string
   refresh?: () => Promise<AuthSession>
 }
 

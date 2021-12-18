@@ -1,11 +1,8 @@
-import { EventEmitter } from "events"
-
-import * as React from "react"
-import { getSession } from "next-auth/client"
-
+import { WebsiteGateway } from "@/interfaces/aether"
 import { AetherClient } from "@/lib/ws/aether-client"
 import { Websocket } from "@/lib/ws/websocket"
-import { WebsiteGateway } from "@/interfaces/aether"
+import { EventEmitter } from "events"
+import * as React from "react"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -14,8 +11,7 @@ const useWebsocket = (emitter: EventEmitter) => {
   React.useEffect(() => {
     let ws: Websocket
     const initHandler = async () => {
-      const session = await getSession()
-      const handler = new AetherClient(session, emitter)
+      const handler = new AetherClient(null, emitter)
       const gateway = await handler.api.gateway.website.get<WebsiteGateway>({ version: 2 })
       if (!gateway.limits.connect.remaining) {
         console.error(
@@ -46,6 +42,8 @@ const useWebsocket = (emitter: EventEmitter) => {
         })
         await sleep(gateway.limits.connectGlobal.resetAfter)
       }
+      if (handler.refreshTokenPromise) await handler.refreshTokenPromise // resolves when token is refreshed
+      delete handler.refreshTokenPromise
       ws = new Websocket(`${gateway.url}?encoding=zlib`, handler)
       setHandler(handler)
     }

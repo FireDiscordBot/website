@@ -1,24 +1,23 @@
-import * as React from "react"
-import Head from "next/head"
-import { AppProps } from "next/app"
-import { getSession, Provider as SessionProvider } from "next-auth/client"
-import { DefaultSeo } from "next-seo"
-import { SWRConfig } from "swr"
-import { ThemeProvider } from "@material-ui/core/styles"
-import CssBaseline from "@material-ui/core/CssBaseline"
-import { MuiPickersUtilsProvider } from "@material-ui/pickers"
-import moment from "@date-io/moment"
-
-import { defaultSeoConfig } from "@/constants"
-import fetcher from "@/utils/fetcher"
-import theme from "@/theme"
-import { isBrowser } from "@/utils/is-browser"
-import "../nprogress.css"
-import useWebsocket from "@/hooks/use-websocket"
-import { Emitter } from "@/lib/ws/socket-emitter"
-import { AetherClient } from "@/lib/ws/aether-client"
 import SimpleSnackbar from "@/components/SimpleSnackbar"
+import { defaultSeoConfig } from "@/constants"
+import useWebsocket from "@/hooks/use-websocket"
 import { Notification } from "@/interfaces/aether"
+import { AetherClient } from "@/lib/ws/aether-client"
+import { Emitter } from "@/lib/ws/socket-emitter"
+import theme from "@/theme"
+import fetcher from "@/utils/fetcher"
+import { isBrowser } from "@/utils/is-browser"
+import moment from "@date-io/moment"
+import CssBaseline from "@material-ui/core/CssBaseline"
+import { ThemeProvider } from "@material-ui/core/styles"
+import { MuiPickersUtilsProvider } from "@material-ui/pickers"
+import { Provider as SessionProvider } from "next-auth/client"
+import { DefaultSeo } from "next-seo"
+import { AppProps } from "next/app"
+import Head from "next/head"
+import * as React from "react"
+import { SWRConfig } from "swr"
+import "../nprogress.css"
 
 if (isBrowser()) {
   import("@/utils/load-nprogress")
@@ -76,10 +75,6 @@ function FireApp(props: AppProps) {
 }
 
 const initHandler = async (handler: AetherClient) => {
-  if (!handler.auth) {
-    const session = await getSession()
-    if (session) handler.auth = session
-  }
   handler.devToolsWarning()
   handler.initialised = true
 }
