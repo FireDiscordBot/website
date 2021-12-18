@@ -1,28 +1,23 @@
-import EventEmitter from "events"
-
-import { getSession, signOut } from "next-auth/client"
-import Router, { Router as RouterType } from "next/router"
-
-import { Message } from "./message"
-import { MessageUtil } from "./message-util"
-import { Websocket } from "./websocket"
-
 import {
+  Command,
+  EventType,
   ExperimentConfig,
   IdentifyResponse,
   ResumeResponse,
-  WebsiteGateway,
-  EventType,
   SessionInfo,
-  Command,
+  WebsiteGateway,
 } from "@/interfaces/aether"
 import { AuthSession, AuthToken } from "@/interfaces/auth"
-import { fetchUser, getBannerImage, getAvatarImage } from "@/utils/discord"
 import { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
 import routeBuilder from "@/utils/api-router"
-
+import { fetchUser, getAvatarImage, getBannerImage } from "@/utils/discord"
+import EventEmitter from "events"
+import { getSession, signIn, signOut } from "next-auth/client"
+import Router, { Router as RouterType } from "next/router"
 import { UAParser } from "ua-parser-js"
-import { discord } from "@/constants"
+import { Message } from "./message"
+import { MessageUtil } from "./message-util"
+import { Websocket } from "./websocket"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -91,10 +86,6 @@ export class AetherClient {
     return this.oauth?.user
   }
 
-  get oauthURL() {
-    return discord.authUrl
-  }
-
   isSuperuser() {
     return this.config && this.config["utils.superuser"] == true
   }
@@ -110,6 +101,11 @@ export class AetherClient {
   async signOut() {
     if (typeof window == "undefined") return
     await signOut().catch(() => {})
+  }
+
+  async signIn() {
+    if (typeof window == "undefined") return
+    return await signIn("discord")
   }
 
   get api() {
@@ -233,13 +229,8 @@ export class AetherClient {
       } else if (event.code == 1012) {
         delete this.session
         delete this.seq
-      } else if (
-        event.code == 4003 &&
-        event.reason == "Required scopes are missing" &&
-        typeof window !== "undefined" &&
-        discord.authUrl
-      ) {
-        return (window.location.href = discord.authUrl)
+      } else if (event.code == 4003 && event.reason == "Required scopes are missing" && typeof window !== "undefined") {
+        return this.signIn()
       }
       // cannot recover from codes below (4001 is special and handled above but if we're here, it didn't work)
       if (

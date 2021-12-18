@@ -20,7 +20,6 @@ export const discord = {
       (guildId ? `&guild_id=${guildId}` : "")
     )
   },
-  authUrl: "",
 }
 
 export const stripe = {
