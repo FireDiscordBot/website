@@ -5,8 +5,7 @@ import Providers from "next-auth/providers"
 import type { AccessTokenResponse, AuthSession, AuthToken, AuthUser } from "@/interfaces/auth"
 import type { APIUser } from "@/interfaces/discord"
 import { fetchUser, getBannerImage, getAvatarImage } from "@/utils/discord"
-import { discord } from "@/constants"
-import { handler as eventHandler } from "@/pages/_app"
+import { discord, fire } from "@/constants"
 
 const discordProvider = Providers.Discord({
   scope: "identify email guilds guilds.members.read",
@@ -24,20 +23,15 @@ const discordProvider = Providers.Discord({
   clientSecret: discord.clientSecret,
 })
 
-discord.authUrl = discordProvider.authorizationUrl
-
-let refreshLock = false
+const fresh: Record<string, AuthToken | null> = {}
 
 const refreshToken = async (token: AuthToken): Promise<AuthToken> => {
   if (!token.refreshToken) return token
-  if (refreshLock) {
-    if (!eventHandler) return token
-    else {
-      const refreshed = await eventHandler.refreshTokenPromise
-      if (refreshed) return refreshed
-      else while (refreshLock) {} // stall until false
-    }
-  } else refreshLock = true
+
+  if (fresh[token.refreshToken] === null) await new Promise((r) => setTimeout(r, 5000))
+
+  if (fresh[token.refreshToken]) return fresh[token.refreshToken] as AuthToken
+  else fresh[token.refreshToken] = null
 
   const data = {
     client_id: discord.clientId,
@@ -54,18 +48,18 @@ const refreshToken = async (token: AuthToken): Promise<AuthToken> => {
     body: new URLSearchParams(data),
   })
 
-  if (!response.ok) return token
+  if (!response.ok)
+    return fresh[token.refreshToken] ? (fresh[token.refreshToken] as AuthToken) : { ...token, error: "RefreshFailed" }
 
   const refreshed = (await response.json()) as AccessTokenResponse
-  token.accessToken = refreshed.access_token
-  token.refreshToken = refreshed.refresh_token ?? token.refreshToken
-  token.expiresAt = +new Date() + refreshed.expires_in * 1000 - 3600000
-  token.lastRefresh = +new Date()
 
-  // here we will check if a ws connection is open and if so, close it since we need to reconnect with the new token
-  if (eventHandler?.websocket?.open) eventHandler.websocket.close(4000, "Reconnecting due to refreshed token")
-
-  return token
+  return (fresh[token.refreshToken] = {
+    ...token,
+    accessToken: refreshed.access_token,
+    refreshToken: refreshed.refresh_token ?? token.refreshToken,
+    expiresAt: +new Date() + refreshed.expires_in * 1000 - 3600000,
+    lastRefresh: +new Date(),
+  })
 }
 
 const nextAuthConfig: NextAuthOptions = {
@@ -85,37 +79,29 @@ const nextAuthConfig: NextAuthOptions = {
       }
 
       if (token.accessToken) {
-        const user = await fetchUser(token.accessToken).catch(() => {
-          return null
-        })
-        if (user) {
-          token.discriminator = user.discriminator
-          token.publicFlags = user.public_flags
-          token.image = getAvatarImage(user)
-          token.name = user.username
-          token.email = user.email
+        const fetch = async (accessToken: string) => {
+          const user = await fetchUser(accessToken).catch(() => {
+            return null
+          })
+          if (user) {
+            token.discriminator = user.discriminator
+            token.publicFlags = user.public_flags
+            token.image = getAvatarImage(user)
+            token.name = user.username
+            token.email = user.email
+          }
+          return user
+        }
+        let user = await fetch(token.accessToken)
+        if (!user) {
+          token = await refreshToken(token)
+          if (token.accessToken) user = await fetch(token.accessToken)
         }
       }
 
-      if (token.lastRefresh && +new Date() - token.lastRefresh < 300000) return token
+      if (token.lastRefresh && +new Date() - token.lastRefresh > fire.refreshAfter) return await refreshToken(token)
 
-      let resolve: (value: AuthToken | PromiseLike<AuthToken>) => void
-      const refreshTokenPromise = new Promise((r) => {
-        resolve = r
-      }) as Promise<AuthToken>
-      if (eventHandler) eventHandler.refreshTokenPromise = refreshTokenPromise
-
-      return await refreshToken(token)
-        .then((refreshed) => {
-          refreshLock = false
-          if (typeof eventHandler?.auth?.refresh == "function") eventHandler.auth.refresh()
-          resolve(refreshed)
-          return refreshed
-        })
-        .catch(() => {
-          refreshLock = false
-          return token
-        })
+      return token
     },
     async session(session: AuthSession, token: AuthToken) {
       if (token?.accessToken) {
@@ -123,13 +109,12 @@ const nextAuthConfig: NextAuthOptions = {
         session.refreshToken = token.refreshToken
         if (token.lastRefresh) session.lastRefresh = new Date(token.lastRefresh).toISOString()
       }
+      session.error = token.error
       session.user.id = token.sub ?? ""
       session.user.discriminator = token.discriminator
       session.user.publicFlags = token.publicFlags
       session.user.premiumType = token.premiumType
       session.user.image = token.image
-
-      if (eventHandler && eventHandler?.auth?.accessToken == token.accessToken) eventHandler.auth = session
 
       return session
     },

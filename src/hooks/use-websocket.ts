@@ -1,7 +1,9 @@
 import { WebsiteGateway } from "@/interfaces/aether"
+import { AuthSession } from "@/interfaces/auth"
 import { AetherClient } from "@/lib/ws/aether-client"
 import { Websocket } from "@/lib/ws/websocket"
 import { EventEmitter } from "events"
+import { getSession } from "next-auth/client"
 import * as React from "react"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -11,7 +13,8 @@ const useWebsocket = (emitter: EventEmitter) => {
   React.useEffect(() => {
     let ws: Websocket
     const initHandler = async () => {
-      const handler = new AetherClient(null, emitter)
+      const session = (await getSession()) as AuthSession
+      const handler = new AetherClient(session, emitter)
       const gateway = await handler.api.gateway.website.get<WebsiteGateway>({ version: 2 })
       if (!gateway.limits.connect.remaining) {
         console.error(

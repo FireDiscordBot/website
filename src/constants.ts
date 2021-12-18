@@ -6,7 +6,7 @@ export const fire = {
   requiredScopes: "bot applications.commands",
   githubUrl: "https://github.com/FireDiscordBot/bot",
   aetherApiUrl: process.env.NEXT_PUBLIC_AETHER_API_URL ?? "Not provided",
-  websiteSocketUrl: process.env.NEXT_PUBLIC_AETHER_WS_API_URL ?? "Not provided",
+  refreshAfter: 259200000,
 }
 
 export const discord = {

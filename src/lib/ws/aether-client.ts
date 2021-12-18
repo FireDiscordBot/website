@@ -27,6 +27,7 @@ const getReconnectTime = (code: number) => {
       return process.env.NODE_ENV == "development" ? 15000 : 3000
     }
     case 4005:
+    case 4009:
     case 4999: {
       return 0
     }
@@ -39,13 +40,13 @@ const getReconnectTime = (code: number) => {
 export class AetherClient {
   configListeners: Record<string, (value: unknown) => void>
   refreshTokenPromise?: Promise<AuthToken>
+  private _auth: AuthSession | undefined
   identified: "identifying" | boolean
   config?: Record<string, unknown>
   experiments: ExperimentConfig[]
   commandCategories: string[]
   heartbeat?: NodeJS.Timeout
   oauth?: AuthorizationInfo
-  auth?: AuthSession | null
   sessions: SessionInfo[]
   logIgnore: EventType[]
   guilds: DiscordGuild[]
@@ -60,7 +61,7 @@ export class AetherClient {
   acked?: boolean
   seq?: number
 
-  constructor(session: AuthSession | null, emitter: EventEmitter) {
+  constructor(session: AuthSession, emitter: EventEmitter) {
     if (session) {
       this.auth = session
       this.auth.refresh = this.getSession.bind(this)
@@ -86,15 +87,28 @@ export class AetherClient {
     return this.oauth?.user
   }
 
+  get auth() {
+    return this._auth
+  }
+
+  set auth(session: AuthSession | undefined) {
+    if (session?.accessToken != this._auth?.accessToken) this.websocket?.close(4009, "Reauthenticating")
+    this._auth = session
+    if (!this.identified) this.identify()
+  }
+
   isSuperuser() {
     return this.config && this.config["utils.superuser"] == true
   }
 
   async getSession(): Promise<AuthSession> {
     this.auth = (await getSession().catch(() => null)) as AuthSession
-    if (this.auth) {
-      this.auth.refresh = this.getSession.bind(this)
+    if (!this.auth) return this.auth
+    else if (!this.auth.accessToken) {
+      await sleep(2000)
+      return this.getSession()
     }
+    this.auth.refresh = this.getSession.bind(this)
     return this.auth as AuthSession
   }
 
@@ -168,7 +182,7 @@ export class AetherClient {
           })
         delete this.session
         delete this.seq
-      } else if (event.code != 4001)
+      } else if (event.code != 4001 && event.code != 4009)
         this.emitter.emit("NOTIFICATION", {
           text: event.reason ? event.reason : "Websocket error occurred",
           severity: "error",
@@ -210,7 +224,7 @@ export class AetherClient {
                 return this.setWebsocket(ws)
               }
             } else {
-              delete this.auth
+              this.auth = undefined
               delete this.session
               delete this.seq
               if (!this.websocket) throw new Error("what the fuck")
@@ -324,7 +338,7 @@ export class AetherClient {
     this.commandCategories = data.commandCategories
     this.commands = [...this.commands, ...data.firstCategory] // prevent clearing commands when reconnecting
     this.commands = this.commands.filter((c, index) => this.commands.findIndex((c2) => c2.name === c.name) === index)
-    this.identify()
+    if (this.auth?.accessToken) this.identify()
   }
 
   async RESUME_CLIENT(data: ResumeResponse) {
@@ -366,6 +380,7 @@ export class AetherClient {
 
   HEARTBEAT_ACK() {
     this.acked = true
+    if (typeof this.auth?.refresh == "function") this.auth.refresh()
   }
 
   async identify() {
