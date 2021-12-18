@@ -9,7 +9,7 @@ import { discord } from "@/constants"
 import { handler as eventHandler } from "@/pages/_app"
 
 const discordProvider = Providers.Discord({
-  scope: "identify email guilds",
+  scope: "identify email guilds guilds.members.reads",
   profile: (profile: APIUser): AuthUser => ({
     id: profile.id,
     name: profile.username,
