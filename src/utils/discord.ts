@@ -14,7 +14,7 @@ export const fetchGuilds = async (accessToken: string): Promise<DiscordGuild[]> 
   if (guilds.length == 100) {
     // for the odd chance someone is in over 100
     const moreGuilds: DiscordGuild[] = await fetcher(
-      `https://discord.com/api/v9/users/@me/guilds?after=${guilds[guilds.length - 1].id}`,
+      `https://discord.com/api/v9/users/@me/guilds?after=${guilds[guilds.length - 1].id}&with_counts=true`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
