@@ -1,17 +1,14 @@
 import * as React from "react"
-import {
-  Box,
-  Button,
-  createStyles,
-  FormControl,
-  Grid,
-  InputLabel,
-  makeStyles,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from "@material-ui/core"
+import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
+import FormControl from "@mui/material/FormControl"
+import Grid from "@mui/material/Grid"
+import InputLabel from "@mui/material/InputLabel"
+import MenuItem from "@mui/material/MenuItem"
+import TextField from "@mui/material/TextField"
+import Typography from "@mui/material/Typography"
+import Select, { SelectChangeEvent } from "@mui/material/Select"
+import { styled } from "@mui/material/styles"
 
 import { handler } from "../_app"
 
@@ -19,40 +16,32 @@ import SuperuserLayout, { SuperuserPageTypes } from "@/layouts/superuser-page"
 import useSession from "@/hooks/use-session"
 import Loading from "@/components/loading"
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    formControl: {
-      margin: theme.spacing(1),
-      minWidth: 180,
-    },
-    selectEmpty: {
-      marginTop: theme.spacing(2),
-    },
-  }),
-)
+const StyledFormControl = styled(FormControl)(({ theme }) => ({
+  margin: theme.spacing(1),
+  minWidth: 180,
+}))
 
 const snowflakeRegex = /\d{15,21}/
 
 const AdminPage = () => {
-  const classes = useStyles()
   const [session, loading] = useSession({ redirectTo: "/" })
   const [experiment, setExperiment] = React.useState<string>("")
   const [experimentType, setExperimentType] = React.useState<string>("")
   const [applyToID, setID] = React.useState<string>("")
   const [bucket, setBucket] = React.useState<number>(0)
 
-  const handleExperimentChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleExperimentChange = (event: SelectChangeEvent) => {
     setExperiment(event.target.value as string)
   }
 
-  const handleExperimentTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleExperimentTypeChange = (event: SelectChangeEvent) => {
     if (experiment && handler?.experiments.find((e) => e.id == experiment)?.kind != event.target.value)
       setExperiment("")
     setExperimentType(event.target.value as string)
   }
 
-  const handleBucketChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setBucket(event.target.value as number)
+  const handleBucketChange = (event: SelectChangeEvent) => {
+    setBucket(parseInt(event.target.value))
   }
 
   const handleApplyToIDChange = (value: string) => {
@@ -78,7 +67,7 @@ const AdminPage = () => {
       <Grid>
         <Grid item>
           <Typography variant="h6">Apply Experiment</Typography>
-          <FormControl className={classes.formControl}>
+          <StyledFormControl>
             <InputLabel id="experiment-kind-select-label">Experiment Kind</InputLabel>
             <Select
               labelId="experiment-kind-select-label"
@@ -94,8 +83,8 @@ const AdminPage = () => {
                 User
               </MenuItem>
             </Select>
-          </FormControl>
-          <FormControl className={classes.formControl}>
+          </StyledFormControl>
+          <StyledFormControl>
             <InputLabel id="experiment-list-select-label">Experiment Name</InputLabel>
             <Select
               labelId="experiment-list-select-label"
@@ -112,13 +101,13 @@ const AdminPage = () => {
                   </MenuItem>
                 ))}
             </Select>
-          </FormControl>
-          <FormControl className={classes.formControl}>
+          </StyledFormControl>
+          <StyledFormControl>
             <InputLabel id="experiment-bucket-select-label">Treatment</InputLabel>
             <Select
               labelId="experiment-bucket-select-label"
               id="experiment-bucket-select-label"
-              value={bucket}
+              value={bucket.toString()}
               onChange={handleBucketChange}
               disabled={experiment ? false : true}
               required
@@ -131,8 +120,8 @@ const AdminPage = () => {
                   </MenuItem>
                 ))}
             </Select>
-          </FormControl>
-          <FormControl className={classes.formControl}>
+          </StyledFormControl>
+          <StyledFormControl>
             <Box mb={2}>
               <TextField
                 id="apply-to-id"
@@ -142,7 +131,7 @@ const AdminPage = () => {
                 label={experimentType == "guild" ? "Guild ID" : "User ID"}
               />
             </Box>
-          </FormControl>
+          </StyledFormControl>
           <Box mb={2}>
             <Button
               variant={"outlined"}

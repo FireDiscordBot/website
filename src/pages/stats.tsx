@@ -1,13 +1,12 @@
 import { useRouter } from "next/router"
 import * as React from "react"
-import Container from "@material-ui/core/Container"
-import Grid from "@material-ui/core/Grid"
-import Card from "@material-ui/core/Card"
-import CardContent from "@material-ui/core/CardContent"
-import Typography from "@material-ui/core/Typography"
-import { createStyles, makeStyles } from "@material-ui/core/styles"
-import PeopleIcon from "@material-ui/icons/People"
-import StorageIcon from "@material-ui/icons/Storage"
+import Container from "@mui/material/Container"
+import Grid from "@mui/material/Grid"
+import Card from "@mui/material/Card"
+import CardContent from "@mui/material/CardContent"
+import Typography from "@mui/material/Typography"
+import { styled } from "@mui/material/styles"
+import StorageIcon from "@mui/icons-material/Storage"
 
 import { emitter, handler } from "./_app"
 
@@ -18,32 +17,23 @@ import { formatBytes, formatNumber } from "@/utils/formatting"
 import ClusterCard from "@/components/ClusterCard"
 import CircularProgressCard from "@/components/CircularProgressCard"
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    cardContent: {
-      display: "flex",
-      alignItems: "center",
-      flexDirection: "column",
-      justifyContent: "center",
-      height: "inherit",
-    },
-    fullHeight: {
-      height: "100%",
-    },
-    icon: {
-      fontSize: theme.spacing(10),
-    },
-    chartsContainer: {
-      marginBottom: theme.spacing(2),
-    },
-    clusterGridItem: {
-      display: "flex",
-    },
-  }),
-)
+const StyledStorageIcon = styled(StorageIcon)(({ theme }) => ({
+  fontSize: theme.spacing(10),
+}))
+
+const StyledCard = styled(Card)({
+  height: "100%",
+})
+
+const StyledCardContent = styled(CardContent)({
+  display: "flex",
+  alignItems: "center",
+  flexDirection: "column",
+  justifyContent: "center",
+  height: "inherit",
+})
 
 const StatsPage = () => {
-  const classes = useStyles()
   const router = useRouter()
 
   const [initialStats, setInitialStats] = React.useState<InitialStats | undefined>(undefined)
@@ -133,7 +123,7 @@ const StatsPage = () => {
   return (
     <DefaultLayout title="Stats">
       <Container>
-        <Grid container spacing={4} justifyContent="center" className={classes.chartsContainer}>
+        <Grid container spacing={4} justifyContent="center" mb={2}>
           <Grid item xs={6} sm={5} md={3}>
             <CircularProgressCard title="CPU" value={clusterStats.map((c) => c.cpu).reduce((a, b) => a + b, 0)} />
           </Grid>
@@ -151,30 +141,30 @@ const StatsPage = () => {
             />
           </Grid>
           <Grid item xs={6} sm={5} md={3}>
-            <Card className={classes.fullHeight}>
-              <CardContent className={classes.cardContent}>
-                <StorageIcon className={classes.icon} color="primary" />
+            <StyledCard>
+              <StyledCardContent>
+                <StyledStorageIcon color="primary" />
                 <Typography variant="h5" color="textPrimary">
                   {formatNumber(clusterStats.map((c) => c.guilds).reduce((a, b) => a + b, 0))}
                 </Typography>
                 <Typography variant="body1" color="textSecondary">
                   Servers
                 </Typography>
-              </CardContent>
-            </Card>
+              </StyledCardContent>
+            </StyledCard>
           </Grid>
           <Grid item xs={6} sm={5} md={3}>
-            <Card className={classes.fullHeight}>
-              <CardContent className={classes.cardContent}>
-                <PeopleIcon className={classes.icon} color="primary" />
+            <StyledCard>
+              <StyledCardContent>
+                <StyledStorageIcon color="primary" />
                 <Typography variant="h5" color="textPrimary">
                   {formatNumber(clusterStats.map((c) => c.users).reduce((a, b) => a + b, 0))}
                 </Typography>
                 <Typography variant="body1" color="textSecondary">
                   Users
                 </Typography>
-              </CardContent>
-            </Card>
+              </StyledCardContent>
+            </StyledCard>
           </Grid>
         </Grid>
         <Grid container spacing={2} justifyContent="center">

@@ -1,11 +1,11 @@
 import { loadStripe } from "@stripe/stripe-js"
 import * as React from "react"
 import useSWR, { mutate } from "swr"
-import Grid from "@material-ui/core/Grid"
-import Box from "@material-ui/core/Box"
-import Typography from "@material-ui/core/Typography"
-import { TextField } from "@material-ui/core"
-import { Pagination } from "@material-ui/lab"
+import Grid from "@mui/material/Grid"
+import Box from "@mui/material/Box"
+import Typography from "@mui/material/Typography"
+import { TextField } from "@mui/material"
+import { Pagination } from '@mui/material';
 
 import { emitter } from "../_app"
 

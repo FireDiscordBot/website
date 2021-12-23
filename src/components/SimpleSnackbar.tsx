@@ -1,11 +1,11 @@
-import Snackbar, { SnackbarOrigin, SnackbarCloseReason } from "@material-ui/core/Snackbar"
-import Alert, { Color } from "@material-ui/lab/Alert"
+import Snackbar, { SnackbarOrigin, SnackbarCloseReason } from "@mui/material/Snackbar"
+import Alert, { AlertColor } from "@mui/material/Alert"
 import * as React from "react"
 
 type Props = {
   message: string | undefined | null
   autoHideDuration?: number
-  severity?: Color
+  severity?: AlertColor
   horizontal?: SnackbarOrigin["horizontal"]
   vertical?: SnackbarOrigin["vertical"]
   onFinishCloseAnimation?: () => void
@@ -25,13 +25,15 @@ const SimpleSnackbar = ({
     setOpen(message != null)
   }, [message])
 
-  const handleClose = (_: React.SyntheticEvent, reason?: SnackbarCloseReason) => {
+  const handleCloseSnackbar = (_: any, reason: SnackbarCloseReason) => {
     if (reason != "clickaway") setOpen(false)
   }
 
+  const handleCloseAlert = () => setOpen(false)
+
   return (
     <Snackbar
-      onClose={handleClose}
+      onClose={handleCloseSnackbar}
       TransitionProps={{
         onExited: onFinishCloseAnimation,
       }}
@@ -44,7 +46,7 @@ const SimpleSnackbar = ({
       }}
     >
       {severity && (
-        <Alert onClose={handleClose} severity={severity} elevation={6} variant="filled">
+        <Alert onClose={handleCloseAlert} severity={severity} elevation={6} variant="filled">
           {message}
         </Alert>
       )}

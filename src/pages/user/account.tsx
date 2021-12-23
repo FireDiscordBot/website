@@ -1,15 +1,14 @@
 import * as React from "react"
 import Link from "next/link"
-import Box from "@material-ui/core/Box"
-import Button from "@material-ui/core/Button"
-import Tooltip from "@material-ui/core/Tooltip"
-import Avatar from "@material-ui/core/Avatar"
-import Typography from "@material-ui/core/Typography"
-import Card from "@material-ui/core/Card"
-import CardContent from "@material-ui/core/CardContent"
-import CardActions from "@material-ui/core/CardActions"
-import { createStyles, makeStyles } from "@material-ui/core/styles"
-import Skeleton from "@material-ui/lab/Skeleton"
+import Button from "@mui/material/Button"
+import Tooltip from "@mui/material/Tooltip"
+import Avatar from "@mui/material/Avatar"
+import Typography from "@mui/material/Typography"
+import Card from "@mui/material/Card"
+import CardContent from "@mui/material/CardContent"
+import CardActions from "@mui/material/CardActions"
+import Box from "@mui/material/Box"
+import Skeleton from "@mui/material/Skeleton"
 import useSWR from "swr"
 
 import { emitter, handler } from "../_app"
@@ -33,32 +32,7 @@ type DataRequestResponse =
       } | null
     }
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    mb: {
-      marginBottom: theme.spacing(2),
-    },
-    flex: {
-      display: "flex",
-    },
-    avatar: {
-      width: "80px",
-      height: "80px",
-    },
-    bold: {
-      fontWeight: 700,
-    },
-    flags: {
-      marginTop: theme.spacing(1) / 2,
-      "& > span:not(:last-child)": {
-        marginRight: theme.spacing(1),
-      },
-    },
-  }),
-)
-
 const AccountPage = () => {
-  const classes = useStyles()
   const [session, loading] = useSession({ redirectTo: "/" })
   const { subscription, isLoading, error } = useCurrentSubscription(session != null && !loading)
   const setErrorMessage = (text: string) =>
@@ -91,8 +65,8 @@ const AccountPage = () => {
 
   const onClickRequestData = async (event: React.MouseEvent) => {
     event.preventDefault()
-    if (document?.getElementById("request-data")?.className) 
-        document.getElementById("request-data")!.className += " Mui-disabled"
+    if (document?.getElementById("request-data")?.className)
+      document.getElementById("request-data")!.className += " Mui-disabled"
     await mutate(undefined, true)
 
     if (typeof dataRequest?.status == "number" && dataRequest.status != 0) {
@@ -166,20 +140,28 @@ const AccountPage = () => {
       <Typography variant="h4" gutterBottom>
         General info
       </Typography>
-
-      <Card className={classes.mb}>
-        <CardContent className={classes.flex}>
-          <Avatar src={session.user.image} className={classes.avatar} />
+      <Card sx={{ marginBottom: (theme) => theme.spacing(2) }}>
+        <CardContent sx={{ display: "flex" }}>
+          <Avatar src={session.user.image} sx={{ width: "80px", height: "80px" }} />
           <Box display="flex" flexDirection="column" mr={0} ml={2} mt="auto" mb="auto">
             <div>
-              <Typography variant="body1" component="span" className={classes.bold}>
+              <Typography variant="body1" component="span" fontWeight={700}>
                 {session.user.name}
               </Typography>
               <Typography variant="body1" color="textSecondary" component="span">
                 #{session.user.discriminator}
               </Typography>
             </div>
-            <div className={classes.flags}>{flagsElements}</div>
+            <Box
+              sx={(theme) => ({
+                marginTop: theme.spacing(0.5),
+                "& > span:not(:last-child)": {
+                  marginRight: theme.spacing(1),
+                },
+              })}
+            >
+              {flagsElements}
+            </Box>
           </Box>
         </CardContent>
         <CardActions>

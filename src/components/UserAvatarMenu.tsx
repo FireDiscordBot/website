@@ -1,8 +1,8 @@
 import * as React from "react"
-import Menu, { MenuProps } from "@material-ui/core/Menu"
-import MenuItem, { MenuItemProps } from "@material-ui/core/MenuItem"
-import { AccountCircle, Event, ExitToApp, Star, Code } from "@material-ui/icons"
-import { ListItemIcon, ListItemText } from "@material-ui/core"
+import Menu, { MenuProps } from "@mui/material/Menu"
+import MenuItem, { MenuItemProps } from "@mui/material/MenuItem"
+import { AccountCircle, Event, ExitToApp, Star, Code } from "@mui/icons-material"
+import { ListItemIcon, ListItemText } from "@mui/material"
 
 import MenuItemLink from "./MenuItemLink"
 
@@ -20,7 +20,7 @@ const UserAvatarMenu = ({ onClickLogout, ...props }: Props) => (
       vertical: "top",
       horizontal: "right",
     }}
-    getContentAnchorEl={null}
+    anchorEl={null}
     keepMounted
     {...props}
   >

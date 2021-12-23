@@ -1,17 +1,15 @@
 import * as React from "react"
-import clsx from "clsx"
 import { useRouter } from "next/router"
-import Paper from "@material-ui/core/Paper"
-import Container from "@material-ui/core/Container"
-import Tabs from "@material-ui/core/Tabs"
-import Tab from "@material-ui/core/Tab"
-import Box from "@material-ui/core/Box"
-import Grid from "@material-ui/core/Grid"
-import useMediaQuery from "@material-ui/core/useMediaQuery"
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles"
-import { withStyles } from "@material-ui/core"
-import { TextField } from "@material-ui/core"
-import { red } from "@material-ui/core/colors"
+import Paper from "@mui/material/Paper"
+import Container from "@mui/material/Container"
+import Tabs, { TabsProps, tabsClasses } from "@mui/material/Tabs"
+import Tab from "@mui/material/Tab"
+import Box from "@mui/material/Box"
+import Grid from "@mui/material/Grid"
+import useMediaQuery from "@mui/material/useMediaQuery"
+import { Theme, styled } from "@mui/material/styles"
+import { TextField } from "@mui/material"
+import { red } from "@mui/material/colors"
 
 import { emitter, handler } from "./_app"
 
@@ -21,31 +19,23 @@ import DefaultLayout from "@/layouts/default"
 import CommandAccordion from "@/components/CommandAccordion"
 import Loading from "@/components/loading"
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    card: {
-      display: "flex",
-    },
-    fullHeight: {
-      height: "100%",
-    },
-    borderRight: {
-      borderRight: `1px solid ${theme.palette.divider}`,
-    },
-  }),
-)
+interface CategoriesTabsProps extends TabsProps {
+  isMobile: boolean
+}
 
-const CategoriesTabs = withStyles({
-  indicator: {
+const CategoriesTabs = styled(Tabs)<CategoriesTabsProps>(({ isMobile, theme }) => ({
+  [`& .${tabsClasses.indicator}`]: {
     backgroundColor: red[700],
   },
-})(Tabs)
+  ...(!isMobile && {
+    borderRight: `1px solid ${theme.palette.divider}`,
+  }),
+}))
 
 const CommandsPage = () => {
-  const classes = useStyles()
   const router = useRouter()
 
-  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"))
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"))
   const [prefix, setPrefix] = React.useState(fire.defaultPrefix)
   const [selectedCategoryIndex, setSelectedCategoryIndex] = React.useState<number>(0)
   const [commands, setCommandsState] = React.useState<Command[]>(
@@ -145,15 +135,13 @@ const CommandsPage = () => {
             placeholder={"Search Commands"}
           />
           <Grid item xs={12} md={12}>
-            <Paper className={classes.fullHeight}>
+            <Paper sx={{ height: "100%" }}>
               <CategoriesTabs
                 orientation={"horizontal"}
                 variant="scrollable"
                 value={selectedCategoryIndex}
                 onChange={onChangeSelectedTab}
-                className={clsx(classes.fullHeight, {
-                  [classes.borderRight]: !isMobile,
-                })}
+                isMobile={isMobile}
               >
                 {getCategories().map((category, index) => (
                   <Tab label={category} key={index} />

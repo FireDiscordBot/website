@@ -1,24 +1,9 @@
 import * as React from "react"
-import clsx from "clsx"
-import CircularProgress, { CircularProgressProps } from "@material-ui/core/CircularProgress"
-import Typography from "@material-ui/core/Typography"
-import Box from "@material-ui/core/Box"
-import { createStyles, makeStyles } from "@material-ui/core/styles"
+import CircularProgress, { CircularProgressProps } from "@mui/material/CircularProgress"
+import Typography from "@mui/material/Typography"
+import Box from "@mui/material/Box"
 
 import { formatNumber } from "@/utils/formatting"
-
-const useStyles = makeStyles(() =>
-  createStyles({
-    progress: {
-      display: "block",
-    },
-    topProgress: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-    },
-  }),
-)
 
 export type Props = CircularProgressProps & {
   title: string
@@ -29,7 +14,6 @@ export type Props = CircularProgressProps & {
 }
 
 const CustomCircularProgress = (props: Props) => {
-  const classes = useStyles()
   const min = props.min ?? 0
   const max = props.max ?? 100
   const percentage = ((props.value - min) * 100) / (max - min)
@@ -40,12 +24,17 @@ const CustomCircularProgress = (props: Props) => {
 
   return (
     <Box position="relative">
-      <CircularProgress variant="determinate" value={100} color="secondary" size="100%" className={classes.progress} />
+      <CircularProgress variant="determinate" value={100} color="secondary" size="100%" sx={{ display: "block" }} />
       <CircularProgress
         variant="determinate"
         value={percentage}
         size="100%"
-        className={clsx(classes.progress, classes.topProgress)}
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          display: "block",
+        }}
       />
       <Box
         top={0}

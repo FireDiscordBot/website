@@ -1,18 +1,16 @@
 import { ClusterStats } from "@/interfaces/aether"
 import { handler } from "@/pages/_app"
 import { formatBytes, formatNumber } from "@/utils/formatting"
-import Box from "@material-ui/core/Box"
-import Button from "@material-ui/core/Button"
-import Card from "@material-ui/core/Card"
-import CardContent from "@material-ui/core/CardContent"
-import Dialog from "@material-ui/core/Dialog"
-import DialogContent from "@material-ui/core/DialogContent"
-import Grid from "@material-ui/core/Grid"
-import { createStyles, makeStyles } from "@material-ui/core/styles"
-import Typography from "@material-ui/core/Typography"
-import PeopleIcon from "@material-ui/icons/People"
-import StorageIcon from "@material-ui/icons/Storage"
-import * as React from "react"
+import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
+import Card from "@mui/material/Card"
+import CardContent from "@mui/material/CardContent"
+import Dialog from "@mui/material/Dialog"
+import DialogContent from "@mui/material/DialogContent"
+import Grid from "@mui/material/Grid"
+import Typography from "@mui/material/Typography"
+import { styled } from "@mui/material/styles"
+import PeopleIcon from "@mui/icons-material/People"
 import CircularProgressCard from "./CircularProgressCard"
 import DialogTitle from "./DialogTitle"
 
@@ -30,30 +28,21 @@ const StatLine = ({ title, value }: StatLineProps) => (
   </Box>
 )
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    cardContent: {
-      display: "flex",
-      alignItems: "center",
-      flexDirection: "column",
-      justifyContent: "center",
-      height: "inherit",
-    },
-    dialogCardContent: {
-      backgroundColor: theme.palette.background.default,
-      borderBottom: "none",
-    },
-    fullHeight: {
-      height: "100%",
-    },
-    icon: {
-      fontSize: theme.spacing(10),
-    },
-    chartsContainer: {
-      marginBottom: theme.spacing(2),
-    },
-  }),
-)
+const StyledCard = styled(Card)({
+  height: "100%",
+})
+
+const StyledCardContent = styled(CardContent)({
+  display: "flex",
+  alignItems: "center",
+  flexDirection: "column",
+  justifyContent: "center",
+  height: "inherit",
+})
+
+const StyledPeopleIcon = styled(PeopleIcon)(({ theme }) => ({
+  fontSize: theme.spacing(10),
+}))
 
 type Props = {
   open?: boolean
@@ -62,7 +51,6 @@ type Props = {
 }
 
 const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
-  const classes = useStyles()
   const open = props.open ?? false
 
   const restartCluster = () => {
@@ -79,12 +67,18 @@ const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
         Cluster {clusterStats.id} ({clusterStats.name})
       </DialogTitle>
       {handler?.isSuperuser() && (
-        <Button color="default" size="small" onClick={restartCluster}>
+        <Button size="small" onClick={restartCluster}>
           Restart
         </Button>
       )}
-      <DialogContent dividers className={classes.dialogCardContent}>
-        <Grid container spacing={2} justifyContent="center" className={classes.chartsContainer}>
+      <DialogContent
+        dividers
+        sx={{
+          backgroundColor: (theme) => theme.palette.background.default,
+          borderBottom: "none",
+        }}
+      >
+        <Grid container spacing={2} justifyContent="center" sx={{ marginBottom: (theme) => theme.spacing(2) }}>
           <Grid item xs={6} sm={5} md={3}>
             <CircularProgressCard title="CPU" value={clusterStats.cpu} />
           </Grid>
@@ -100,30 +94,30 @@ const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
             />
           </Grid>
           <Grid item xs={6} sm={5} md={3}>
-            <Card className={classes.fullHeight}>
-              <CardContent className={classes.cardContent}>
-                <StorageIcon className={classes.icon} color="primary" />
+            <StyledCard>
+              <StyledCardContent>
+                <StyledPeopleIcon color="primary" />
                 <Typography variant="h5" color="textPrimary">
                   {formatNumber(clusterStats.guilds)}
                 </Typography>
                 <Typography variant="body1" color="textSecondary">
                   Servers
                 </Typography>
-              </CardContent>
-            </Card>
+              </StyledCardContent>
+            </StyledCard>
           </Grid>
           <Grid item xs={6} sm={5} md={3}>
-            <Card className={classes.fullHeight}>
-              <CardContent className={classes.cardContent}>
-                <PeopleIcon className={classes.icon} color="primary" />
+            <StyledCard>
+              <StyledCardContent>
+                <StyledPeopleIcon color="primary" />
                 <Typography variant="h5" color="textPrimary">
                   {formatNumber(clusterStats.users)}
                 </Typography>
                 <Typography variant="body1" color="textSecondary">
                   Users
                 </Typography>
-              </CardContent>
-            </Card>
+              </StyledCardContent>
+            </StyledCard>
           </Grid>
         </Grid>
 

@@ -1,9 +1,9 @@
 import * as React from "react"
-import Container from "@material-ui/core/Container"
-import Grid from "@material-ui/core/Grid"
-import Box from "@material-ui/core/Box"
-import { TextField, Typography } from "@material-ui/core"
-import { Pagination } from "@material-ui/lab"
+import Container from "@mui/material/Container"
+import Grid from "@mui/material/Grid"
+import Box from "@mui/material/Box"
+import { TextField, Typography } from "@mui/material"
+import { Pagination } from '@mui/material';
 
 import { emitter, handler } from "./_app"
 

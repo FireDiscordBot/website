@@ -7,10 +7,11 @@ import { Emitter } from "@/lib/ws/socket-emitter"
 import theme from "@/theme"
 import fetcher from "@/utils/fetcher"
 import { isBrowser } from "@/utils/is-browser"
-import moment from "@date-io/moment"
-import CssBaseline from "@material-ui/core/CssBaseline"
-import { ThemeProvider } from "@material-ui/core/styles"
-import { MuiPickersUtilsProvider } from "@material-ui/pickers"
+import AdapterMoment from "@mui/lab/AdapterMoment"
+import LocalizationProvider from "@mui/lab/LocalizationProvider"
+import CssBaseline from "@mui/material/CssBaseline"
+import { CacheProvider } from "@emotion/react"
+import { ThemeProvider } from "@mui/material/styles"
 import { SessionProvider } from "next-auth/react"
 import { DefaultSeo } from "next-seo"
 import { AppProps } from "next/app"
@@ -18,6 +19,7 @@ import Head from "next/head"
 import * as React from "react"
 import { SWRConfig } from "swr"
 import "../nprogress.css"
+import createEmotionCache from "@/utils/createEmotionCache"
 
 if (isBrowser()) {
   import("@/utils/load-nprogress")
@@ -26,8 +28,11 @@ if (isBrowser()) {
 export const emitter = new Emitter()
 export let handler: AetherClient
 
+const clientSideEmotionCache = createEmotionCache()
+
 function FireApp(props: AppProps) {
-  const { Component, pageProps } = props
+  // @ts-expect-error
+  const { Component, pageProps, emotionCache = clientSideEmotionCache } = props
   const [notification, setNotification] = React.useState<Notification | undefined>(undefined)
 
   React.useEffect(() => {
@@ -47,29 +52,31 @@ function FireApp(props: AppProps) {
 
   return (
     <>
-      <MuiPickersUtilsProvider utils={moment}>
+      <LocalizationProvider dateAdapter={AdapterMoment}>
         <Head>
           <title>Fire</title>
           <meta name="viewport" content="initial-scale=1, width=device-width" />
         </Head>
         <DefaultSeo {...defaultSeoConfig} />
-        <ThemeProvider theme={theme}>
-          <SWRConfig value={{ fetcher: fetcher }}>
-            <SessionProvider session={pageProps.session}>
-              <CssBaseline />
-              <Component {...pageProps} />
-              <SimpleSnackbar
-                message={notification?.text}
-                severity={notification?.severity}
-                horizontal={notification?.horizontal}
-                vertical={notification?.vertical}
-                autoHideDuration={notification?.autoHideDuration}
-                onFinishCloseAnimation={onFinishCloseAnimation}
-              />
-            </SessionProvider>
-          </SWRConfig>
-        </ThemeProvider>
-      </MuiPickersUtilsProvider>
+        <CacheProvider value={emotionCache}>
+          <ThemeProvider theme={theme}>
+            <SWRConfig value={{ fetcher: fetcher }}>
+              <SessionProvider session={pageProps.session}>
+                <CssBaseline />
+                <Component {...pageProps} />
+                <SimpleSnackbar
+                  message={notification?.text}
+                  severity={notification?.severity}
+                  horizontal={notification?.horizontal}
+                  vertical={notification?.vertical}
+                  autoHideDuration={notification?.autoHideDuration}
+                  onFinishCloseAnimation={onFinishCloseAnimation}
+                />
+              </SessionProvider>
+            </SWRConfig>
+          </ThemeProvider>
+        </CacheProvider>
+      </LocalizationProvider>
     </>
   )
 }

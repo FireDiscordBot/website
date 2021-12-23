@@ -1,43 +1,29 @@
-import Skeleton from "@material-ui/lab/Skeleton"
+import Skeleton from "@mui/material/Skeleton"
 import * as React from "react"
-import clsx from "clsx"
-import { green } from "@material-ui/core/colors"
-import Button from "@material-ui/core/Button"
-import Card from "@material-ui/core/Card"
-import CardContent from "@material-ui/core/CardContent"
-import CardActions from "@material-ui/core/CardActions"
-import Typography from "@material-ui/core/Typography"
-import Avatar from "@material-ui/core/Avatar"
-import { createStyles, makeStyles } from "@material-ui/core/styles"
+import { green } from "@mui/material/colors"
+import Button from "@mui/material/Button"
+import Card, { CardProps } from "@mui/material/Card"
+import CardContent from "@mui/material/CardContent"
+import CardActions from "@mui/material/CardActions"
+import Typography from "@mui/material/Typography"
+import Avatar from "@mui/material/Avatar"
+import Box from "@mui/material/Box"
+import { styled } from "@mui/material/styles"
 
 import { getGuildIcon } from "@/utils/discord"
 import { UserGuild } from "@/interfaces/aether"
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    card: {
-      height: "100%",
-      transition: theme.transitions.create("background-color"),
-    },
-    content: {
-      display: "flex",
-      alignItems: "center",
-      "&:last-child": {
-        paddingBottom: theme.spacing(2),
-      },
-    },
-    cardText: {
-      marginLeft: theme.spacing(2),
-      overflow: "hidden",
-    },
-    actions: {
-      justifyContent: "end",
-    },
-    premiumCard: {
-      backgroundColor: green[800],
-    },
+interface StyledCard extends CardProps {
+  premium: boolean
+}
+
+const StyledCard = styled(Card)<StyledCard>(({ theme, premium }) => ({
+  height: "100%",
+  transition: theme.transitions.create("background-color"),
+  ...(premium && {
+    backgroundColor: green[800],
   }),
-)
+}))
 
 type Props = {
   guild?: UserGuild
@@ -45,7 +31,6 @@ type Props = {
 }
 
 const UserGuildCard = ({ guild, onClickToggle }: Props) => {
-  const classes = useStyles()
   const avatar = React.useMemo(() => {
     if (!guild) {
       return (
@@ -66,28 +51,32 @@ const UserGuildCard = ({ guild, onClickToggle }: Props) => {
   }
 
   return (
-    <Card
-      className={clsx(classes.card, {
-        [classes.premiumCard]: guild?.premium ?? false,
-      })}
-    >
-      <CardContent className={classes.content}>
+    <StyledCard premium={guild?.premium ?? false}>
+      <CardContent
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          "&:last-child": {
+            paddingBottom: (theme) => theme.spacing(2),
+          },
+        }}
+      >
         {avatar}
-        <div className={classes.cardText}>
+        <Box overflow="hidden" ml={2}>
           <Typography variant="h6" component="h2" noWrap>
             {guild ? guild.name : <Skeleton width={50} animation="wave" />}
           </Typography>
           <Typography variant="caption">
             {guild ? `Premium: ${guild.premium ? "Yes" : "No"}` : <Skeleton width={50} animation="wave" />}
           </Typography>
-        </div>
+        </Box>
       </CardContent>
-      <CardActions className={classes.actions}>
-        <Button color="default" size="small" onClick={onClick}>
+      <CardActions sx={{ justifyContent: "end" }}>
+        <Button size="small" onClick={onClick}>
           {guild ? "Toggle" : <Skeleton width={40} animation="wave" />}
         </Button>
       </CardActions>
-    </Card>
+    </StyledCard>
   )
 }
 

@@ -1,6 +1,6 @@
 import * as React from "react"
 import NextLink, { LinkProps } from "next/link"
-import MenuItem from "@material-ui/core/MenuItem"
+import MenuItem from "@mui/material/MenuItem"
 
 import { AnyObject } from "@/types"
 
@@ -36,7 +36,7 @@ const Link: React.ForwardRefRenderFunction<never, LinkAndChildrenProps> = (
 const ForwardedLink = React.forwardRef<never, LinkAndChildrenProps>(Link)
 
 const MenuItemLink: React.ForwardRefRenderFunction<never, LinkAndChildrenProps> = ({ children, ...linkProps }, ref) => (
-  <MenuItem {...linkProps} component={ForwardedLink} innerRef={ref}>
+  <MenuItem {...linkProps} component={ForwardedLink} ref={ref}>
     {children}
   </MenuItem>
 )

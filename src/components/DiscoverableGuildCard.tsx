@@ -1,36 +1,35 @@
 import * as React from "react"
-import Card from "@material-ui/core/Card"
-import CardActionArea from "@material-ui/core/CardActionArea"
-import CardContent from "@material-ui/core/CardContent"
-import CardMedia from "@material-ui/core/CardMedia"
-import Typography from "@material-ui/core/Typography"
-import Avatar from "@material-ui/core/Avatar"
-import { createStyles, makeStyles } from "@material-ui/core/styles"
-import Skeleton from "@material-ui/lab/Skeleton"
+import Card from "@mui/material/Card"
+import CardActionArea from "@mui/material/CardActionArea"
+import CardContent from "@mui/material/CardContent"
+import CardMedia from "@mui/material/CardMedia"
+import Typography from "@mui/material/Typography"
+import Avatar from "@mui/material/Avatar"
+import Skeleton from "@mui/material/Skeleton"
+import { styled } from "@mui/material/styles"
 
 import { DiscoverableGuild } from "@/interfaces/aether"
 import { formatNumber } from "@/utils/formatting"
 import { Invite } from "@/interfaces/discord"
 import { emitter, handler } from "@/pages/_app"
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    fullHeight: {
-      height: "100%",
-    },
-    media: {
-      height: "200px",
-    },
-    content: {
-      display: "flex",
-      alignItems: "center",
-    },
-    cardText: {
-      marginLeft: theme.spacing(2),
-      overflow: "hidden",
-    },
-  }),
-)
+const StyledCard = styled(Card)({
+  height: "100%",
+})
+
+const StyledCardMedia = styled(CardMedia)({
+  height: "200px",
+})
+
+const StyledCardContent = styled(CardContent)({
+  display: "flex",
+  alignItems: "center",
+})
+
+const CardText = styled("div")(({ theme }) => ({
+  marginLeft: theme.spacing(2),
+  overflow: "hidden",
+}))
 
 type Props = {
   guild?: DiscoverableGuild
@@ -41,28 +40,29 @@ type JoinRequestResponse = { error: string; code: number } | { error: null; invi
 const domain = process.env.NODE_ENV == "development" ? "test.inv.wtf/join" : "discover.inv.wtf"
 
 const DiscoverableGuildCard = ({ guild }: Props) => {
-  const classes = useStyles()
-  if (!guild)
+  if (!guild) {
     return (
       <Skeleton animation="wave">
-        <Card className={classes.fullHeight}>
-          <CardMedia className={classes.media} image={""} title={"Unavailable Guild"} />
-          <CardContent className={classes.content}>
+        <StyledCard>
+          <StyledCardMedia image={""} title={"Unavailable Guild"} />
+          <StyledCardContent>
             <Avatar />
-            <div className={classes.cardText}>
+            <CardText>
               <Typography variant="h6" component="h2" noWrap>
                 Long string of text to make the card wider lol
               </Typography>
               <Typography variant="body2" color="textSecondary" component="p">
                 0 Members
               </Typography>
-            </div>
-          </CardContent>
-        </Card>
+            </CardText>
+          </StyledCardContent>
+        </StyledCard>
       </Skeleton>
     )
+  }
+
   return (
-    <Card className={classes.fullHeight}>
+    <StyledCard>
       <CardActionArea
         onClick={async () => {
           const request = await requestJoin(guild).catch(() => {
@@ -107,20 +107,20 @@ const DiscoverableGuildCard = ({ guild }: Props) => {
             })
         }}
       >
-        <CardMedia className={classes.media} image={guild.splash} title={guild.name} />
-        <CardContent className={classes.content}>
+        <StyledCardMedia image={guild.splash} title={guild.name} />
+        <StyledCardContent>
           <Avatar src={guild.icon} />
-          <div className={classes.cardText}>
+          <CardText>
             <Typography variant="h6" component="h2" noWrap>
               {guild.name}
             </Typography>
             <Typography variant="body2" color="textSecondary" component="p">
               {formatNumber(guild.members)} Members
             </Typography>
-          </div>
-        </CardContent>
+          </CardText>
+        </StyledCardContent>
       </CardActionArea>
-    </Card>
+    </StyledCard>
   )
 }
 

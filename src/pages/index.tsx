@@ -1,13 +1,13 @@
 import * as React from "react"
 import Image from "next/image"
-import Container from "@material-ui/core/Container"
-import Grid from "@material-ui/core/Grid"
-import Typography from "@material-ui/core/Typography"
-import Button from "@material-ui/core/Button"
-import Card from "@material-ui/core/Card"
-import CardContent from "@material-ui/core/CardContent"
-import { createStyles, makeStyles } from "@material-ui/core/styles"
-import GitHubIcon from "@material-ui/icons/GitHub"
+import Container from "@mui/material/Container"
+import Grid from "@mui/material/Grid"
+import Typography from "@mui/material/Typography"
+import Button from "@mui/material/Button"
+import Card from "@mui/material/Card"
+import CardContent from "@mui/material/CardContent"
+import { styled } from "@mui/material/styles"
+import GitHubIcon from "@mui/icons-material/GitHub"
 
 import DefaultLayout from "@/layouts/default"
 import { discord, fire } from "@/constants"
@@ -41,41 +41,27 @@ const FEATURES: Feature[] = [
   },
 ]
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    banner: {
-      paddingTop: theme.spacing(4),
-      paddingBottom: theme.spacing(4),
-      [theme.breakpoints.up("sm")]: {
-        paddingTop: theme.spacing(12),
-        paddingBottom: theme.spacing(8),
-      },
-    },
-    logoGridItem: {
-      marginBottom: theme.spacing(3),
-    },
-    buttonsGridItem: {
-      marginTop: theme.spacing(3),
-      display: "flex",
-      justifyContent: "center",
-    },
-    button: {
-      margin: theme.spacing(0, 1),
-    },
-    featureCard: {
-      height: "100%",
-    },
-  }),
-)
+const StyledButton = styled(Button)(({ theme }) => ({
+  margin: theme.spacing(0, 1),
+}))
 
 const IndexPage = () => {
-  const classes = useStyles()
-
   return (
     <DefaultLayout>
       <Container>
-        <Grid container justifyContent="center" className={classes.banner}>
-          <Grid item xs={3} md={2} className={classes.logoGridItem}>
+        <Grid
+          container
+          justifyContent="center"
+          sx={(theme) => ({
+            paddingTop: theme.spacing(4),
+            paddingBottom: theme.spacing(4),
+            [theme.breakpoints.up("sm")]: {
+              paddingTop: theme.spacing(12),
+              paddingBottom: theme.spacing(8),
+            },
+          })}
+        >
+          <Grid item xs={3} md={2} mb={3}>
             <Image src="/logo-gr.svg" width={256} height={256} layout="responsive" alt="Fire's logo" />
           </Grid>
           <Grid item xs={12} container justifyContent="center">
@@ -85,26 +71,20 @@ const IndexPage = () => {
                 will need.
               </Typography>
             </Grid>
-            <Grid item xs={12} className={classes.buttonsGridItem}>
-              <Button variant="contained" color="primary" className={classes.button} href={discord.inviteUrl()}>
+            <Grid item xs={12} mt={3} display="flex" justifyContent="center">
+              <StyledButton variant="contained" color="primary" href={discord.inviteUrl()}>
                 Invite
-              </Button>
-              <Button
-                variant="outlined"
-                color="default"
-                className={classes.button}
-                startIcon={<GitHubIcon />}
-                href={fire.githubUrl}
-              >
+              </StyledButton>
+              <StyledButton variant="outlined" startIcon={<GitHubIcon />} href={fire.githubUrl}>
                 GitHub
-              </Button>
+              </StyledButton>
             </Grid>
           </Grid>
         </Grid>
         <Grid container spacing={4} justifyContent="center">
           {FEATURES.map((feature, index) => (
             <Grid item md={4} key={index}>
-              <Card className={classes.featureCard}>
+              <Card sx={{ height: "100%" }}>
                 <CardContent>
                   <Typography variant="h4" color="textSecondary" gutterBottom>
                     {feature.title}

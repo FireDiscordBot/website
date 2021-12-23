@@ -1,15 +1,19 @@
-import Typography from "@material-ui/core/Typography"
 import * as React from "react"
 import { useEffect, useState } from "react"
-import { Box, Button, Card, Grid, IconButton, LinearProgress, TextField } from "@material-ui/core"
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles"
-import { Delete } from "@material-ui/icons"
+import Typography from "@mui/material/Typography"
+import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
+import Card from "@mui/material/Card"
+import Grid from "@mui/material/Grid"
+import IconButton from "@mui/material/IconButton"
+import LinearProgress, { linearProgressClasses } from "@mui/material/LinearProgress"
+import TextField from "@mui/material/TextField"
+import { Delete } from "@mui/icons-material"
 import useSWR from "swr"
-import Tooltip from "@material-ui/core/Tooltip"
-import { withStyles } from "@material-ui/styles"
-import { KeyboardDateTimePicker } from "@material-ui/pickers"
+import Tooltip from "@mui/material/Tooltip"
+import { styled } from "@mui/material/styles"
+import DateTimePicker from "@mui/lab/DateTimePicker"
 import moment from "moment"
-import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date"
 import { StatusCodes } from "http-status-codes"
 
 import { emitter } from "../_app"
@@ -19,40 +23,13 @@ import UserPageLayout from "@/layouts/user-page"
 import { Reminder } from "@/interfaces/aether"
 import { getTimestamp } from "@/utils/discord"
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    reminderContainer: {
-      marginBottom: theme.spacing(1),
-    },
-    reminderCard: {
-      display: "flex",
-      padding: theme.spacing(2),
-      borderBottomRightRadius: "0",
-      borderBottomLeftRadius: "0",
-    },
-    fullHeight: {
-      height: "100%",
-    },
-    borderRight: {
-      borderRight: `1px solid ${theme.palette.divider}`,
-    },
-    trashButton: {
-      float: "right",
-    },
-  }),
-)
-
-const ReminderProgressBar = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      borderBottomRightRadius: "4px",
-      borderBottomLeftRadius: "4px",
-    },
-    barColorSecondary: {
-      backgroundColor: theme.palette.success.main,
-    },
-  }),
-)(LinearProgress)
+const ReminderProgressBar = styled(LinearProgress)(({ theme }) => ({
+  borderBottomRightRadius: "4px",
+  borderBottomLeftRadius: "4px",
+  [`&.${linearProgressClasses.barColorSecondary}`]: {
+    backgroundColor: theme.palette.success.main,
+  },
+}))
 
 let toDelete: number[] = []
 
@@ -61,8 +38,6 @@ const Reminders = () => {
   const [currentTime, setCurrentTime] = useState(0)
   const [futureDate, setFutureDate] = useState(moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"))
   const [futureText, setFutureText] = useState("")
-
-  const classes = useStyles()
 
   const { data } = useSWR<Reminder[]>(session ? "/api/user/reminders" : null, {
     revalidateOnMount: true,
@@ -85,8 +60,8 @@ const Reminders = () => {
     }
   }, [currentTime])
 
-  const handleDateChange = (_date: MaterialUiPickersDate, value?: string | null) => {
-    setFutureDate(value ? value : moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"))
+  const handleDateChange = (date: string | null) => {
+    setFutureDate(date ? date : moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"))
   }
 
   const handleTextChange = (value: string | null | undefined) => {
@@ -163,13 +138,12 @@ const Reminders = () => {
             />
           </Grid>
           <Grid item xs={12} md={3}>
-            <KeyboardDateTimePicker
-              variant="inline"
+            <DateTimePicker
               ampm={false}
               value={futureDate}
-              onChange={(date, value) => handleDateChange(date, value)}
+              onChange={handleDateChange}
+              renderInput={(props) => <TextField {...props} />}
               disablePast
-              format="yyyy-MM-DD HH:mm:ss"
             />
           </Grid>
           <Grid item xs={12} md={1}>
@@ -182,18 +156,26 @@ const Reminders = () => {
           {!loading && (
             <div>
               {reminders?.map((reminder, index) => (
-                <div key={index} className={classes.reminderContainer}>
-                  <Card className={classes.reminderCard}>
+                <Box key={index} mb={1}>
+                  <Card
+                    sx={{
+                      display: "flex",
+                      padding: (theme) => theme.spacing(2),
+                      borderBottomRightRadius: "0",
+                      borderBottomLeftRadius: "0",
+                    }}
+                  >
                     <Grid container direction="row">
                       <Grid item xs={12} sm={11}>
                         <Typography color="textPrimary">{reminder.text}</Typography>
                       </Grid>
                       <Grid container item xs={12} sm={1} alignContent={"flex-start"} justifyContent={"flex-end"}>
                         <IconButton
-                          className={classes.trashButton}
+                          sx={{ float: "right" }}
                           onClick={() => {
                             handleReminderDelete(reminder)
                           }}
+                          size="large"
                         >
                           <Delete />
                         </IconButton>
@@ -211,7 +193,7 @@ const Reminders = () => {
                       </Box>
                     </Box>
                   </Tooltip>
-                </div>
+                </Box>
               ))}
             </div>
           )}
