@@ -1,6 +1,6 @@
 import { getReasonPhrase, StatusCodes } from "http-status-codes"
 import { NextApiResponse } from "next"
-import { getSession } from "next-auth/client"
+import { getSession } from "next-auth/react"
 
 import { ApiErrorResponse, ApiHandler, ApiResponseBody, AuthenticatedApiHandler } from "@/types"
 import { AuthSession } from "@/interfaces/auth"

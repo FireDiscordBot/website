@@ -1,5 +1,5 @@
-import { useEffect } from "react"
-import { useSession as useNextAuthSession } from "next-auth/client"
+import { useEffect, useMemo } from "react"
+import { useSession as useNextAuthSession } from "next-auth/react"
 import Router from "next/router"
 
 type Options = {
@@ -7,17 +7,18 @@ type Options = {
 }
 
 const useSession = ({ redirectTo }: Options = {}) => {
-  const [session, loading] = useNextAuthSession()
+  const { data, status } = useNextAuthSession()
+  const loading = useMemo(() => status === "loading", [status])
 
   useEffect(() => {
     if (!redirectTo || loading) return
 
-    if (redirectTo && !session) {
+    if (redirectTo && !data) {
       Router.push(redirectTo)
     }
-  }, [session, loading, redirectTo])
+  }, [data, loading, redirectTo])
 
-  return [session, loading] as const
+  return [data, loading] as const
 }
 
 export default useSession

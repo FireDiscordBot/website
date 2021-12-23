@@ -48,4 +48,44 @@ declare module "next-auth" {
     expires: string
     refresh?: () => Promise<AuthSession>
   }
+
+  interface User {
+    id: string
+    email: string
+    name: string
+    discriminator: string
+    image: string
+    banner: string | null
+    publicFlags: number
+    premiumType: number
+  }
+
+  interface Account {
+    providerAccountId: string
+    access_token: string
+    refresh_token: string
+    expires_at: number
+    scope: string
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    accessToken?: string
+    refreshToken?: string
+    expiresAt?: number
+    lastRefresh?: number
+    error?: string
+    sub?: string
+    exp?: number
+    iat?: number
+    id: string
+    email: string
+    name: string
+    discriminator: string
+    image: string
+    banner: string | null
+    publicFlags: number
+    premiumType: number
+  }
 }

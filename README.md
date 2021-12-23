@@ -34,20 +34,18 @@ NEXT_PUBLIC_DISCORD_CLIENT_ID=XXX
 DISCORD_CLIENT_SECRET=XXX
 NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY=XXX
 STRIPE_API_SECRET_KEY=XXX
+NEXT_AUTH_SECRET=XXX
 JWT_SECRET=XXX
-JWT_SIGNING_KEY=XXX
-JWT_ENCRYPTION_KEY=XXX
 ```
 
 - `NEXT_PUBLIC_DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` are available at
   the [Discord Developer Portal](https://discord.com/developers/)
 - `NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY` and `STRIPE_API_SECRET_KEY` are available at
   the [Stripe Dashboard](https://dashboard.stripe.com/dashboard)
-- JWT secrets can be generated with the NPM package [node-jose-tools](https://www.npmjs.com/package/node-jose-tools)
+- Secrets can be generated with the NPM package [node-jose-tools](https://www.npmjs.com/package/node-jose-tools)
   using the following commands:
-    - `JWT_SECRET`: `openssl rand -base64 64`
-    - `JWT_SIGNING_KEY`: `jose newkey -s 256 -t oct -a HS512`
-    - `JWT_ENCRYPTION_KEY`: `jose newkey -s 256 -t oct -a A256GCM -u enc`
+  - `NEXT_AUTH_SECRET`: `openssl rand -base64 32`
+  - `JWT_SECRET`: `openssl rand -base64 64`
 
 4. Run the development server with Yarn
 

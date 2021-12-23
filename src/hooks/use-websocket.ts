@@ -3,7 +3,7 @@ import { AuthSession } from "@/interfaces/auth"
 import { AetherClient } from "@/lib/ws/aether-client"
 import { Websocket } from "@/lib/ws/websocket"
 import { EventEmitter } from "events"
-import { getSession } from "next-auth/client"
+import { getSession } from "next-auth/react"
 import * as React from "react"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))

@@ -1,14 +1,14 @@
 import { NextApiHandler } from "next"
 import NextAuth, { NextAuthOptions } from "next-auth"
-import Providers from "next-auth/providers"
+import DiscordProvider from "next-auth/providers/discord"
 
-import type { AccessTokenResponse, AuthSession, AuthToken, AuthUser } from "@/interfaces/auth"
+import type { AccessTokenResponse, AuthToken, AuthUser } from "@/interfaces/auth"
 import type { APIUser } from "@/interfaces/discord"
 import { fetchUser, getBannerImage, getAvatarImage } from "@/utils/discord"
 import { discord, fire } from "@/constants"
 
-const discordProvider = Providers.Discord({
-  scope: "identify email guilds guilds.members.read",
+const discordProvider = DiscordProvider({
+  authorization: "https://discord.com/api/oauth2/authorize?scope=identify+email+guilds+guilds.members.read",
   profile: (profile: APIUser): AuthUser => ({
     id: profile.id,
     name: profile.username,
@@ -65,11 +65,11 @@ const refreshToken = async (token: AuthToken): Promise<AuthToken> => {
 const nextAuthConfig: NextAuthOptions = {
   providers: [discordProvider],
   callbacks: {
-    async jwt(token: AuthToken, user: AuthUser, account) {
-      if (account?.accessToken) {
-        token.accessToken = account.accessToken
-        token.refreshToken = account.refreshToken
-        token.expiresAt = +new Date() + (account.expires_in ?? 1) * 1000 - 3600000
+    async jwt({ token, user, account }) {
+      if (account?.access_token) {
+        token.accessToken = account.access_token
+        token.refreshToken = account.refresh_token
+        token.expiresAt = +new Date() + (account.expires_at ?? 1) * 1000 - 3600000
         token.lastRefresh = +new Date() // we didn't refresh but the token is fresh out of the oven
       }
       if (user) {
@@ -103,7 +103,7 @@ const nextAuthConfig: NextAuthOptions = {
 
       return token
     },
-    async session(session: AuthSession, token: AuthToken) {
+    async session({ session, token }) {
       if (token?.accessToken) {
         session.accessToken = token.accessToken
         session.refreshToken = token.refreshToken
@@ -119,11 +119,9 @@ const nextAuthConfig: NextAuthOptions = {
       return session
     },
   },
+  secret: process.env.NEXT_AUTH_SECRET, // openssl rand -base64 32
   jwt: {
-    encryption: true,
     secret: process.env.JWT_SECRET, // openssl rand -base64 64
-    signingKey: process.env.JWT_SIGNING_KEY, // npx node-jose-tools newkey -s 256 -t oct -a HS512
-    encryptionKey: process.env.JWT_ENCRYPTION_KEY, // npx node-jose-tools newkey -s 256 -t oct -a A256GCM -u enc
   },
 }
 

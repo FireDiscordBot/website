@@ -12,7 +12,7 @@ import { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord
 import routeBuilder from "@/utils/api-router"
 import { fetchUser, getAvatarImage, getBannerImage } from "@/utils/discord"
 import EventEmitter from "events"
-import { getSession, signIn, signOut } from "next-auth/client"
+import { getSession, signIn, signOut } from "next-auth/react"
 import Router, { Router as RouterType } from "next/router"
 import { UAParser } from "ua-parser-js"
 import { Message } from "./message"
