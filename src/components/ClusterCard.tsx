@@ -23,7 +23,7 @@ const ClusterCard = ({ cluster, onClick }: Props) => {
             color={
               cluster.error || cluster.unavailableGuilds || cluster.shards.some((shard) => shard.status != 0)
                 ? "error"
-                : "initial"
+                : "white"
             }
           >
             {cluster.id}
