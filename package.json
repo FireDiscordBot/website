@@ -18,14 +18,13 @@
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@material-ui/pickers": "^3.3.10",
-    "@next/bundle-analyzer": "^11.1.2",
     "@stripe/stripe-js": "^1.17.1",
     "clsx": "^1.1.1",
     "http-status-codes": "^2.1.4",
     "moment": "^2.29.1",
-    "next": "^11.1.2",
-    "next-auth": "^3.29.0",
-    "next-seo": "^4.26.0",
+    "next": "^12.0.7",
+    "next-auth": "^4.0.5",
+    "next-seo": "^4.28.1",
     "nprogress": "^0.2.0",
     "react": "^17.0.2",
     "react-desktop-notification": "^1.0.9",
@@ -46,7 +45,8 @@
     "eslint-config-next": "11.1.2",
     "eslint-config-prettier": "^8.3.0",
     "prettier": "^2.3.2",
-    "typescript": "^4.4.2"
+    "typescript": "^4.4.2",
+    "@next/bundle-analyzer": "^12.0.7"
   },
   "license": "MIT"
 }
