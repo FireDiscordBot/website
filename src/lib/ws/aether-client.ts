@@ -143,7 +143,7 @@ export class AetherClient {
         "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
         "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
-        { url: websocket.url },
+        { url: websocket.connectedTo },
       )
       while (this.queue.length) this.send(this.queue.pop())
     }
@@ -220,7 +220,7 @@ export class AetherClient {
                 delete this.session
                 delete this.seq
                 if (!this.websocket) throw new Error("what the fuck")
-                const ws = new Websocket(`${this.websocket.url}?encoding=zlib`)
+                const ws = new Websocket(`${this.websocket.connectedTo}?encoding=zlib`)
                 return this.setWebsocket(ws)
               }
             } else {
@@ -228,7 +228,7 @@ export class AetherClient {
               delete this.session
               delete this.seq
               if (!this.websocket) throw new Error("what the fuck")
-              const ws = new Websocket(`${this.websocket.url}?encoding=zlib`)
+              const ws = new Websocket(`${this.websocket.connectedTo}?encoding=zlib`)
               return this.setWebsocket(ws)
             }
           })
@@ -287,8 +287,8 @@ export class AetherClient {
         if (!this.websocket) throw new Error("what the fuck")
         const ws = new Websocket(
           this.session
-            ? `${this.websocket.url}?sessionId=${this.session}&seq=${this.seq}&encoding=zlib`
-            : `${this.websocket.url}?encoding=zlib`,
+            ? `${this.websocket.connectedTo}?sessionId=${this.session}&seq=${this.seq}&encoding=zlib`
+            : `${this.websocket.connectedTo}?encoding=zlib`,
         )
         return this.setWebsocket(ws)
       } catch {

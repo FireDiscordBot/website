@@ -12,11 +12,11 @@ else {
 export class Websocket extends WebSocket {
   handlers: Map<string, (value: any) => void>
   aether?: AetherClient
-  url: string
+  connectedTo: string
 
   constructor(url: string, eventHandler?: AetherClient) {
     super(url)
-    this.url = url.split("?")[0]
+    this.connectedTo = url.split("?")[0]
     this.handlers = new Map()
     this.onmessage = (event: MessageEvent) => {
       const message = MessageUtil.decode(event.data)
