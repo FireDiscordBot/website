@@ -38,11 +38,13 @@ const getReconnectTime = (code: number) => {
 }
 
 export class AetherClient {
+  private sessionPromiseResolver?: (session: string | PromiseLike<string>) => void
   configListeners: Record<string, (value: unknown) => void>
   refreshTokenPromise?: Promise<AuthToken>
   private _auth: AuthSession | undefined
   identified: "identifying" | boolean
   config?: Record<string, unknown>
+  sessionPromise?: Promise<string>
   experiments: ExperimentConfig[]
   commandCategories: string[]
   heartbeat?: NodeJS.Timeout
@@ -78,6 +80,10 @@ export class AetherClient {
     this.queue = []
     this.seq = 0
 
+    this.sessionPromise = new Promise((r) => {
+      this.sessionPromiseResolver = r
+    })
+
     this.logIgnore = [EventType.HEARTBEAT, EventType.HEARTBEAT_ACK, EventType.REALTIME_STATS]
     this.router = Router.router ?? undefined
     if (this.router) this.router.events.on("routeChangeStart", this.handleSubscribe.bind(this))
@@ -94,7 +100,7 @@ export class AetherClient {
   set auth(session: AuthSession | undefined) {
     if (session?.accessToken != this._auth?.accessToken) this.websocket?.close(4009, "Reauthenticating")
     this._auth = session
-    if (!this.identified && !!this.heartbeat) this.identify()
+    if (!this.identified) this.identify()
   }
 
   isSuperuser() {
@@ -334,6 +340,7 @@ export class AetherClient {
       this.send(new Message(EventType.HEARTBEAT, this.seq || null))
     }, data.interval)
     this.session = data.sessionId
+    this.sessionPromiseResolver?.(this.session)
     this.experiments = [...data.guildExperiments, ...data.userExperiments]
     this.commandCategories = data.commandCategories
     this.commands = [...this.commands, ...data.firstCategory] // prevent clearing commands when reconnecting
@@ -388,6 +395,7 @@ export class AetherClient {
     this.identified = "identifying"
     if (this.refreshTokenPromise) await this.refreshTokenPromise // resolves when token is refreshed
     delete this.refreshTokenPromise
+    if (this.sessionPromise) await this.sessionPromise // resolves when session is created and received in HELLO
     const identified = await this.sendIdentify().catch((reason: string) => {
       this.websocket?.close(4008, reason)
     })
