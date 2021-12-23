@@ -122,8 +122,6 @@ const CommandsPage = () => {
     }
   }, [router.query, commands])
 
-  if (!handler?.commandCategories?.length) return <Loading />
-
   return (
     <DefaultLayout title="Commands">
       <Container>
