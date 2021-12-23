@@ -149,8 +149,11 @@ const CommandsPage = () => {
           </Grid>
           <Grid item xs={12} md={12}>
             <Box paddingTop={3} width="100%" key={0}>
-              {commands.length ? (
-                commands.map((command, index) => <CommandAccordion command={command} prefix={prefix} key={index} />)
+              {handler?.commandCategories?.length && commands.length ? (
+                // TODO: put subcommands inside the main command's CommandAccordion
+                commands
+                  .filter((command) => !!command.description)
+                  .map((command, index) => <CommandAccordion command={command} prefix={prefix} key={index} />)
               ) : (
                 <Loading />
               )}

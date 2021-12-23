@@ -64,6 +64,7 @@ export type Command = {
   usage: string
   aliases: string
   category?: string
+  parent?: string
 }
 
 export type CategoryFlag = {
