@@ -8,7 +8,6 @@ import { fetchUser, getBannerImage, getAvatarImage } from "@/utils/discord"
 import { discord, fire } from "@/constants"
 
 const discordProvider = DiscordProvider({
-  authorization: "https://discord.com/api/oauth2/authorize?scope=identify+email+guilds+guilds.members.read",
   profile: (profile: APIUser): AuthUser => ({
     id: profile.id,
     name: profile.username,
