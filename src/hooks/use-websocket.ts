@@ -15,6 +15,7 @@ const useWebsocket = (emitter: EventEmitter) => {
     const initHandler = async () => {
       const session = (await getSession()) as AuthSession
       const handler = new AetherClient(session, emitter)
+      setHandler(handler)
       const gateway = await handler.api.gateway.website.get<WebsiteGateway>({ version: 2 })
       if (!gateway.limits.connect.remaining) {
         console.error(
@@ -48,7 +49,6 @@ const useWebsocket = (emitter: EventEmitter) => {
       if (handler.refreshTokenPromise) await handler.refreshTokenPromise // resolves when token is refreshed
       delete handler.refreshTokenPromise
       ws = new Websocket(`${gateway.url}?encoding=zlib`, handler)
-      setHandler(handler)
     }
     initHandler().catch(() => {
       console.error()
