@@ -94,7 +94,7 @@ export class AetherClient {
   set auth(session: AuthSession | undefined) {
     if (session?.accessToken != this._auth?.accessToken) this.websocket?.close(4009, "Reauthenticating")
     this._auth = session
-    if (!this.identified) this.identify()
+    if (!this.identified && !!this.heartbeat) this.identify()
   }
 
   isSuperuser() {
