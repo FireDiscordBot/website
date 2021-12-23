@@ -72,8 +72,8 @@ const CommandsPage = () => {
   }
 
   const onChangeSelectedTab = (event: React.ChangeEvent<unknown>, _: number) => {
-    const categoryName = (event.target as HTMLSpanElement).innerHTML
-    if (categoryName.startsWith("<")) return // we got actual html, yuck
+    const categoryName = (event.target as HTMLSpanElement).textContent
+    if (!categoryName) return
     let index = getCategories().indexOf(categoryName)
     setSelectedCategoryIndex(index)
     if (!cachedCategories.includes(categoryName) && categoryName != "All")
