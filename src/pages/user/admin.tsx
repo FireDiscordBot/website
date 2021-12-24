@@ -92,6 +92,7 @@ const AdminPage = () => {
               value={experiment}
               onChange={handleExperimentChange}
               required
+              disabled={!experimentType}
             >
               {handler?.experiments
                 .filter((exp) => exp.kind == experimentType)
@@ -107,9 +108,9 @@ const AdminPage = () => {
             <Select
               labelId="experiment-bucket-select-label"
               id="experiment-bucket-select-label"
-              value={bucket.toString()}
+              value={experiment ? bucket.toString() : undefined}
               onChange={handleBucketChange}
-              disabled={experiment ? false : true}
+              disabled={!experiment}
               required
             >
               {handler?.experiments
@@ -129,6 +130,7 @@ const AdminPage = () => {
                 fullWidth
                 required
                 label={experimentType == "guild" ? "Guild ID" : "User ID"}
+                disabled={!experimentType}
               />
             </Box>
           </StyledFormControl>
