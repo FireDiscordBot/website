@@ -3,7 +3,7 @@ import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
 import Box from "@mui/material/Box"
 import { TextField, Typography } from "@mui/material"
-import { Pagination } from '@mui/material';
+import { Pagination } from "@mui/material"
 
 import { emitter, handler } from "./_app"
 
@@ -54,6 +54,7 @@ const DiscoverPage = () => {
   const [sortIds, setSortIds] = React.useState<string[] | null>(null)
   const [guilds, setGuilds] = React.useState<DiscoverableGuild[]>([])
   const [initialGuilds, setInitialGuilds] = React.useState<DiscoverableGuild[]>([])
+  const [lastSub, setLastSub] = React.useState<string[]>([])
 
   const [page, setPage] = React.useState(1)
 
@@ -63,9 +64,15 @@ const DiscoverPage = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const setAndSubscribe = (set: DiscoverableGuild[]) => {
-    const shouldSendSub = set.length != guilds.length || !set.every((g) => guilds.includes(g))
+    const shouldSendSub =
+      set.length != lastSub.length || set.length != initialGuilds.length || !set.every((g) => guilds.includes(g))
     setGuilds(set)
-    if (handler && shouldSendSub) handler.handleSubscribe("/discover", { guildIds: set.map((g) => g.id) })
+    const subIds = set.map((g) => g.id)
+    const sameSubIds = subIds.length == lastSub.length && subIds.every((id) => lastSub.includes(id))
+    if (handler && shouldSendSub && !sameSubIds) {
+      setLastSub(subIds)
+      handler.handleSubscribe("/discover", { guildIds: subIds })
+    }
   }
 
   React.useEffect(() => {
