@@ -37,7 +37,8 @@ type Props = {
 
 type JoinRequestResponse = { error: string; code: number } | { error: null; invite: Invite }
 
-const domain = process.env.NODE_ENV == "development" ? "test.inv.wtf/join" : "discover.inv.wtf"
+const domain =
+  process.env.NODE_ENV == "development" ? "http://localhost:1338/v2/discoverable/join" : "https://discover-v2.inv.wtf"
 
 const DiscoverableGuildCard = ({ guild }: Props) => {
   if (!guild) {
@@ -86,7 +87,7 @@ const DiscoverableGuildCard = ({ guild }: Props) => {
                 autoHideDuration: 5000,
               })
             else if (request.code == 401 && typeof window != "undefined")
-              window.location.href = `https://${domain}/${guild.id}`
+              window.open(`${domain}/${guild.id}/${handler?.session}`, "_blank")
             else
               emitter.emit("NOTIFICATION", {
                 text: request.error,
@@ -96,7 +97,7 @@ const DiscoverableGuildCard = ({ guild }: Props) => {
                 autoHideDuration: 5000,
               })
           } else if (request.invite && typeof window != "undefined")
-            window.location.href = `https://discord.com/invite/${request.invite.code}`
+            window.open(`https://discord.com/invite/${request.invite.code}`, "_blank")
           else
             emitter.emit("NOTIFICATION", {
               text: "An unknown error occurred",
