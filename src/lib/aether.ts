@@ -2,6 +2,7 @@ import { fire } from "@/constants"
 import fetcher from "@/utils/fetcher"
 import { AdminSessionData, BuildOverride, Reminder } from "@/interfaces/aether"
 import { GetCollectData } from "@/types"
+import { PremiumDiscordGuild } from "@/interfaces/discord"
 
 export const requestWithAuth = <R = never>(accessToken: string, path: string, method?: string, body?: unknown) =>
   fetcher<R>(`${fire.aetherApiUrl}/${path}`, {
@@ -33,8 +34,11 @@ export const createStripePortalSession = async (accessToken: string) => {
   return json.url
 }
 
-export const fetchPremiumGuilds = async (accessToken: string) => {
-  return await requestWithAuth<string[]>(accessToken, `guilds/premium`)
+export const fetchPremiumGuilds = async (accessToken: string, sessionId?: string) => {
+  return await requestWithAuth<PremiumDiscordGuild[]>(
+    accessToken,
+    sessionId ? `guilds/premium?sessionId=${sessionId}` : "guilds/premium",
+  )
 }
 
 export const toggleGuildPremium = async (

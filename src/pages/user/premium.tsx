@@ -5,9 +5,9 @@ import Grid from "@mui/material/Grid"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import { TextField } from "@mui/material"
-import { Pagination } from '@mui/material';
+import { Pagination } from "@mui/material"
 
-import { emitter } from "../_app"
+import { emitter, handler } from "../_app"
 
 import { openUrl } from "@/utils/open-url"
 import { discord, stripe as stripeConstants } from "@/constants"
@@ -21,7 +21,7 @@ import UserGuildCard from "@/components/UserGuildCard"
 import SubscriptionCard from "@/components/SubscriptionCard"
 import useCurrentSubscription from "@/hooks/use-current-subscription"
 import useSession from "@/hooks/use-session"
-import { UserGuild } from "@/interfaces/aether"
+import { PremiumDiscordGuild } from "@/interfaces/discord"
 
 if (!stripeConstants.publicKey) {
   throw Error("Env variable NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY not defined")
@@ -30,7 +30,7 @@ if (!stripeConstants.publicKey) {
 const stripePromise = loadStripe(stripeConstants.publicKey)
 
 // stolen from https://stackoverflow.com/a/57697857 lol
-const paginate = function (array: UserGuild[], index: number, size: number) {
+const paginate = function (array: PremiumDiscordGuild[], index: number, size: number) {
   // transform values
   index = Math.abs(index)
   index = index > 0 ? index - 1 : index
@@ -44,14 +44,17 @@ const paginate = function (array: UserGuild[], index: number, size: number) {
   ]
 }
 
-const getSort = (guild: UserGuild) => guild.name.toLowerCase().charCodeAt(0)
-const sort = (guilds?: UserGuild[]) => (guilds?.length ? guilds.sort((a, b) => getSort(a) - getSort(b)) : undefined)
+const getSort = (guild: PremiumDiscordGuild) => guild.name.toLowerCase().charCodeAt(0)
+const sort = (guilds?: PremiumDiscordGuild[]) =>
+  guilds?.length ? guilds.sort((a, b) => getSort(a) - getSort(b)) : undefined
 
 const PremiumPage = () => {
   const [session, loading] = useSession({ redirectTo: "/" })
-  const { subscription, isLoading: isLoadingSubscription, error: subscriptionError } = useCurrentSubscription(
-    session != null && !loading,
-  )
+  const {
+    subscription,
+    isLoading: isLoadingSubscription,
+    error: subscriptionError,
+  } = useCurrentSubscription(session != null && !loading)
   const setErrorMessage = (text: string | null) =>
     text &&
     emitter.emit("NOTIFICATION", {
@@ -62,16 +65,22 @@ const PremiumPage = () => {
       autoHideDuration: 5000,
     })
 
-  const { data: initialGuilds, isValidating, mutate: mutateGuilds, error: guildsError } = useSWR<UserGuild[]>(
-    session ? "/api/user/guilds" : null,
+  const {
+    data: initialGuilds,
+    isValidating,
+    mutate: mutateGuilds,
+    error: guildsError,
+  } = useSWR<PremiumDiscordGuild[]>(
+    session ? (handler?.session ? `/api/user/guilds?sessionId=${handler.session}` : "/api/user/guilds") : null,
     {
       revalidateOnReconnect: false,
       revalidateOnFocus: false,
     },
   )
-  const premiumGuildsCount = React.useMemo(() => initialGuilds?.filter((guild) => guild.premium)?.length ?? 0, [
-    initialGuilds,
-  ])
+  const premiumGuildsCount = React.useMemo(
+    () => initialGuilds?.filter((guild) => guild.premium && guild.managed)?.length ?? 0,
+    [initialGuilds],
+  )
   const [guilds, setGuilds] = React.useState(sort(initialGuilds))
 
   const [plansDialogOpen, setPlansDialogOpen] = React.useState(false)
@@ -110,7 +119,7 @@ const PremiumPage = () => {
     setGuilds(sort(filteredGuilds))
   }
 
-  const onClickToggle = async (guild: UserGuild) => {
+  const onClickToggle = async (guild: PremiumDiscordGuild) => {
     if (!subscription) {
       setErrorMessage("No subscription")
       return
@@ -142,7 +151,8 @@ const PremiumPage = () => {
     const guildIndex = newGuilds.findIndex((newGuild) => newGuild.id == guild.id)
     if (guildIndex !== -1) {
       const guild = newGuilds[guildIndex]
-      newGuilds[guildIndex] = { ...guild, premium: premiumGuilds.includes(guild.id) }
+      const premium = premiumGuilds.includes(guild.id)
+      newGuilds[guildIndex] = { ...guild, premium, managed: premium }
     }
     setGuilds(newGuilds)
 
@@ -151,7 +161,8 @@ const PremiumPage = () => {
     const initialGuildIndex = newInitialGuilds.findIndex((newGuild) => newGuild.id == guild.id)
     if (initialGuildIndex !== -1) {
       const guild = newInitialGuilds[initialGuildIndex]
-      newInitialGuilds[initialGuildIndex] = { ...guild, premium: premiumGuilds.includes(guild.id) }
+      const premium = premiumGuilds.includes(guild.id)
+      newInitialGuilds[initialGuildIndex] = { ...guild, premium, managed: premium }
     }
 
     mutateGuilds(newInitialGuilds, false)
@@ -189,6 +200,8 @@ const PremiumPage = () => {
 
   const onClosePlansDialog = () => setPlansDialogOpen(false)
 
+  const shouldShowServers = () => !isValidating && guilds?.length && subscription
+
   return (
     <UserPage title="Premium" noindex nofollow>
       <Typography variant="h4" gutterBottom>
@@ -207,14 +220,16 @@ const PremiumPage = () => {
         Servers
       </Typography>
 
-      <Box mb={2}>
-        <TextField
-          id="guild-filter"
-          onChange={(value) => handleTextChange(value.target.value)}
-          fullWidth
-          placeholder={"Find a server..."}
-        />
-      </Box>
+      {shouldShowServers() && (
+        <Box mb={2}>
+          <TextField
+            id="guild-filter"
+            onChange={(value) => handleTextChange(value.target.value)}
+            fullWidth
+            placeholder={"Find a server..."}
+          />
+        </Box>
+      )}
 
       <Grid container spacing={2}>
         {isValidating &&
@@ -223,8 +238,17 @@ const PremiumPage = () => {
               <UserGuildCard onClickToggle={onClickToggle} />
             </Grid>
           ))}
-        {!guilds}
-        {!isValidating &&
+        {!isValidating && guilds && guilds.length == 0 && (
+          <Typography variant="h2" align="center" color="error" gutterBottom>
+            No servers found
+          </Typography>
+        )}
+        {!isValidating && !subscription && (
+          <Typography variant="h4" align="center" color="error" gutterBottom>
+            You must subscribe to premium before you can manage a server&#39;s premium status.
+          </Typography>
+        )}
+        {shouldShowServers() &&
           paginate(guilds || [], page, 12).map((guild, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
               <UserGuildCard guild={guild} onClickToggle={onClickToggle} />
@@ -232,7 +256,7 @@ const PremiumPage = () => {
           ))}
       </Grid>
 
-      {(guilds?.length || 0) > 12 && (
+      {shouldShowServers() && (guilds?.length || 0) > 12 && (
         <Pagination
           style={{ marginTop: 15, display: "flex", alignItems: "center", justifyContent: "center" }}
           count={Math.ceil((guilds?.length || 0) / 12)}

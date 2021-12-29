@@ -120,6 +120,11 @@ export type DiscordGuild = {
   features: string[]
 }
 
+export type PremiumDiscordGuild = DiscordGuild & {
+  premium: boolean
+  managed: boolean | null
+}
+
 export type DiscordFlag = {
   key: string
   value: number

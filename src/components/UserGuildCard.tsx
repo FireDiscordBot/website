@@ -1,17 +1,17 @@
-import Skeleton from "@mui/material/Skeleton"
-import * as React from "react"
-import { green } from "@mui/material/colors"
-import Button from "@mui/material/Button"
-import Card, { CardProps } from "@mui/material/Card"
-import CardContent from "@mui/material/CardContent"
-import CardActions from "@mui/material/CardActions"
-import Typography from "@mui/material/Typography"
+import { PremiumDiscordGuild } from "@/interfaces/discord"
+import { getGuildIcon } from "@/utils/discord"
+import Tooltip from "@mui/material/Tooltip"
 import Avatar from "@mui/material/Avatar"
 import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
+import Card, { CardProps } from "@mui/material/Card"
+import CardActions from "@mui/material/CardActions"
+import CardContent from "@mui/material/CardContent"
+import { green } from "@mui/material/colors"
+import Skeleton from "@mui/material/Skeleton"
 import { styled } from "@mui/material/styles"
-
-import { getGuildIcon } from "@/utils/discord"
-import { UserGuild } from "@/interfaces/aether"
+import Typography from "@mui/material/Typography"
+import * as React from "react"
 
 interface StyledCard extends CardProps {
   premium: boolean
@@ -26,8 +26,8 @@ const StyledCard = styled(Card)<StyledCard>(({ theme, premium }) => ({
 }))
 
 type Props = {
-  guild?: UserGuild
-  onClickToggle: (guild: UserGuild) => void
+  guild?: PremiumDiscordGuild
+  onClickToggle: (guild: PremiumDiscordGuild) => void
 }
 
 const UserGuildCard = ({ guild, onClickToggle }: Props) => {
@@ -72,9 +72,19 @@ const UserGuildCard = ({ guild, onClickToggle }: Props) => {
         </Box>
       </CardContent>
       <CardActions sx={{ justifyContent: "end" }}>
-        <Button size="small" onClick={onClick}>
-          {guild ? "Toggle" : <Skeleton width={40} animation="wave" />}
-        </Button>
+        {guild?.premium && guild?.managed == null ? (
+          <Tooltip arrow placement="top" title="You cannot manage this server's premium status">
+            <span>
+              <Button size="small" disabled>
+                {guild ? "Toggle" : <Skeleton width={40} animation="wave" />}
+              </Button>
+            </span>
+          </Tooltip>
+        ) : (
+          <Button size="small" onClick={onClick}>
+            {guild ? "Toggle" : <Skeleton width={40} animation="wave" />}
+          </Button>
+        )}
       </CardActions>
     </StyledCard>
   )

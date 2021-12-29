@@ -1,10 +1,9 @@
-import { NextApiHandler, NextApiRequest, NextApiResponse } from "next"
-
 // import { NetworkErrorData } from "./utils/fetcher"
-
-import { Reminder, UserGuild } from "@/interfaces/aether"
-import { Plan } from "@/interfaces/fire"
+import { Reminder } from "@/interfaces/aether"
 import { AuthSession } from "@/interfaces/auth"
+import { Plan } from "@/interfaces/fire"
+import { NextApiHandler, NextApiRequest, NextApiResponse } from "next"
+import { PremiumDiscordGuild } from "./interfaces/discord"
 
 export type AnyObject = Record<string, unknown>
 
@@ -49,7 +48,7 @@ export type PostSubscriptionResponse = { sessionId: string }
 
 export type PostBillingPortalResponse = { url: string }
 
-export type GetGuildsResponse = UserGuild[]
+export type GetGuildsResponse = PremiumDiscordGuild[]
 
 export type GetRemindersResponse = Reminder[]
 
