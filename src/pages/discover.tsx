@@ -60,17 +60,29 @@ const DiscoverPage = () => {
 
   const handleChangePage = (_: unknown, page: number) => {
     setPage(page)
+    const viewable = paginate(
+      guilds.filter((g) => !g.featured),
+      page,
+      9,
+    )
+    viewable?.push(...guilds.filter((g) => g.featured))
+    if (viewable?.length && handler) handler.handleSubscribe("/discover", { guildIds: viewable.map((g) => g.id) })
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const setAndSubscribe = (set: DiscoverableGuild[]) => {
-    const shouldSendSub =
-      set.length != lastSub.length || set.length != initialGuilds.length || !set.every((g) => guilds.includes(g))
     setGuilds(set)
-    const subIds = set.map((g) => g.id)
-    const sameSubIds = subIds.length == lastSub.length && subIds.every((id) => lastSub.includes(id))
-    if (handler && shouldSendSub && !sameSubIds) {
-      setLastSub(subIds)
+    const viewable =
+      paginate(
+        set.filter((g) => !g.featured),
+        page,
+        9,
+      ) ?? []
+    viewable?.push(...set.filter((g) => g.featured))
+    if (!viewable.length) return
+    const subIds = viewable.map((g) => g.id).sort()
+    if ((subIds?.length != lastSub.length || !subIds.every((id, i) => lastSub[i] == id)) && handler) {
+      setLastSub(subIds.sort())
       handler.handleSubscribe("/discover", { guildIds: subIds })
     }
   }
@@ -151,10 +163,10 @@ const DiscoverPage = () => {
     }
     emitter.removeAllListeners("DISCOVERY_UPDATE")
     emitter.on("DISCOVERY_UPDATE", setGuildsWithSort)
-  }, [guilds, initialGuilds, setAndSubscribe, sortIds])
+  }, [guilds, initialGuilds, page, setAndSubscribe, sortIds])
 
   const handleTextChange = (value: string | null | undefined) => {
-    if (!value) return setAndSubscribe(getSortedGuilds(initialGuilds ?? [], sortIds ?? [], true))
+    if (!value) return setAndSubscribe(getSortedGuilds(initialGuilds, sortIds ?? [], true))
 
     const filteredGuilds =
       initialGuilds?.filter((guild) => guild.name.toLowerCase().includes(value.toLowerCase())) || []
