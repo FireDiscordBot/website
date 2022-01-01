@@ -38,6 +38,7 @@ const CommandsPage = () => {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"))
   const [prefix, setPrefix] = React.useState(fire.defaultPrefix)
   const [selectedCategoryIndex, setSelectedCategoryIndex] = React.useState<number>(0)
+  const [preFilterCategoryIndex, setPreFilterCategoryIndex] = React.useState<number>(0)
   const [commands, setCommandsState] = React.useState<Command[]>(
     handler?.commands
       ? handler.commands.filter((c) => c.category == handler.commandCategories[selectedCategoryIndex])
@@ -50,7 +51,7 @@ const CommandsPage = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const getCategories = () => {
     if (!handler) return []
-    return filter
+    const categories = filter
       ? [
           "All",
           ...handler.commandCategories.filter((cat) =>
@@ -58,6 +59,8 @@ const CommandsPage = () => {
           ),
         ]
       : handler.commandCategories
+    if (categories.length == 2 && categories[0] == "All") return categories.slice(1)
+    return categories
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -84,8 +87,15 @@ const CommandsPage = () => {
   }
 
   const handleTextChange = (f: string) => {
+    if (!f) {
+      setSelectedCategoryIndex(preFilterCategoryIndex)
+      setPreFilterCategoryIndex(0)
+    }
     setFilter(f)
-    if (!filter) setSelectedCategoryIndex(0)
+    if (!filter) {
+      setPreFilterCategoryIndex(selectedCategoryIndex)
+      setSelectedCategoryIndex(0)
+    }
     if (filterTimeout) clearTimeout(filterTimeout)
     if (handler) {
       if (filter) setFilterTimeout(setTimeout(() => handler.handleSubscribe("/commands", { filter }), 250))
