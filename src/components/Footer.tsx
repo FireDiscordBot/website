@@ -14,7 +14,7 @@ const Footer = () => {
     <StyledFooter>
       <Container sx={{ display: "flex", justifyContent: "center" }}>
         <Typography variant="caption" color="textSecondary">
-          © 2021 Fire Bot. All Rights Reserved.
+          © 2022 Fire Bot. All Rights Reserved.
         </Typography>
       </Container>
     </StyledFooter>
