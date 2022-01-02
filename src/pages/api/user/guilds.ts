@@ -4,8 +4,12 @@ import { error, withSession } from "@/utils/api-handler-utils"
 import { createErrorResponse } from "@/utils/fetcher"
 
 const handler: AuthenticatedApiHandler<GetGuildsResponse> = async (session, req, res) => {
+  if (!req.query.sessionId) {
+    error(res, 400, "Missing Session ID")
+    return
+  }
   try {
-    const premiumGuilds = await fetchPremiumGuilds(session.accessToken, req.query.sessionId?.toString())
+    const premiumGuilds = await fetchPremiumGuilds(session.accessToken, req.query.sessionId.toString())
     res.json(premiumGuilds)
   } catch (e: any) {
     const errorResponse = createErrorResponse(e)

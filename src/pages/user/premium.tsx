@@ -71,7 +71,7 @@ const PremiumPage = () => {
     mutate: mutateGuilds,
     error: guildsError,
   } = useSWR<PremiumDiscordGuild[]>(
-    session ? (handler?.session ? `/api/user/guilds?sessionId=${handler.session}` : "/api/user/guilds") : null,
+    session ? (handler?.session ? `/api/user/guilds?sessionId=${handler.session}` : null) : null,
     {
       revalidateOnReconnect: false,
       revalidateOnFocus: false,

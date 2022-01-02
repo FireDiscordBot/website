@@ -34,11 +34,8 @@ export const createStripePortalSession = async (accessToken: string) => {
   return json.url
 }
 
-export const fetchPremiumGuilds = async (accessToken: string, sessionId?: string) => {
-  return await requestWithAuth<PremiumDiscordGuild[]>(
-    accessToken,
-    sessionId ? `guilds/premium?sessionId=${sessionId}` : "guilds/premium",
-  )
+export const fetchPremiumGuilds = async (accessToken: string, sessionId: string) => {
+  return await requestWithAuth<PremiumDiscordGuild[]>(accessToken, `guilds/premium?sessionId=${sessionId}`)
 }
 
 export const toggleGuildPremium = async (
