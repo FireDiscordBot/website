@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@date-io/moment": "1.x",
+    "@emotion/cache": "^11.7.1",
     "@emotion/react": "^11.7.1",
     "@emotion/server": "^11.4.0",
     "@emotion/styled": "^11.6.0",
@@ -50,5 +51,6 @@
     "prettier": "^2.3.2",
     "typescript": "^4.5.4"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "packageManager": "yarn@3.1.1"
 }
