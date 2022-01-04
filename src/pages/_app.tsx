@@ -7,7 +7,7 @@ import { Emitter } from "@/lib/ws/socket-emitter"
 import theme from "@/theme"
 import fetcher from "@/utils/fetcher"
 import { isBrowser } from "@/utils/is-browser"
-import AdapterMoment from "@mui/lab/AdapterMoment"
+import AdapterDayjs from "@mui/lab/AdapterDayjs"
 import LocalizationProvider from "@mui/lab/LocalizationProvider"
 import CssBaseline from "@mui/material/CssBaseline"
 import { CacheProvider } from "@emotion/react"
@@ -52,7 +52,7 @@ function FireApp(props: AppProps) {
 
   return (
     <>
-      <LocalizationProvider dateAdapter={AdapterMoment}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Head>
           <title>Fire</title>
           <meta name="viewport" content="initial-scale=1, width=device-width" />
