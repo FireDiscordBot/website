@@ -1,22 +1,23 @@
-import { defaultSeoConfig } from "@/constants"
-import { AetherClient } from "@/lib/ws/aether-client"
-import { Emitter } from "@/lib/ws/socket-emitter"
-import theme from "@/theme"
-import fetcher from "@/utils/fetcher"
-import { isBrowser } from "@/utils/is-browser"
+import { CacheProvider, EmotionCache } from "@emotion/react"
 import AdapterDayjs from "@mui/lab/AdapterDayjs"
 import LocalizationProvider from "@mui/lab/LocalizationProvider"
 import CssBaseline from "@mui/material/CssBaseline"
-import { CacheProvider, EmotionCache } from "@emotion/react"
 import { ThemeProvider } from "@mui/material/styles"
 import { SessionProvider } from "next-auth/react"
 import { DefaultSeo } from "next-seo"
 import { AppProps } from "next/app"
 import Head from "next/head"
-import * as React from "react"
 import { SWRConfig } from "swr"
-import "../nprogress.css"
+
+import { defaultSeoConfig } from "@/constants"
+import { AetherClient } from "@/lib/ws/aether-client"
+import { Emitter } from "@/lib/ws/socket-emitter"
+import theme from "@/theme"
 import createEmotionCache from "@/utils/createEmotionCache"
+import fetcher from "@/utils/fetcher"
+import { isBrowser } from "@/utils/is-browser"
+
+import "../nprogress.css"
 
 if (isBrowser()) {
   import("@/utils/load-nprogress")

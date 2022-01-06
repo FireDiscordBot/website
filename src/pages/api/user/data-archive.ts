@@ -1,8 +1,8 @@
 import { createDataArchive, getDataRequest } from "@/lib/aether"
-import { AnyObject, GetCollectData, PostCollectData } from "@/types"
-import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
-import { NetworkError } from "@/utils/fetcher"
+import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { ApiErrorResponse, methodNotAllowed, respondWithError, respondWithSuccess } from "@/lib/api/response"
+import { AnyObject, GetCollectData, PostCollectData } from "@/types"
+import { NetworkError } from "@/utils/fetcher"
 
 const handler: AuthenticatedApiHandler<PostCollectData | GetCollectData | AnyObject> = async (req, res, session) => {
   if (req.method !== "POST" && req.method !== "GET") {

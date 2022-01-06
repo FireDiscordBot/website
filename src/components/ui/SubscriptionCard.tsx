@@ -1,4 +1,3 @@
-import * as React from "react"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
@@ -6,12 +5,12 @@ import CardActions from "@mui/material/CardActions"
 import CardContent from "@mui/material/CardContent"
 import Typography from "@mui/material/Typography"
 
-import fetcher from "@/utils/fetcher"
-import { PostBillingPortalResponse } from "@/types"
 import useCurrentSubscription from "@/hooks/use-current-subscription"
 import useSession from "@/hooks/use-session"
-import { capitalize, formatDateTime } from "@/utils/formatting"
 import { ApiResponse } from "@/lib/api/response"
+import { PostBillingPortalResponse } from "@/types"
+import fetcher from "@/utils/fetcher"
+import { capitalize, formatDateTime } from "@/utils/formatting"
 
 type DetailLineProps = {
   title: string

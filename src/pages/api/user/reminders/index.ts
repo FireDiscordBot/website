@@ -1,8 +1,8 @@
-import { Reminder } from "@/interfaces/aether"
-import { GetRemindersResponse } from "@/types"
-import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
+import type { Reminder } from "@/interfaces/aether"
 import { fetchUserReminders } from "@/lib/aether"
+import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { internalServerError, respondWithError, respondWithSuccess } from "@/lib/api/response"
+import type { GetRemindersResponse } from "@/types"
 
 const handler: AuthenticatedApiHandler<GetRemindersResponse> = async (_req, res, session) => {
   let reminders: Reminder[]

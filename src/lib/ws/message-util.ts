@@ -2,7 +2,7 @@ import { deflateSync, inflateSync } from "zlib"
 
 import { Message } from "./message"
 
-import { Payload } from "@/interfaces/aether"
+import type { Payload } from "@/interfaces/aether"
 
 export class MessageUtil {
   static encode(message: Message) {

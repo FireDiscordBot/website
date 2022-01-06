@@ -1,7 +1,7 @@
 import { createStripePortalSession } from "@/lib/aether"
-import { PostBillingPortalResponse } from "@/types"
-import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
+import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { methodNotAllowed, respondWithError, respondWithSuccess } from "@/lib/api/response"
+import { PostBillingPortalResponse } from "@/types"
 
 const handler: AuthenticatedApiHandler<PostBillingPortalResponse> = async (req, res, session) => {
   if (req.method !== "POST") {

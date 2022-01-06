@@ -1,6 +1,6 @@
-import Snackbar, { SnackbarOrigin, SnackbarCloseReason } from "@mui/material/Snackbar"
 import Alert, { AlertColor } from "@mui/material/Alert"
-import * as React from "react"
+import Snackbar, { SnackbarCloseReason, SnackbarOrigin } from "@mui/material/Snackbar"
+import { useEffect, useState } from "react"
 
 type Props = {
   message: string | undefined | null
@@ -19,9 +19,9 @@ const SimpleSnackbar = ({
   vertical,
   onFinishCloseAnimation,
 }: Props) => {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = useState(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     setOpen(message != null)
   }, [message])
 

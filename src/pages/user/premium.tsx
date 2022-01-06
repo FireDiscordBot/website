@@ -1,27 +1,27 @@
-import { loadStripe } from "@stripe/stripe-js"
-import * as React from "react"
-import useSWR, { mutate } from "swr"
-import Grid from "@mui/material/Grid"
-import Box from "@mui/material/Box"
-import Typography from "@mui/material/Typography"
 import { Alert, TextField } from "@mui/material"
 import { Pagination } from "@mui/material"
+import Box from "@mui/material/Box"
+import Grid from "@mui/material/Grid"
+import Typography from "@mui/material/Typography"
+import { loadStripe } from "@stripe/stripe-js"
+import { useEffect, useMemo, useState } from "react"
+import useSWR, { mutate } from "swr"
 
 import { emitter, handler } from "../_app"
 
-import { openUrl } from "@/utils/open-url"
-import { discord, stripe as stripeConstants } from "@/constants"
-import fetcher, { createErrorResponse } from "@/utils/fetcher"
-import { PostSubscriptionResponse } from "@/types"
-import { Plan } from "@/interfaces/fire"
-import SelectPlanCard from "@/components/ui/SelectPlanCard"
 import UserPage from "@/components/layout/user-page"
 import Loading from "@/components/loading"
-import UserGuildCard from "@/components/ui/UserGuildCard"
+import SelectPlanCard from "@/components/ui/SelectPlanCard"
 import SubscriptionCard from "@/components/ui/SubscriptionCard"
+import UserGuildCard from "@/components/ui/UserGuildCard"
+import { discord, stripe as stripeConstants } from "@/constants"
 import useCurrentSubscription from "@/hooks/use-current-subscription"
 import useSession from "@/hooks/use-session"
 import { PremiumDiscordGuild } from "@/interfaces/discord"
+import { Plan } from "@/interfaces/fire"
+import { PostSubscriptionResponse } from "@/types"
+import fetcher, { createErrorResponse } from "@/utils/fetcher"
+import { openUrl } from "@/utils/open-url"
 
 if (!stripeConstants.publicKey) {
   throw Error("Env variable NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY not defined")
@@ -78,30 +78,30 @@ const PremiumPage = () => {
       revalidateOnFocus: false,
     },
   )
-  const premiumGuildsCount = React.useMemo(
+  const premiumGuildsCount = useMemo(
     () => initialGuilds?.filter((guild) => guild.premium && guild.managed)?.length ?? 0,
     [initialGuilds],
   )
-  const [guilds, setGuilds] = React.useState(sort(initialGuilds))
+  const [guilds, setGuilds] = useState(sort(initialGuilds))
 
-  const [plansDialogOpen, setPlansDialogOpen] = React.useState(false)
+  const [plansDialogOpen, setPlansDialogOpen] = useState(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!subscription && !isLoadingSubscription) {
       mutate("/api/stripe/subscriptions", fetcher("/api/stripe/subscriptions"))
     }
   }, [subscription, isLoadingSubscription])
 
-  React.useEffect(() => {
+  useEffect(() => {
     const message = subscriptionError?.message ?? guildsError?.message
     setErrorMessage(message)
   }, [subscriptionError, guildsError])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!guilds) setGuilds(sort(initialGuilds))
   }, [guilds, initialGuilds])
 
-  const [page, setPage] = React.useState(1)
+  const [page, setPage] = useState(1)
 
   const handleChangePage = (_: unknown, page: number) => {
     setPage(page)

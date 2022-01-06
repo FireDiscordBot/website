@@ -1,15 +1,15 @@
 import Avatar from "@mui/material/Avatar"
-import * as React from "react"
 import Dialog from "@mui/material/Dialog"
 import List from "@mui/material/List"
 import ListItem from "@mui/material/ListItem"
-import ListItemText from "@mui/material/ListItemText"
 import ListItemAvatar from "@mui/material/ListItemAvatar"
+import ListItemText from "@mui/material/ListItemText"
 
-import { formatNumber } from "@/utils/formatting"
-import { Plan } from "@/interfaces/fire"
-import useAvailablePlans from "@/hooks/use-available-plans"
 import DialogTitle from "./DialogTitle"
+
+import useAvailablePlans from "@/hooks/use-available-plans"
+import { Plan } from "@/interfaces/fire"
+import { formatNumber } from "@/utils/formatting"
 
 type Props = {
   open: boolean

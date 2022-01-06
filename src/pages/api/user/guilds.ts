@@ -1,8 +1,8 @@
 import { fetchPremiumGuilds } from "@/lib/aether"
-import { GetGuildsResponse } from "@/types"
-import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
-import { createErrorResponse } from "@/utils/fetcher"
+import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { badRequest, internalServerError, respondWithError, respondWithSuccess } from "@/lib/api/response"
+import { GetGuildsResponse } from "@/types"
+import { createErrorResponse } from "@/utils/fetcher"
 
 const handler: AuthenticatedApiHandler<GetGuildsResponse> = async (req, res, session) => {
   if (!req.query.sessionId) {

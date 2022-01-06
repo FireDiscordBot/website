@@ -1,7 +1,7 @@
 import { getReasonPhrase, StatusCodes } from "http-status-codes"
 
-import { AnyObject } from "@/types"
-import { ApiErrorResponse } from "@/lib/api/response"
+import type { ApiErrorResponse } from "@/lib/api/response"
+import type { AnyObject } from "@/types"
 
 export class NetworkError extends Error {
   data?: AnyObject

@@ -1,7 +1,6 @@
-import * as React from "react"
+import CloseIcon from "@mui/icons-material/Close"
 import MuiDialogTitle from "@mui/material/DialogTitle"
 import IconButton from "@mui/material/IconButton"
-import CloseIcon from "@mui/icons-material/Close"
 import Typography from "@mui/material/Typography"
 
 export interface DialogTitleProps {

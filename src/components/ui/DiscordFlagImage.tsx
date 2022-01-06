@@ -1,6 +1,5 @@
-import * as React from "react"
-import Image from "next/image"
 import Tooltip from "@mui/material/Tooltip"
+import Image from "next/image"
 
 import { DiscordFlag } from "@/interfaces/discord"
 

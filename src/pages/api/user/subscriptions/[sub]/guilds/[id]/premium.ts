@@ -1,6 +1,5 @@
 import { toggleGuildPremium } from "@/lib/aether"
-import { PutTogglePremiumGuildResponse } from "@/types"
-import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
+import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import {
   badRequest,
   internalServerError,
@@ -8,6 +7,7 @@ import {
   respondWithError,
   respondWithSuccess,
 } from "@/lib/api/response"
+import { PutTogglePremiumGuildResponse } from "@/types"
 
 const handler: AuthenticatedApiHandler<PutTogglePremiumGuildResponse> = async (req, res, session) => {
   if (req.method !== "PUT" && req.method !== "DELETE") {

@@ -1,3 +1,13 @@
+import EventEmitter from "events"
+
+import { getSession, signIn, signOut } from "next-auth/react"
+import Router, { Router as RouterType } from "next/router"
+import { UAParser } from "ua-parser-js"
+
+import { Message } from "./message"
+import { MessageUtil } from "./message-util"
+import { Websocket } from "./websocket"
+
 import {
   Command,
   EventType,
@@ -7,16 +17,9 @@ import {
   SessionInfo,
   WebsiteGateway,
 } from "@/interfaces/aether"
-import { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
-import routeBuilder from "@/utils/api-router"
+import type { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
 import { fetchUser, getAvatarImageUrl, getBannerImage } from "@/lib/discord"
-import EventEmitter from "events"
-import { getSession, signIn, signOut } from "next-auth/react"
-import Router, { Router as RouterType } from "next/router"
-import { UAParser } from "ua-parser-js"
-import { Message } from "./message"
-import { MessageUtil } from "./message-util"
-import { Websocket } from "./websocket"
+import routeBuilder from "@/utils/api-router"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 

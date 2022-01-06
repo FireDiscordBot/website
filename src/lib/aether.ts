@@ -1,8 +1,8 @@
 import { fire } from "@/constants"
-import fetcher from "@/utils/fetcher"
 import { AdminSessionData, BuildOverride, Reminder } from "@/interfaces/aether"
-import { GetCollectData } from "@/types"
 import { PremiumDiscordGuild } from "@/interfaces/discord"
+import { GetCollectData } from "@/types"
+import fetcher from "@/utils/fetcher"
 
 export const requestWithAuth = <R = never>(accessToken: string, path: string, method?: string, body?: unknown) =>
   fetcher<R>(`${fire.aetherApiUrl}/${path}`, {

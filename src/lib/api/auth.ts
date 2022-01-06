@@ -1,6 +1,7 @@
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next"
 import type { Session } from "next-auth"
 import { getSession } from "next-auth/react"
+
 import { ApiResponse, respondWithError, unauthorized } from "./response"
 
 export type AuthenticatedApiHandler<D> = (

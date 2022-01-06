@@ -1,6 +1,6 @@
-import { APIUser, DiscordFlag, DiscordGuild, flags, PartialOAuthUser } from "@/interfaces/discord"
-import { UserGuild } from "@/interfaces/aether"
 import { messageLinkRegex } from "@/constants"
+import { UserGuild } from "@/interfaces/aether"
+import { APIUser, DiscordFlag, DiscordGuild, PartialOAuthUser, flags } from "@/interfaces/discord"
 import fetcher from "@/utils/fetcher"
 
 export const fetchGuilds = async (accessToken: string): Promise<DiscordGuild[]> => {

@@ -1,23 +1,23 @@
-import * as React from "react"
-import { useRouter } from "next/router"
-import Paper from "@mui/material/Paper"
-import Container from "@mui/material/Container"
-import Tabs, { TabsProps, tabsClasses } from "@mui/material/Tabs"
-import Tab from "@mui/material/Tab"
-import Box from "@mui/material/Box"
-import Grid from "@mui/material/Grid"
-import useMediaQuery from "@mui/material/useMediaQuery"
-import { Theme, styled } from "@mui/material/styles"
 import { TextField } from "@mui/material"
+import Box from "@mui/material/Box"
+import Container from "@mui/material/Container"
+import Grid from "@mui/material/Grid"
+import Paper from "@mui/material/Paper"
+import Tab from "@mui/material/Tab"
+import Tabs, { TabsProps, tabsClasses } from "@mui/material/Tabs"
 import { red } from "@mui/material/colors"
+import { Theme, styled } from "@mui/material/styles"
+import useMediaQuery from "@mui/material/useMediaQuery"
+import { useRouter } from "next/router"
+import { ChangeEvent, useEffect, useState } from "react"
 
 import { emitter, handler } from "./_app"
 
+import DefaultLayout from "@/components/layout/default"
+import Loading from "@/components/loading"
+import CommandAccordion from "@/components/ui/CommandAccordion"
 import { fire } from "@/constants"
 import { Command } from "@/interfaces/aether"
-import DefaultLayout from "@/components/layout/default"
-import CommandAccordion from "@/components/ui/CommandAccordion"
-import Loading from "@/components/loading"
 
 interface CategoriesTabsProps extends TabsProps {
   isMobile: boolean
@@ -36,17 +36,17 @@ const CommandsPage = () => {
   const router = useRouter()
 
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"))
-  const [prefix, setPrefix] = React.useState(fire.defaultPrefix)
-  const [selectedCategoryIndex, setSelectedCategoryIndex] = React.useState<number>(0)
-  const [preFilterCategoryIndex, setPreFilterCategoryIndex] = React.useState<number>(0)
-  const [commands, setCommandsState] = React.useState<Command[]>(
+  const [prefix, setPrefix] = useState(fire.defaultPrefix)
+  const [selectedCategoryIndex, setSelectedCategoryIndex] = useState<number>(0)
+  const [preFilterCategoryIndex, setPreFilterCategoryIndex] = useState<number>(0)
+  const [commands, setCommandsState] = useState<Command[]>(
     handler?.commands
       ? handler.commands.filter((c) => c.category == handler.commandCategories[selectedCategoryIndex])
       : [],
   )
-  const [filter, setFilter] = React.useState<string>("")
-  const [filterTimeout, setFilterTimeout] = React.useState<NodeJS.Timeout | null>(null)
-  const [cachedCategories, setCachedCategories] = React.useState<string[]>([])
+  const [filter, setFilter] = useState<string>("")
+  const [filterTimeout, setFilterTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [cachedCategories, setCachedCategories] = useState<string[]>([])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const getCategories = () => {
@@ -74,7 +74,7 @@ const CommandsPage = () => {
     )
   }
 
-  const onChangeSelectedTab = (event: React.ChangeEvent<unknown>, _: number) => {
+  const onChangeSelectedTab = (event: ChangeEvent<unknown>, _: number) => {
     const categoryName = (event.target as HTMLSpanElement).textContent
     if (!categoryName) return
     let index = getCategories().indexOf(categoryName)
@@ -103,7 +103,7 @@ const CommandsPage = () => {
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const setCommands = (commands: Command[]) => {
       if (!handler) return
       handler.commands = [...handler.commands, ...commands]
@@ -122,7 +122,7 @@ const CommandsPage = () => {
     })
   }, [cachedCategories, commands, filter, getCategories, selectedCategoryIndex, updateCommandsList])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (typeof router.query.prefix === "string") {
       setPrefix(router.query.prefix)
     }

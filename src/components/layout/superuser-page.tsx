@@ -1,12 +1,11 @@
-import * as React from "react"
 import { NextSeoProps } from "next-seo"
 import { useState } from "react"
 
-import UserPageLayout from "./user-page"
 import DefaultLayout from "./default"
+import UserPageLayout from "./user-page"
 
-import { emitter, handler } from "@/pages/_app"
 import Loading from "@/components/loading"
+import { emitter, handler } from "@/pages/_app"
 
 export enum SuperuserPageTypes {
   DEFAULT,

@@ -1,6 +1,6 @@
-import * as React from "react"
-import NextLink, { LinkProps } from "next/link"
 import MenuItem from "@mui/material/MenuItem"
+import NextLink, { LinkProps } from "next/link"
+import { forwardRef, ForwardRefRenderFunction, PropsWithChildren } from "react"
 
 import { AnyObject } from "@/types"
 
@@ -15,11 +15,11 @@ const ListItemLink: React.ForwardRefRenderFunction<never, React.PropsWithChildre
   </li>
 )
 
-const ForwardedListItemLink = React.forwardRef<never, React.PropsWithChildren<AnyObject>>(ListItemLink)
+const ForwardedListItemLink = forwardRef<never, React.PropsWithChildren<AnyObject>>(ListItemLink)
 
-type LinkAndChildrenProps = React.PropsWithChildren<LinkProps>
+type LinkAndChildrenProps = PropsWithChildren<LinkProps>
 
-const Link: React.ForwardRefRenderFunction<never, LinkAndChildrenProps> = (
+const Link: ForwardRefRenderFunction<never, LinkAndChildrenProps> = (
   { href, as, replace, scroll, shallow, prefetch, locale, passHref, children, ...otherProps },
   ref,
 ) => {
@@ -33,14 +33,14 @@ const Link: React.ForwardRefRenderFunction<never, LinkAndChildrenProps> = (
   )
 }
 
-const ForwardedLink = React.forwardRef<never, LinkAndChildrenProps>(Link)
+const ForwardedLink = forwardRef<never, LinkAndChildrenProps>(Link)
 
-const MenuItemLink: React.ForwardRefRenderFunction<never, LinkAndChildrenProps> = ({ children, ...linkProps }, ref) => (
+const MenuItemLink: ForwardRefRenderFunction<never, LinkAndChildrenProps> = ({ children, ...linkProps }, ref) => (
   <MenuItem {...linkProps} component={ForwardedLink} ref={ref}>
     {children}
   </MenuItem>
 )
 
-const ForwardedMenuItemLink = React.forwardRef<never, LinkAndChildrenProps>(MenuItemLink)
+const ForwardedMenuItemLink = forwardRef<never, LinkAndChildrenProps>(MenuItemLink)
 
 export default ForwardedMenuItemLink

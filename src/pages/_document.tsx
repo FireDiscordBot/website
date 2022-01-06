@@ -1,6 +1,7 @@
-import * as React from "react"
-import Document, { Html, Head, Main, NextScript } from "next/document"
 import createEmotionServer from "@emotion/server/create-instance"
+import Document, { Head, Html, Main, NextScript } from "next/document"
+import { Children } from "react"
+
 import createEmotionCache from "../utils/createEmotionCache"
 
 import theme from "@/theme"
@@ -50,6 +51,6 @@ MyDocument.getInitialProps = async (ctx) => {
 
   return {
     ...initialProps,
-    styles: [...emotionStyleTags, ...React.Children.toArray(initialProps.styles)],
+    styles: [...emotionStyleTags, ...Children.toArray(initialProps.styles)],
   }
 }

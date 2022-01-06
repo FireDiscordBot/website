@@ -1,17 +1,16 @@
-import * as React from "react"
+import Avatar from "@mui/material/Avatar"
 import Card from "@mui/material/Card"
 import CardActionArea from "@mui/material/CardActionArea"
 import CardContent from "@mui/material/CardContent"
 import CardMedia from "@mui/material/CardMedia"
-import Typography from "@mui/material/Typography"
-import Avatar from "@mui/material/Avatar"
 import Skeleton from "@mui/material/Skeleton"
+import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
 
 import { DiscoverableGuild } from "@/interfaces/aether"
-import { formatNumber } from "@/utils/formatting"
 import { Invite } from "@/interfaces/discord"
 import { emitter, handler } from "@/pages/_app"
+import { formatNumber } from "@/utils/formatting"
 
 const StyledCard = styled(Card)({
   height: "100%",

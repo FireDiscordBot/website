@@ -1,17 +1,18 @@
-import { PremiumDiscordGuild } from "@/interfaces/discord"
-import { getGuildIcon } from "@/lib/discord"
-import Tooltip from "@mui/material/Tooltip"
 import Avatar from "@mui/material/Avatar"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Card, { CardProps } from "@mui/material/Card"
 import CardActions from "@mui/material/CardActions"
 import CardContent from "@mui/material/CardContent"
-import { green } from "@mui/material/colors"
 import Skeleton from "@mui/material/Skeleton"
-import { styled } from "@mui/material/styles"
+import Tooltip from "@mui/material/Tooltip"
 import Typography from "@mui/material/Typography"
-import * as React from "react"
+import { green } from "@mui/material/colors"
+import { styled } from "@mui/material/styles"
+import { MouseEvent, useMemo } from "react"
+
+import { PremiumDiscordGuild } from "@/interfaces/discord"
+import { getGuildIcon } from "@/lib/discord"
 
 interface StyledCard extends CardProps {
   premium: boolean
@@ -31,7 +32,7 @@ type Props = {
 }
 
 const UserGuildCard = ({ guild, onClickToggle }: Props) => {
-  const avatar = React.useMemo(() => {
+  const avatar = useMemo(() => {
     if (!guild) {
       return (
         <Skeleton animation="wave">
@@ -44,7 +45,7 @@ const UserGuildCard = ({ guild, onClickToggle }: Props) => {
     return guildIcon.type == "text" ? <Avatar>{guildIcon.value}</Avatar> : <Avatar src={guildIcon.value} />
   }, [guild])
 
-  const onClick = (event: React.MouseEvent) => {
+  const onClick = (event: MouseEvent) => {
     if (!guild) return
     event.preventDefault()
     onClickToggle(guild)

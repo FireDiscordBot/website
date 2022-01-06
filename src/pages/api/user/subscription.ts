@@ -1,10 +1,8 @@
 import { Stripe } from "stripe"
 
-import { createErrorResponse } from "@/utils/fetcher"
 import stripe from "@/api/server-stripe"
 import { createStripeCheckoutSession, fetchCustomerId } from "@/lib/aether"
-import { GetSubscriptionResponse, PostSubscriptionResponse } from "@/types"
-import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
+import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import {
   badRequest,
   internalServerError,
@@ -12,6 +10,8 @@ import {
   respondWithError,
   respondWithSuccess,
 } from "@/lib/api/response"
+import { GetSubscriptionResponse, PostSubscriptionResponse } from "@/types"
+import { createErrorResponse } from "@/utils/fetcher"
 
 const subscriptionComparator = (first: Stripe.Subscription, second: Stripe.Subscription) => {
   const getStatusWeight = (status: Stripe.Subscription.Status) => {

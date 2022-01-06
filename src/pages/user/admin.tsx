@@ -1,20 +1,20 @@
-import * as React from "react"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import FormControl from "@mui/material/FormControl"
 import Grid from "@mui/material/Grid"
 import InputLabel from "@mui/material/InputLabel"
 import MenuItem from "@mui/material/MenuItem"
+import Select, { SelectChangeEvent } from "@mui/material/Select"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
-import Select, { SelectChangeEvent } from "@mui/material/Select"
 import { styled } from "@mui/material/styles"
+import { useState } from "react"
 
 import { handler } from "../_app"
 
 import SuperuserLayout, { SuperuserPageTypes } from "@/components/layout/superuser-page"
-import useSession from "@/hooks/use-session"
 import Loading from "@/components/loading"
+import useSession from "@/hooks/use-session"
 
 const StyledFormControl = styled(FormControl)(({ theme }) => ({
   margin: theme.spacing(1),
@@ -25,10 +25,10 @@ const snowflakeRegex = /\d{15,21}/
 
 const AdminPage = () => {
   const [session, loading] = useSession({ redirectTo: "/" })
-  const [experiment, setExperiment] = React.useState<string>("")
-  const [experimentType, setExperimentType] = React.useState<string>("")
-  const [applyToID, setID] = React.useState<string>("")
-  const [bucket, setBucket] = React.useState<number>(0)
+  const [experiment, setExperiment] = useState<string>("")
+  const [experimentType, setExperimentType] = useState<string>("")
+  const [applyToID, setID] = useState<string>("")
+  const [bucket, setBucket] = useState<number>(0)
 
   const handleExperimentChange = (event: SelectChangeEvent) => {
     setExperiment(event.target.value as string)

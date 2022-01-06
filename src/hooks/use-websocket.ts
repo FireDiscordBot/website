@@ -3,13 +3,13 @@ import { AetherClient } from "@/lib/ws/aether-client"
 import { Websocket } from "@/lib/ws/websocket"
 import { EventEmitter } from "events"
 import { getSession } from "next-auth/react"
-import * as React from "react"
+import { useEffect, useState } from "react"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const useWebsocket = (emitter: EventEmitter) => {
-  const [handler, setHandler] = React.useState<AetherClient>()
-  React.useEffect(() => {
+  const [handler, setHandler] = useState<AetherClient>()
+  useEffect(() => {
     let ws: Websocket
     const initHandler = async () => {
       const session = await getSession()

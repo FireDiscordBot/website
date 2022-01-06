@@ -1,7 +1,7 @@
 import useSWR, { SWRConfiguration } from "swr"
 
-import { Plan } from "@/interfaces/fire"
-import { ApiResponse } from "@/lib/api/response"
+import type { Plan } from "@/interfaces/fire"
+import type { ApiResponse } from "@/lib/api/response"
 
 const useAvailablePlans = (load = true, config?: SWRConfiguration<ApiResponse<Plan[]>>) => {
   const { data: res, error } = useSWR<ApiResponse<Plan[]>>(load ? "/api/stripe/subscriptions" : null, config)

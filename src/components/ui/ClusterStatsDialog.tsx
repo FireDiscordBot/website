@@ -1,6 +1,4 @@
-import { ClusterStats } from "@/interfaces/aether"
-import { handler } from "@/pages/_app"
-import { formatBytes, formatNumber } from "@/utils/formatting"
+import PeopleIcon from "@mui/icons-material/People"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
@@ -10,9 +8,13 @@ import DialogContent from "@mui/material/DialogContent"
 import Grid from "@mui/material/Grid"
 import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
-import PeopleIcon from "@mui/icons-material/People"
+
 import CircularProgressCard from "./CircularProgressCard"
 import DialogTitle from "./DialogTitle"
+
+import { ClusterStats } from "@/interfaces/aether"
+import { handler } from "@/pages/_app"
+import { formatBytes, formatNumber } from "@/utils/formatting"
 
 type StatLineProps = {
   title: string

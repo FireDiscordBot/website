@@ -1,7 +1,7 @@
 import useSWR from "swr"
 
+import type { ApiResponse } from "@/lib/api/response"
 import { GetSubscriptionResponse } from "@/types"
-import { ApiResponse } from "@/lib/api/response"
 
 const useCurrentSubscription = (hasSession = true) => {
   const { data: res, error } = useSWR<ApiResponse<GetSubscriptionResponse>>(

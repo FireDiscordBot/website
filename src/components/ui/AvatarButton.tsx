@@ -1,8 +1,9 @@
-import { getAvatarImageUrl } from "@/lib/discord"
 import Avatar from "@mui/material/Avatar"
 import IconButton, { IconButtonProps } from "@mui/material/IconButton"
 import type { Session } from "next-auth"
 import { useMemo } from "react"
+
+import { getAvatarImageUrl } from "@/lib/discord"
 
 type Props = IconButtonProps<"button", { user: Session["user"] }>
 

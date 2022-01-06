@@ -1,20 +1,21 @@
-import useSession from "@/hooks/use-session"
 import AppBar, { AppBarProps } from "@mui/material/AppBar"
-import Button from "@mui/material/Button"
 import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
 import Container from "@mui/material/Container"
 import Link from "@mui/material/Link"
 import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
-import useScrollTrigger from "@mui/material/useScrollTrigger"
 import { styled } from "@mui/material/styles"
+import useScrollTrigger from "@mui/material/useScrollTrigger"
 import { signIn, signOut } from "next-auth/react"
 import NextImage from "next/image"
 import NextLink from "next/link"
 import { useRouter } from "next/router"
-import * as React from "react"
+import { useState } from "react"
+
 import AvatarButton from "@/components/ui/AvatarButton"
 import UserAvatarMenu from "@/components/ui/UserAvatarMenu"
+import useSession from "@/hooks/use-session"
 
 interface StyledAppBarProps extends AppBarProps {
   scrolled: boolean
@@ -31,7 +32,7 @@ const StyledAppBar = styled(AppBar, {
 }))
 
 const NavBar = () => {
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const scrollTrigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 0,

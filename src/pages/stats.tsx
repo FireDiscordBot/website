@@ -1,21 +1,21 @@
-import { useRouter } from "next/router"
-import * as React from "react"
-import Container from "@mui/material/Container"
-import Grid from "@mui/material/Grid"
+import StorageIcon from "@mui/icons-material/Storage"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
+import Container from "@mui/material/Container"
+import Grid from "@mui/material/Grid"
 import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
-import StorageIcon from "@mui/icons-material/Storage"
+import { useRouter } from "next/router"
+import { useCallback, useEffect, useState } from "react"
 
 import { emitter, handler } from "./_app"
 
-import ClusterStatsDialog from "@/components/ui/ClusterStatsDialog"
 import DefaultLayout from "@/components/layout/default"
+import CircularProgressCard from "@/components/ui/CircularProgressCard"
+import ClusterCard from "@/components/ui/ClusterCard"
+import ClusterStatsDialog from "@/components/ui/ClusterStatsDialog"
 import { ClusterStats, InitialStats } from "@/interfaces/aether"
 import { formatBytes, formatNumber } from "@/utils/formatting"
-import ClusterCard from "@/components/ui/ClusterCard"
-import CircularProgressCard from "@/components/ui/CircularProgressCard"
 
 const StyledStorageIcon = styled(StorageIcon)(({ theme }) => ({
   fontSize: theme.spacing(10),
@@ -36,11 +36,11 @@ const StyledCardContent = styled(CardContent)({
 const StatsPage = () => {
   const router = useRouter()
 
-  const [initialStats, setInitialStats] = React.useState<InitialStats | undefined>(undefined)
-  const [clusterStats, setClusterStats] = React.useState<ClusterStats[]>([])
-  const [selectedClusterStats, setSelectedClusterStats] = React.useState<ClusterStats | undefined>(undefined)
+  const [initialStats, setInitialStats] = useState<InitialStats | undefined>(undefined)
+  const [clusterStats, setClusterStats] = useState<ClusterStats[]>([])
+  const [selectedClusterStats, setSelectedClusterStats] = useState<ClusterStats | undefined>(undefined)
 
-  const findClusterStats = React.useCallback(
+  const findClusterStats = useCallback(
     (id: number) => {
       return clusterStats.find((cluster) => cluster.id === id)
     },
@@ -61,7 +61,7 @@ const StatsPage = () => {
     window?.history.replaceState(null, "", "/stats")
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     emitter.removeAllListeners("REALTIME_STATS")
     emitter.on("REALTIME_STATS", (stats) => {
       const clusterStatsCopy = [...clusterStats]
@@ -105,7 +105,7 @@ const StatsPage = () => {
     })
   }, [clusterStats, initialStats?.clusterCount])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (typeof router.query.cluster === "string") {
       const clusterId = parseInt(router.query.cluster, 10)
       setSelectedClusterStats(findClusterStats(clusterId))
@@ -113,7 +113,7 @@ const StatsPage = () => {
     }
   }, [findClusterStats, router.query, selectedClusterStats])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedClusterStats) {
       setSelectedClusterStats(findClusterStats(selectedClusterStats.id))
       window?.history.replaceState(null, "", `/stats?cluster=${selectedClusterStats.id}`)

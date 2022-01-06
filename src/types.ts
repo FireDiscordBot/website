@@ -1,7 +1,6 @@
-// import { NetworkErrorData } from "./utils/fetcher"
-import { Reminder } from "@/interfaces/aether"
-import { Plan } from "@/interfaces/fire"
-import { PremiumDiscordGuild } from "./interfaces/discord"
+import type { PremiumDiscordGuild } from "./interfaces/discord"
+import type { Reminder } from "@/interfaces/aether"
+import type { Plan } from "@/interfaces/fire"
 
 export type AnyObject = Record<string, unknown>
 

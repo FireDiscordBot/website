@@ -1,7 +1,7 @@
 import { createUserReminder } from "@/lib/aether"
-import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
-import { NetworkError } from "@/utils/fetcher"
+import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { badRequest, methodNotAllowed, respondWithError, respondWithSuccess } from "@/lib/api/response"
+import { NetworkError } from "@/utils/fetcher"
 
 // TODO: typing
 const handler: AuthenticatedApiHandler<any> = async (req, res, session) => {

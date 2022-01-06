@@ -1,7 +1,7 @@
 import { deleteUserReminder } from "@/lib/aether"
-import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
-import { NetworkError } from "@/utils/fetcher"
+import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { badRequest, respondWithError, respondWithSuccess } from "@/lib/api/response"
+import { NetworkError } from "@/utils/fetcher"
 
 const handler: AuthenticatedApiHandler<null> = async (req, res, session) => {
   if (!req.query.timestamp || parseInt(req.query.timestamp as string) < +new Date()) {

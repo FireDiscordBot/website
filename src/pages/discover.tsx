@@ -1,16 +1,16 @@
-import * as React from "react"
-import Container from "@mui/material/Container"
-import Grid from "@mui/material/Grid"
-import Box from "@mui/material/Box"
 import { TextField, Typography } from "@mui/material"
 import { Pagination } from "@mui/material"
+import Box from "@mui/material/Box"
+import Container from "@mui/material/Container"
+import Grid from "@mui/material/Grid"
+import { useEffect, useState } from "react"
 
 import { emitter, handler } from "./_app"
 
 import DefaultLayout from "@/components/layout/default"
+import Loading from "@/components/loading"
 import DiscoverableGuildCard from "@/components/ui/DiscoverableGuildCard"
 import { DiscoverableGuild, DiscoveryUpdateOp } from "@/interfaces/aether"
-import Loading from "@/components/loading"
 
 interface DiscoverySync {
   op: DiscoveryUpdateOp
@@ -51,12 +51,12 @@ const paginate = function (array: DiscoverableGuild[], index: number, size: numb
 }
 
 const DiscoverPage = () => {
-  const [sortIds, setSortIds] = React.useState<string[] | null>(null)
-  const [guilds, setGuilds] = React.useState<DiscoverableGuild[]>([])
-  const [initialGuilds, setInitialGuilds] = React.useState<DiscoverableGuild[]>([])
-  const [lastSub, setLastSub] = React.useState<string[]>([])
+  const [sortIds, setSortIds] = useState<string[] | null>(null)
+  const [guilds, setGuilds] = useState<DiscoverableGuild[]>([])
+  const [initialGuilds, setInitialGuilds] = useState<DiscoverableGuild[]>([])
+  const [lastSub, setLastSub] = useState<string[]>([])
 
-  const [page, setPage] = React.useState(1)
+  const [page, setPage] = useState(1)
 
   const handleChangePage = (_: unknown, page: number) => {
     setPage(page)
@@ -87,7 +87,7 @@ const DiscoverPage = () => {
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const setGuildsWithSort = (updated: DiscoverySync | DiscoverableGuild[]) => {
       if (Array.isArray(updated)) {
         // this will always be sending the full list and usually only on the first load

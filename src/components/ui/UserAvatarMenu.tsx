@@ -1,11 +1,9 @@
-import * as React from "react"
+import { AccountCircle, Code, Event, ExitToApp, Star } from "@mui/icons-material"
+import { ListItemIcon, ListItemText } from "@mui/material"
 import Menu, { MenuProps } from "@mui/material/Menu"
 import MenuItem, { MenuItemProps } from "@mui/material/MenuItem"
-import { AccountCircle, Event, ExitToApp, Star, Code } from "@mui/icons-material"
-import { ListItemIcon, ListItemText } from "@mui/material"
 
 import MenuItemLink from "@/components/routing/MenuItemLink"
-
 import { handler } from "@/pages/_app"
 
 type Props = MenuProps & { onClickLogout: MenuItemProps["onClick"] }

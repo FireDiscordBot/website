@@ -1,9 +1,8 @@
-import { NextSeo, NextSeoProps } from "next-seo"
-import * as React from "react"
 import Box from "@mui/material/Box"
+import { NextSeo, NextSeoProps } from "next-seo"
 
-import NavBar from "@/components/layout/NavBar"
 import Footer from "@/components/layout/Footer"
+import NavBar from "@/components/layout/NavBar"
 
 type Props = NextSeoProps & {
   children?: React.ReactNode

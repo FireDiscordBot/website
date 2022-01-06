@@ -1,6 +1,5 @@
-import * as React from "react"
-import { useEffect, useState } from "react"
-import Typography from "@mui/material/Typography"
+import { Delete } from "@mui/icons-material"
+import DateTimePicker from "@mui/lab/DateTimePicker"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
@@ -8,18 +7,18 @@ import Grid from "@mui/material/Grid"
 import IconButton from "@mui/material/IconButton"
 import LinearProgress, { linearProgressClasses } from "@mui/material/LinearProgress"
 import TextField from "@mui/material/TextField"
-import { Delete } from "@mui/icons-material"
-import useSWR from "swr"
 import Tooltip from "@mui/material/Tooltip"
+import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
-import DateTimePicker from "@mui/lab/DateTimePicker"
-import { StatusCodes } from "http-status-codes"
 import dayjs from "dayjs"
+import { StatusCodes } from "http-status-codes"
+import { useEffect, useState } from "react"
+import useSWR from "swr"
 
 import { emitter } from "../_app"
 
-import useSession from "@/hooks/use-session"
 import UserPageLayout from "@/components/layout/user-page"
+import useSession from "@/hooks/use-session"
 import { Reminder } from "@/interfaces/aether"
 import { getTimestamp } from "@/lib/discord"
 
@@ -45,9 +44,9 @@ const Reminders = () => {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   })
-  const [reminders, setReminders] = React.useState<Reminder[] | undefined>(data)
+  const [reminders, setReminders] = useState<Reminder[] | undefined>(data)
 
-  React.useEffect(() => {
+  useEffect(() => {
     emitter.removeAllListeners("REMINDERS_UPDATE")
     emitter.on("REMINDERS_UPDATE", setReminders)
   }, [reminders])
