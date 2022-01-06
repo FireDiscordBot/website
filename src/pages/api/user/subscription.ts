@@ -5,7 +5,7 @@ import { createErrorResponse } from "@/utils/fetcher"
 import stripe from "@/api/server-stripe"
 import { createStripeCheckoutSession, fetchCustomerId } from "@/lib/aether"
 import { AuthenticatedApiHandler, GetSubscriptionResponse, PostSubscriptionResponse } from "@/types"
-import { error, withSession } from "@/utils/api-handler-utils"
+import { error, withSession } from "@/lib/api/api-handler-utils"
 
 const subscriptionComparator = (first: Stripe.Subscription, second: Stripe.Subscription) => {
   const getStatusWeight = (status: Stripe.Subscription.Status) => {

@@ -1,6 +1,6 @@
 import { Reminder } from "@/interfaces/aether"
 import { AuthenticatedApiHandler, GetRemindersResponse } from "@/types"
-import { error, withSession } from "@/utils/api-handler-utils"
+import { error, withSession } from "@/lib/api/api-handler-utils"
 import { createErrorResponse } from "@/utils/fetcher"
 import { fetchUserReminders } from "@/lib/aether"
 

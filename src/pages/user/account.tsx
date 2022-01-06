@@ -13,12 +13,12 @@ import useSWR from "swr"
 
 import { emitter, handler } from "../_app"
 
-import UserPageLayout from "@/layouts/user-page"
+import UserPageLayout from "@/components/layout/user-page"
 import Loading from "@/components/loading"
-import DiscordFlagImage from "@/components/DiscordFlagImage"
+import DiscordFlagImage from "@/components/ui/DiscordFlagImage"
 import useSession from "@/hooks/use-session"
 import useCurrentSubscription from "@/hooks/use-current-subscription"
-import { parseFlags } from "@/utils/discord"
+import { parseFlags } from "@/lib/discord"
 import { GetCollectData } from "@/types"
 
 type DataRequestResponse =

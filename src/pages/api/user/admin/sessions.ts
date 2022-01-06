@@ -2,7 +2,7 @@ import { StatusCodes } from "http-status-codes"
 
 import { getSessions } from "@/lib/aether"
 import { AnyObject, AuthenticatedApiHandler } from "@/types"
-import { error, withSession } from "@/utils/api-handler-utils"
+import { error, withSession } from "@/lib/api/api-handler-utils"
 import { NetworkError } from "@/utils/fetcher"
 import { AdminSessionData } from "@/interfaces/aether"
 

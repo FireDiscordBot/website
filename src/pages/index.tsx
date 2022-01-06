@@ -9,7 +9,7 @@ import CardContent from "@mui/material/CardContent"
 import { styled } from "@mui/material/styles"
 import GitHubIcon from "@mui/icons-material/GitHub"
 
-import DefaultLayout from "@/layouts/default"
+import DefaultLayout from "@/components/layout/default"
 import { discord, fire } from "@/constants"
 
 type Feature = {

@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes"
 import { createErrorResponse } from "@/utils/fetcher"
 import { toggleGuildPremium } from "@/lib/aether"
 import { AuthenticatedApiHandler, PutTogglePremiumGuildResponse } from "@/types"
-import { error, withSession } from "@/utils/api-handler-utils"
+import { error, withSession } from "@/lib/api/api-handler-utils"
 
 const handler: AuthenticatedApiHandler<PutTogglePremiumGuildResponse> = async (session, req, res) => {
   if (req.method != "PUT" && req.method != "DELETE") {

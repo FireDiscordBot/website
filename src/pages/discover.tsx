@@ -7,8 +7,8 @@ import { Pagination } from "@mui/material"
 
 import { emitter, handler } from "./_app"
 
-import DefaultLayout from "@/layouts/default"
-import DiscoverableGuildCard from "@/components/DiscoverableGuildCard"
+import DefaultLayout from "@/components/layout/default"
+import DiscoverableGuildCard from "@/components/ui/DiscoverableGuildCard"
 import { DiscoverableGuild, DiscoveryUpdateOp } from "@/interfaces/aether"
 import Loading from "@/components/loading"
 

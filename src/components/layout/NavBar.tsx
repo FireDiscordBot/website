@@ -13,8 +13,8 @@ import NextImage from "next/image"
 import NextLink from "next/link"
 import { useRouter } from "next/router"
 import * as React from "react"
-import AvatarButton from "./AvatarButton"
-import UserAvatarMenu from "./UserAvatarMenu"
+import AvatarButton from "@/components/ui/AvatarButton"
+import UserAvatarMenu from "@/components/ui/UserAvatarMenu"
 
 interface StyledAppBarProps extends AppBarProps {
   scrolled: boolean

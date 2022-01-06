@@ -2,7 +2,7 @@ import { StatusCodes } from "http-status-codes"
 
 import { createUserReminder } from "@/lib/aether"
 import { AuthenticatedApiHandler } from "@/types"
-import { error, withSession } from "@/utils/api-handler-utils"
+import { error, withSession } from "@/lib/api/api-handler-utils"
 import { NetworkError } from "@/utils/fetcher"
 
 const handler: AuthenticatedApiHandler = async (session, req, res) => {

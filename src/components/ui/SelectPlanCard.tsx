@@ -9,7 +9,7 @@ import ListItemAvatar from "@mui/material/ListItemAvatar"
 import { formatNumber } from "@/utils/formatting"
 import { Plan } from "@/interfaces/fire"
 import useAvailablePlans from "@/hooks/use-available-plans"
-import DialogTitle from "@/components/DialogTitle"
+import DialogTitle from "./DialogTitle"
 
 type Props = {
   open: boolean

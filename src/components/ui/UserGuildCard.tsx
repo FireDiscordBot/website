@@ -1,5 +1,5 @@
 import { PremiumDiscordGuild } from "@/interfaces/discord"
-import { getGuildIcon } from "@/utils/discord"
+import { getGuildIcon } from "@/lib/discord"
 import Tooltip from "@mui/material/Tooltip"
 import Avatar from "@mui/material/Avatar"
 import Box from "@mui/material/Box"

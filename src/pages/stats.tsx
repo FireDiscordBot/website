@@ -10,12 +10,12 @@ import StorageIcon from "@mui/icons-material/Storage"
 
 import { emitter, handler } from "./_app"
 
-import ClusterStatsDialog from "@/components/ClusterStatsDialog"
-import DefaultLayout from "@/layouts/default"
+import ClusterStatsDialog from "@/components/ui/ClusterStatsDialog"
+import DefaultLayout from "@/components/layout/default"
 import { ClusterStats, InitialStats } from "@/interfaces/aether"
 import { formatBytes, formatNumber } from "@/utils/formatting"
-import ClusterCard from "@/components/ClusterCard"
-import CircularProgressCard from "@/components/CircularProgressCard"
+import ClusterCard from "@/components/ui/ClusterCard"
+import CircularProgressCard from "@/components/ui/CircularProgressCard"
 
 const StyledStorageIcon = styled(StorageIcon)(({ theme }) => ({
   fontSize: theme.spacing(10),

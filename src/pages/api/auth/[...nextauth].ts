@@ -4,7 +4,7 @@ import DiscordProvider from "next-auth/providers/discord"
 
 import type { AccessTokenResponse, AuthToken, AuthUser } from "@/interfaces/auth"
 import type { APIUser } from "@/interfaces/discord"
-import { fetchUser, getBannerImage, getAvatarImage } from "@/utils/discord"
+import { fetchUser, getBannerImage, getAvatarImage } from "@/lib/discord"
 import { discord, fire } from "@/constants"
 
 const discordProvider = DiscordProvider({

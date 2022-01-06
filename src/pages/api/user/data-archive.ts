@@ -2,7 +2,7 @@ import { StatusCodes } from "http-status-codes"
 
 import { createDataArchive, getDataRequest } from "@/lib/aether"
 import { AnyObject, AuthenticatedApiHandler, GetCollectData, PostCollectData } from "@/types"
-import { error, withSession } from "@/utils/api-handler-utils"
+import { error, withSession } from "@/lib/api/api-handler-utils"
 import { NetworkError } from "@/utils/fetcher"
 
 const handler: AuthenticatedApiHandler<PostCollectData | GetCollectData | AnyObject> = async (session, req, res) => {

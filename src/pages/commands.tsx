@@ -15,8 +15,8 @@ import { emitter, handler } from "./_app"
 
 import { fire } from "@/constants"
 import { Command } from "@/interfaces/aether"
-import DefaultLayout from "@/layouts/default"
-import CommandAccordion from "@/components/CommandAccordion"
+import DefaultLayout from "@/components/layout/default"
+import CommandAccordion from "@/components/ui/CommandAccordion"
 import Loading from "@/components/loading"
 
 interface CategoriesTabsProps extends TabsProps {

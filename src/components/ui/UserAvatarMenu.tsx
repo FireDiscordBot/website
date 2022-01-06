@@ -4,7 +4,7 @@ import MenuItem, { MenuItemProps } from "@mui/material/MenuItem"
 import { AccountCircle, Event, ExitToApp, Star, Code } from "@mui/icons-material"
 import { ListItemIcon, ListItemText } from "@mui/material"
 
-import MenuItemLink from "./MenuItemLink"
+import MenuItemLink from "@/components/routing/MenuItemLink"
 
 import { handler } from "@/pages/_app"
 

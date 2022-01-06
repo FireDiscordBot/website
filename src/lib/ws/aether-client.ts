@@ -10,7 +10,7 @@ import {
 import { AuthSession, AuthToken } from "@/interfaces/auth"
 import { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
 import routeBuilder from "@/utils/api-router"
-import { fetchUser, getAvatarImage, getBannerImage } from "@/utils/discord"
+import { fetchUser, getAvatarImage, getBannerImage } from "@/lib/discord"
 import EventEmitter from "events"
 import { getSession, signIn, signOut } from "next-auth/react"
 import Router, { Router as RouterType } from "next/router"

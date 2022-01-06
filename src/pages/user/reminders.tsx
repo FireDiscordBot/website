@@ -19,9 +19,9 @@ import dayjs from "dayjs"
 import { emitter } from "../_app"
 
 import useSession from "@/hooks/use-session"
-import UserPageLayout from "@/layouts/user-page"
+import UserPageLayout from "@/components/layout/user-page"
 import { Reminder } from "@/interfaces/aether"
-import { getTimestamp } from "@/utils/discord"
+import { getTimestamp } from "@/lib/discord"
 
 const ReminderProgressBar = styled(LinearProgress)(({ theme }) => ({
   borderBottomRightRadius: "4px",

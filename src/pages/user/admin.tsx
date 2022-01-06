@@ -12,7 +12,7 @@ import { styled } from "@mui/material/styles"
 
 import { handler } from "../_app"
 
-import SuperuserLayout, { SuperuserPageTypes } from "@/layouts/superuser-page"
+import SuperuserLayout, { SuperuserPageTypes } from "@/components/layout/superuser-page"
 import useSession from "@/hooks/use-session"
 import Loading from "@/components/loading"
 
