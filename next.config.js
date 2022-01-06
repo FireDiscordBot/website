@@ -2,10 +2,17 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 })
 
-module.exports = {
+module.exports = withBundleAnalyzer({
   experimental: {
-    swcFileReading: false
-  }
-}
-
-module.exports = withBundleAnalyzer({})
+    swcFileReading: false,
+  },
+  async redirects() {
+    return [
+      {
+        source: "/user",
+        destination: "/user/account",
+        permanent: true,
+      },
+    ]
+  },
+})
