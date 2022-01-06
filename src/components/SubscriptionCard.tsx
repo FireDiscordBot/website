@@ -58,7 +58,18 @@ const SubscriptionCard = ({ onClickSelectPlan }: Props) => {
         />
       </>
     )
-  }
+  } else
+    details = (
+      <>
+        <Typography variant="body1" color="textSecondary" component="span">
+          Premium gives you access to a bunch of extra features to make Fire the best all-in-one bot you&#39;ve ever
+          seen.
+          <br />
+          <br />
+          Get persisted roles, invite tracking, custom short links, and more!
+        </Typography>{" "}
+      </>
+    )
 
   const actions = subscription ? (
     <Button color="primary" onClick={onClickBillingPortal}>
@@ -73,7 +84,7 @@ const SubscriptionCard = ({ onClickSelectPlan }: Props) => {
   return (
     <Card>
       <CardContent>
-        <Typography variant="h5">{subscription ? subscription.name : "Default"}</Typography>
+        <Typography variant="h5">{subscription ? subscription.name : "Subscribe Now"}</Typography>
         {details}
       </CardContent>
       <CardActions>{actions}</CardActions>
