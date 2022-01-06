@@ -271,7 +271,7 @@ const AccountPage = () => {
       <Card>
         <CardContent>
           <Typography variant="h5">
-            {isLoadingSubscription ? <Skeleton /> : subscription ? subscription.name : "Default"}
+            {isLoadingSubscription ? <Skeleton /> : subscription ? subscription.name : ""}
           </Typography>
 
           {!isLoadingSubscription && !subscription && (
