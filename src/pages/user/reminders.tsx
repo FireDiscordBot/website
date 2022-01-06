@@ -13,8 +13,8 @@ import useSWR from "swr"
 import Tooltip from "@mui/material/Tooltip"
 import { styled } from "@mui/material/styles"
 import DateTimePicker from "@mui/lab/DateTimePicker"
-import moment from "moment"
 import { StatusCodes } from "http-status-codes"
+import dayjs from "dayjs"
 
 import { emitter } from "../_app"
 
@@ -36,7 +36,7 @@ let toDelete: number[] = []
 const Reminders = () => {
   const [session, loading] = useSession({ redirectTo: "/" })
   const [currentTime, setCurrentTime] = useState(0)
-  const [futureDate, setFutureDate] = useState(moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"))
+  const [futureDate, setFutureDate] = useState<Date | null>(null)
   const [futureText, setFutureText] = useState("")
 
   const { data } = useSWR<Reminder[]>(session ? "/api/user/reminders" : null, {
@@ -60,8 +60,8 @@ const Reminders = () => {
     }
   }, [currentTime])
 
-  const handleDateChange = (date: string | null) => {
-    setFutureDate(date ? date : moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"))
+  const handleDateChange = (date: Date | null) => {
+    setFutureDate(date)
   }
 
   const handleTextChange = (value: string | null | undefined) => {
@@ -71,7 +71,7 @@ const Reminders = () => {
   const handleReminderCreate = async () => {
     const reminder = await fetch(`/api/user/reminders/create`, {
       method: "POST",
-      body: JSON.stringify({ reminder: futureText, timestamp: moment(futureDate).valueOf() }),
+      body: JSON.stringify({ reminder: futureText, timestamp: dayjs(futureDate).valueOf() }),
     })
     if (!reminder.ok)
       emitter.emit("NOTIFICATION", {

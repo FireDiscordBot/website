@@ -4,7 +4,7 @@ import useSWR, { mutate } from "swr"
 import Grid from "@mui/material/Grid"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
-import { TextField } from "@mui/material"
+import { Alert, TextField } from "@mui/material"
 import { Pagination } from "@mui/material"
 
 import { emitter, handler } from "../_app"
@@ -239,14 +239,16 @@ const PremiumPage = () => {
             </Grid>
           ))}
         {!isValidating && guilds && guilds.length == 0 && (
-          <Typography variant="h2" align="center" color="error" gutterBottom>
-            No servers found
-          </Typography>
+          <Box padding={2} width={"100%"}>
+            <Alert severity="error">No servers found</Alert>
+          </Box>
         )}
         {!isValidating && !subscription && (
-          <Typography variant="h4" align="center" color="error" gutterBottom>
-            You must subscribe to premium before you can manage a server&#39;s premium status.
-          </Typography>
+          <Box padding={2} width={"100%"}>
+            <Alert severity="error">
+              You must subscribe to premium before you can manage a server&#39;s premium status.
+            </Alert>
+          </Box>
         )}
         {shouldShowServers() &&
           paginate(guilds || [], page, 12).map((guild, index) => (
