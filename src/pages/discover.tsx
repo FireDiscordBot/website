@@ -2,7 +2,7 @@ import * as React from "react"
 import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
 import Box from "@mui/material/Box"
-import { TextField, Typography } from "@mui/material"
+import { Alert, TextField, Typography } from "@mui/material"
 import { Pagination } from "@mui/material"
 
 import { emitter, handler } from "./_app"
@@ -213,9 +213,14 @@ const DiscoverPage = () => {
                   : "All Servers"}
               </Typography>
             ) : (
-              <Typography variant="h2" align="center" color="error" gutterBottom>
-                No servers found
-              </Typography>
+              <Box padding={2} width={"100%"}>
+                <Alert severity="error">
+                  No servers found.{" "}
+                  {(document.getElementById("guild-filter") as HTMLInputElement)?.value.length
+                    ? "Try a different search term."
+                    : "There may be an ongoing outage affecting Fire, please check back later."}
+                </Alert>
+              </Box>
             )}
             <Grid container spacing={4}>
               {paginate(
