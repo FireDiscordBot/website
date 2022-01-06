@@ -22,6 +22,8 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
 }))
 
 const snowflakeRegex = /\d{15,21}/
+const inviteRegex = /discord(?:app)?\.(?:com|gg)\/(?:invite\/)?(?<code>[\w-]{1,25})/gim
+const codeValidityRegex = /[a-zA-Z0-9]{3,25}/gim
 
 const AdminPage = () => {
   const [session, loading] = useSession({ redirectTo: "/" })
@@ -29,6 +31,8 @@ const AdminPage = () => {
   const [experimentType, setExperimentType] = React.useState<string>("")
   const [applyToID, setID] = React.useState<string>("")
   const [bucket, setBucket] = React.useState<number>(0)
+  const [createInvite, setCreateInvite] = React.useState<string>("")
+  const [createCode, setCreateCode] = React.useState<string>("")
 
   const handleExperimentChange = (event: SelectChangeEvent) => {
     setExperiment(event.target.value as string)
@@ -46,6 +50,21 @@ const AdminPage = () => {
 
   const handleApplyToIDChange = (value: string) => {
     if (snowflakeRegex.test(value)) setID(value)
+    snowflakeRegex.lastIndex = 0
+  }
+
+  const handleCreateInviteChange = (value: string) => {
+    if (inviteRegex.test(value)) {
+      inviteRegex.lastIndex = 0
+      const code = inviteRegex.exec(value)?.groups?.code ?? ""
+      setCreateInvite(code)
+    }
+    inviteRegex.lastIndex = 0
+  }
+
+  const handleCreateCodeChange = (value: string) => {
+    if (codeValidityRegex.test(value)) setCreateCode(value)
+    codeValidityRegex.lastIndex = 0
   }
 
   if (!session || loading) {
@@ -74,7 +93,6 @@ const AdminPage = () => {
               id="experiment-kind-select-label"
               value={experimentType}
               onChange={handleExperimentTypeChange}
-              required
             >
               <MenuItem key="guild" value="guild">
                 Guild
@@ -91,7 +109,6 @@ const AdminPage = () => {
               id="experiment-list-select-label"
               value={experiment}
               onChange={handleExperimentChange}
-              required
               disabled={!experimentType}
             >
               {handler?.experiments
@@ -111,7 +128,6 @@ const AdminPage = () => {
               value={experiment ? bucket.toString() : undefined}
               onChange={handleBucketChange}
               disabled={!experiment}
-              required
             >
               {handler?.experiments
                 .find((exp) => exp.id == experiment)
@@ -128,7 +144,6 @@ const AdminPage = () => {
                 id="apply-to-id"
                 onChange={(value) => handleApplyToIDChange(value.target.value)}
                 fullWidth
-                required
                 label={experimentType == "guild" ? "Guild ID" : "User ID"}
                 disabled={!experimentType}
               />
@@ -136,6 +151,7 @@ const AdminPage = () => {
           </StyledFormControl>
           <Box mb={2}>
             <Button
+              id="apply-experiment-button"
               variant={"outlined"}
               onClick={() => {
                 if (!experiment)
@@ -174,6 +190,93 @@ const AdminPage = () => {
                   if (typeof document != "undefined" && !!document.getElementById("apply-to-id"))
                     // @ts-ignore
                     document.getElementById("apply-to-id").value = ""
+                }
+              }}
+            >
+              Submit
+            </Button>
+          </Box>
+        </Grid>
+      </Grid>
+
+      <Grid container style={{ marginBottom: 10 }}>
+        <Grid item>
+          <Grid container>
+            <Grid item>
+              <Typography variant="h4">Vanity URLs & Redirects</Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+
+      <Grid>
+        <Grid item>
+          <Typography variant="h6">Create Vanity</Typography>
+          <StyledFormControl>
+            <Box mb={2}>
+              <TextField
+                id="create-vanity-invite"
+                onChange={(value) => handleCreateInviteChange(value.target.value)}
+                fullWidth
+                label={"Discord Invite"}
+                placeholder={"discord.gg/fire"}
+              />
+            </Box>
+          </StyledFormControl>
+          <StyledFormControl>
+            <Box mb={2}>
+              <TextField
+                id="create-vanity-code"
+                onChange={(value) => handleCreateCodeChange(value.target.value)}
+                fullWidth
+                label={"Vanity Code"}
+                placeholder={"fire"}
+              />
+            </Box>
+          </StyledFormControl>
+          <Box mb={2}>
+            <Button
+              id="create-vanity-button"
+              variant={"outlined"}
+              onClick={async () => {
+                if (!createInvite)
+                  handler?.emitter.emit("NOTIFICATION", {
+                    text: "You must input a valid invite link",
+                    severity: "error",
+                    horizontal: "right",
+                    vertical: "top",
+                    autoHideDuration: 3000,
+                  })
+                else if (!createCode)
+                  handler?.emitter.emit("NOTIFICATION", {
+                    text: `You must input a valid vanity code`,
+                    severity: "error",
+                    horizontal: "right",
+                    vertical: "top",
+                    autoHideDuration: 3000,
+                  })
+                else if (handler) {
+                  const inviteReq = await fetch(`https://discord.com/api/v9/invites/${createInvite}`, {}).catch(
+                    () => {},
+                  )
+                  if (!inviteReq || !inviteReq.ok)
+                    return handler?.emitter.emit("NOTIFICATION", {
+                      text: `Failed to fetch invite info`,
+                      severity: "error",
+                      horizontal: "right",
+                      vertical: "top",
+                      autoHideDuration: 3000,
+                    })
+                  const invite = await inviteReq.json()
+                  handler.createVanity(createCode, invite)
+                  if (typeof document != "undefined") {
+                    if (!!document.getElementById("create-vanity-invite"))
+                      // @ts-ignore
+                      document.getElementById("create-vanity-invite").value = ""
+                    if (!!document.getElementById("create-vanity-code"))
+                      // @ts-ignore
+                      document.getElementById("create-vanity-code").value = ""
+                  }
                 }
               }}
             >

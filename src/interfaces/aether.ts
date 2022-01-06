@@ -134,6 +134,7 @@ export enum EventType {
   SCHEMA_VALIDATION_ERROR,
   SESSIONS_REPLACE,
   RESTART_CLUSTER,
+  CREATE_VANITY,
 }
 
 export type Notification = {

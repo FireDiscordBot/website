@@ -516,6 +516,11 @@ export class AetherClient {
     this.send(new Message(EventType.RESTART_CLUSTER, options))
   }
 
+  createVanity(code: string, invite: any) {
+    if (!this.isSuperuser()) return
+    this.send(new Message(EventType.CREATE_VANITY, { code, invite }))
+  }
+
   CONFIG_UPDATE(data: { name: string; value: unknown }) {
     if (!this.config) return
     if (data.value == "deleteSetting") return delete this.config[data.name]
