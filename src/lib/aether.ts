@@ -1,7 +1,7 @@
 import { fire } from "@/constants"
 import fetcher from "@/utils/fetcher"
 import { AdminSessionData, BuildOverride, Reminder } from "@/interfaces/aether"
-import { GetCollectData } from "@/types"
+import { GetCollectData, PromotionMessage } from "@/types"
 import { PremiumDiscordGuild } from "@/interfaces/discord"
 
 export const requestWithAuth = <R = never>(accessToken: string, path: string, method?: string, body?: unknown) =>
@@ -75,4 +75,8 @@ export const getBuildOverrides = async (accessToken: string) => {
 
 export const getSessions = async (accessToken: string) => {
   return await requestWithAuth<AdminSessionData[]>(accessToken, `sessions`)
+}
+
+export const getOngoingPromotion = async (accessToken: string) => {
+  return await requestWithAuth<PromotionMessage>(accessToken, `v2/premium/promotion`)
 }

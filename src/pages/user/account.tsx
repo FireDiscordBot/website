@@ -1,25 +1,35 @@
-import * as React from "react"
-import Link from "next/link"
-import Button from "@mui/material/Button"
-import Tooltip from "@mui/material/Tooltip"
+import DiscordFlagImage from "@/components/DiscordFlagImage"
+import Loading from "@/components/loading"
+import SelectPlanCard from "@/components/SelectPlanCard"
+import { stripe as stripeConstants } from "@/constants"
+import useCurrentSubscription from "@/hooks/use-current-subscription"
+import useSession from "@/hooks/use-session"
+import { Plan } from "@/interfaces/fire"
+import UserPageLayout from "@/layouts/user-page"
+import { GetCollectData, PostSubscriptionResponse, PromotionMessage } from "@/types"
+import { parseFlags } from "@/utils/discord"
+import fetcher, { createErrorResponse } from "@/utils/fetcher"
+import Alert from "@mui/material/Alert"
 import Avatar from "@mui/material/Avatar"
-import Typography from "@mui/material/Typography"
-import Card from "@mui/material/Card"
-import CardContent from "@mui/material/CardContent"
-import CardActions from "@mui/material/CardActions"
 import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
+import Card from "@mui/material/Card"
+import CardActions from "@mui/material/CardActions"
+import CardContent from "@mui/material/CardContent"
 import Skeleton from "@mui/material/Skeleton"
-import useSWR from "swr"
-
+import Tooltip from "@mui/material/Tooltip"
+import Typography from "@mui/material/Typography"
+import { loadStripe } from "@stripe/stripe-js"
+import Link from "next/link"
+import * as React from "react"
+import useSWR, { mutate } from "swr"
 import { emitter, handler } from "../_app"
 
-import UserPageLayout from "@/layouts/user-page"
-import Loading from "@/components/loading"
-import DiscordFlagImage from "@/components/DiscordFlagImage"
-import useSession from "@/hooks/use-session"
-import useCurrentSubscription from "@/hooks/use-current-subscription"
-import { parseFlags } from "@/utils/discord"
-import { GetCollectData } from "@/types"
+if (!stripeConstants.publicKey) {
+  throw Error("Env variable NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY not defined")
+}
+
+const stripePromise = loadStripe(stripeConstants.publicKey)
 
 type DataRequestResponse =
   | { success: false; error: string }
@@ -34,8 +44,13 @@ type DataRequestResponse =
 
 const AccountPage = () => {
   const [session, loading] = useSession({ redirectTo: "/" })
-  const { subscription, isLoading, error } = useCurrentSubscription(session != null && !loading)
-  const setErrorMessage = (text: string) =>
+  const {
+    subscription,
+    isLoading: isLoadingSubscription,
+    error: subscriptionError,
+  } = useCurrentSubscription(session != null && !loading)
+  const setErrorMessage = (text: string | null) =>
+    text &&
     emitter.emit("NOTIFICATION", {
       text,
       severity: "error",
@@ -44,14 +59,34 @@ const AccountPage = () => {
       autoHideDuration: 5000,
     })
 
-  const { data: dataRequest, mutate } = useSWR<GetCollectData>(session ? "/api/user/data-archive" : null, {
+  const { data: dataRequest, mutate: mutateArchive } = useSWR<GetCollectData>(
+    session ? "/api/user/data-archive" : null,
+    {
+      revalidateOnReconnect: false,
+      revalidateOnFocus: false,
+    },
+  )
+
+  const { data: premiumPromotion } = useSWR<PromotionMessage>(session ? "/api/premium-promotion" : null, {
     revalidateOnReconnect: false,
     revalidateOnFocus: false,
   })
 
+  const [plansDialogOpen, setPlansDialogOpen] = React.useState(false)
+
   React.useEffect(() => {
-    setErrorMessage(error?.message)
-  }, [error])
+    if (!subscription && !isLoadingSubscription) {
+      mutate("/api/stripe/subscriptions", fetcher("/api/stripe/subscriptions"))
+    }
+  }, [subscription, isLoadingSubscription])
+
+  React.useEffect(() => {
+    setErrorMessage(subscriptionError?.message)
+  }, [subscriptionError?.message])
+
+  React.useEffect(() => {
+    setErrorMessage(subscriptionError?.message)
+  }, [subscriptionError])
 
   if (!session || loading) {
     return <Loading />
@@ -67,7 +102,7 @@ const AccountPage = () => {
     event.preventDefault()
     if (document?.getElementById("request-data")?.className)
       document.getElementById("request-data")!.className += " Mui-disabled"
-    await mutate(undefined, true)
+    await mutateArchive(undefined, true)
 
     if (typeof dataRequest?.status == "number" && dataRequest.status != 0) {
       const link = document.createElement("a")
@@ -135,8 +170,46 @@ const AccountPage = () => {
       }, 10000)
     })
 
+  const onClickPlan = async (plan: Plan) => {
+    const stripe = await stripePromise
+
+    if (!stripe) {
+      setErrorMessage("Stripe not loaded. Try again in 10 seconds.")
+      return
+    }
+
+    let json: PostSubscriptionResponse
+
+    try {
+      json = await fetcher(`/api/user/subscription?servers=${plan.servers}`, {
+        method: "POST",
+      })
+    } catch (e: any) {
+      setErrorMessage(createErrorResponse(e).error)
+      return
+    }
+
+    const stripeResponse = await stripe.redirectToCheckout({
+      sessionId: json.sessionId,
+    })
+
+    if (stripeResponse.error) {
+      setErrorMessage(stripeResponse.error?.message ?? null)
+    }
+  }
+
+  const onClickSelectPlan = () => setPlansDialogOpen(true)
+
+  const onClosePlansDialog = () => setPlansDialogOpen(false)
+
   return (
     <UserPageLayout title="Account" noindex nofollow>
+      {!subscription && premiumPromotion?.text && (premiumPromotion?.expires ?? Number.MAX_VALUE) > +new Date() && (
+        <Box width={"100%"}>
+          <Alert severity="info">{premiumPromotion.text}</Alert>
+          <br></br>
+        </Box>
+      )}
       <Typography variant="h4" gutterBottom>
         General info
       </Typography>
@@ -198,15 +271,43 @@ const AccountPage = () => {
       <Card>
         <CardContent>
           <Typography variant="h5">
-            {isLoading ? <Skeleton /> : subscription ? subscription.name : "Default"}
+            {isLoadingSubscription ? <Skeleton /> : subscription ? subscription.name : "Default"}
           </Typography>
+
+          {!isLoadingSubscription && !subscription && (
+            <Typography variant="body1" color="textSecondary" component="span">
+              Premium gives you access to a bunch of extra features to make Fire the best all-in-one bot you&#39;ve ever
+              seen.
+              <br />
+              <br />
+              Get persisted roles, invite tracking, custom short links, and more!
+            </Typography>
+          )}
         </CardContent>
-        <CardActions>
-          <Link href="/user/premium" passHref>
-            <Button color="primary">Fire premium page</Button>
-          </Link>
-        </CardActions>
+        {!!subscription ? (
+          <CardActions>
+            <Link href="/user/premium" passHref>
+              <Button color="primary">Manage Subscription</Button>
+            </Link>
+          </CardActions>
+        ) : (
+          <CardActions>
+            <Button color="primary" onClick={onClickSelectPlan}>
+              Get Premium Now
+            </Button>
+            <Link href="https://inv.wtf/premium" passHref>
+              <Button color="secondary">Learn More</Button>
+            </Link>
+          </CardActions>
+        )}
       </Card>
+
+      <SelectPlanCard
+        open={plansDialogOpen}
+        onClose={onClosePlansDialog}
+        onClickPlan={onClickPlan}
+        loadPlans={!subscription && !isLoadingSubscription}
+      />
     </UserPageLayout>
   )
 }
