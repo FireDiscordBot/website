@@ -1,18 +1,17 @@
-import { StatusCodes } from "http-status-codes"
-
 import { createStripePortalSession } from "@/lib/aether"
-import { AuthenticatedApiHandler, PostBillingPortalResponse } from "@/types"
-import { error, withSession } from "@/lib/api/api-handler-utils"
+import { PostBillingPortalResponse } from "@/types"
+import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
+import { methodNotAllowed, respondWithError, respondWithSuccess } from "@/lib/api/response"
 
-const handler: AuthenticatedApiHandler<PostBillingPortalResponse> = async (session, req, res) => {
+const handler: AuthenticatedApiHandler<PostBillingPortalResponse> = async (req, res, session) => {
   if (req.method !== "POST") {
-    error(res, StatusCodes.METHOD_NOT_ALLOWED)
+    respondWithError(res, methodNotAllowed())
     return
   }
 
   const url = await createStripePortalSession(session.accessToken)
 
-  res.json({ url })
+  respondWithSuccess(res, { url })
 }
 
-export default withSession(handler)
+export default withAuth(handler)

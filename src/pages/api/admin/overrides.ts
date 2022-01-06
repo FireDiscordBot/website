@@ -1,18 +1,16 @@
-import { StatusCodes } from "http-status-codes"
-
 import { getBuildOverrides } from "@/lib/aether"
-import { AuthenticatedApiHandler } from "@/types"
-import { error, withSession } from "@/lib/api/api-handler-utils"
+import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
 import { BuildOverride } from "@/interfaces/aether"
+import { methodNotAllowed, respondWithError, respondWithSuccess } from "@/lib/api/response"
 
-const handler: AuthenticatedApiHandler<BuildOverride[]> = async (session, req, res) => {
+const handler: AuthenticatedApiHandler<BuildOverride[]> = async (req, res, session) => {
   if (req.method !== "GET") {
-    error(res, StatusCodes.METHOD_NOT_ALLOWED)
+    respondWithError(res, methodNotAllowed())
     return
   }
 
   const data = await getBuildOverrides(session.accessToken)
-  res.json(data)
+  respondWithSuccess(res, data)
 }
 
-export default withSession(handler)
+export default withAuth(handler)

@@ -1,11 +1,17 @@
-import { StatusCodes } from "http-status-codes"
 import { Stripe } from "stripe"
 
 import { createErrorResponse } from "@/utils/fetcher"
 import stripe from "@/api/server-stripe"
 import { createStripeCheckoutSession, fetchCustomerId } from "@/lib/aether"
-import { AuthenticatedApiHandler, GetSubscriptionResponse, PostSubscriptionResponse } from "@/types"
-import { error, withSession } from "@/lib/api/api-handler-utils"
+import { GetSubscriptionResponse, PostSubscriptionResponse } from "@/types"
+import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
+import {
+  badRequest,
+  internalServerError,
+  methodNotAllowed,
+  respondWithError,
+  respondWithSuccess,
+} from "@/lib/api/response"
 
 const subscriptionComparator = (first: Stripe.Subscription, second: Stripe.Subscription) => {
   const getStatusWeight = (status: Stripe.Subscription.Status) => {
@@ -21,19 +27,20 @@ const subscriptionComparator = (first: Stripe.Subscription, second: Stripe.Subsc
   return getStatusWeight(first.status) - getStatusWeight(second.status)
 }
 
-const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _req, res) => {
+const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (_req, res, session) => {
   let customerId: string
 
   try {
     customerId = await fetchCustomerId(session.accessToken)
   } catch (e: any) {
     const errorResponse = createErrorResponse(e)
-    if (errorResponse.error.includes("Customer Not Found")) {
-      res.json({
+    if (errorResponse.message.includes("Customer Not Found")) {
+      respondWithSuccess(res, {
         hasSubscription: false,
       })
     } else {
-      error(res, errorResponse.code, errorResponse.error)
+      // TODO: handle errors
+      respondWithError(res, internalServerError())
     }
     return
   }
@@ -49,7 +56,7 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _r
   )
 
   if (!hasSubscription) {
-    res.json({
+    respondWithSuccess(res, {
       hasSubscription: false,
     })
     return
@@ -63,7 +70,7 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _r
   if (subscription.metadata?.custom_limit)
     servers = parseInt(subscription.metadata?.custom_limit ?? servers.toString(), 10)
 
-  res.json({
+  respondWithSuccess(res, {
     hasSubscription: true,
     subscription: {
       id: subscription.id,
@@ -79,34 +86,34 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _r
   })
 }
 
-const post: AuthenticatedApiHandler<PostSubscriptionResponse> = async (session, req, res) => {
+const post: AuthenticatedApiHandler<PostSubscriptionResponse> = async (req, res, session) => {
   if (typeof req.query.servers != "string") {
-    error(res, StatusCodes.BAD_REQUEST)
+    respondWithError(res, badRequest())
     return
   }
 
   const servers = parseInt(req.query.servers)
 
   if (![1, 3, 5].includes(servers)) {
-    error(res, StatusCodes.BAD_REQUEST)
+    respondWithError(res, badRequest())
     return
   }
 
   const stripeSessionId = await createStripeCheckoutSession(session.accessToken, servers)
 
-  res.json({ sessionId: stripeSessionId })
+  respondWithSuccess(res, { sessionId: stripeSessionId })
 }
 
-const handler: AuthenticatedApiHandler<GetSubscriptionResponse | PostSubscriptionResponse> = (session, req, res) => {
+const handler: AuthenticatedApiHandler<GetSubscriptionResponse | PostSubscriptionResponse> = (req, res, session) => {
   switch (req.method) {
     case "GET":
-      return get(session, req, res)
+      return get(req, res, session)
     case "POST":
-      return post(session, req, res)
+      return post(req, res, session)
     default:
-      error(res, StatusCodes.METHOD_NOT_ALLOWED)
+      respondWithError(res, methodNotAllowed())
       break
   }
 }
 
-export default withSession(handler)
+export default withAuth(handler)

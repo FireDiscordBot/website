@@ -1,24 +1,21 @@
-import { StatusCodes } from "http-status-codes"
-
 import { deleteUserReminder } from "@/lib/aether"
-import { AuthenticatedApiHandler } from "@/types"
-import { error, withSession } from "@/lib/api/api-handler-utils"
+import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
 import { NetworkError } from "@/utils/fetcher"
+import { badRequest, respondWithError, respondWithSuccess } from "@/lib/api/response"
 
-const handler: AuthenticatedApiHandler = async (session, req, res) => {
+const handler: AuthenticatedApiHandler<null> = async (req, res, session) => {
   if (!req.query.timestamp || parseInt(req.query.timestamp as string) < +new Date()) {
-    error(
+    respondWithError(
       res,
-      StatusCodes.BAD_REQUEST,
-      parseInt(req.query.timestamp as string) < +new Date() ? "Invalid Timestamp" : undefined,
+      badRequest(parseInt(req.query.timestamp as string) < +new Date() ? "Invalid Timestamp" : undefined),
     )
     return
   }
 
   const deleted = await deleteUserReminder(session.accessToken, req.query.timestamp as string).catch((e) => e)
   if (deleted instanceof NetworkError) return res.status(deleted.code).json(deleted.data as any)
-  res.status(200).json({})
+  respondWithSuccess(res, null, 204)
   return
 }
 
-export default withSession(handler)
+export default withAuth(handler)

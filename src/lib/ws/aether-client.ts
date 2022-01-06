@@ -7,10 +7,9 @@ import {
   SessionInfo,
   WebsiteGateway,
 } from "@/interfaces/aether"
-import { AuthSession, AuthToken } from "@/interfaces/auth"
 import { APIMember, AuthorizationInfo, DiscordGuild } from "@/interfaces/discord"
 import routeBuilder from "@/utils/api-router"
-import { fetchUser, getAvatarImage, getBannerImage } from "@/lib/discord"
+import { fetchUser, getAvatarImageUrl, getBannerImage } from "@/lib/discord"
 import EventEmitter from "events"
 import { getSession, signIn, signOut } from "next-auth/react"
 import Router, { Router as RouterType } from "next/router"
@@ -40,8 +39,8 @@ const getReconnectTime = (code: number) => {
 export class AetherClient {
   private sessionPromiseResolver?: (session: string | PromiseLike<string>) => void
   configListeners: Record<string, (value: unknown) => void>
-  refreshTokenPromise?: Promise<AuthToken>
-  private _auth: AuthSession | undefined
+  refreshTokenPromise?: Promise<any>
+  private _auth: any | undefined
   identified: "identifying" | boolean
   config?: Record<string, unknown>
   sessionPromise?: Promise<string>
@@ -63,7 +62,7 @@ export class AetherClient {
   acked?: boolean
   seq?: number
 
-  constructor(session: AuthSession, emitter: EventEmitter) {
+  constructor(session: any, emitter: EventEmitter) {
     if (session) {
       this.auth = session
       this.auth.refresh = this.getSession.bind(this)
@@ -97,7 +96,7 @@ export class AetherClient {
     return this._auth
   }
 
-  set auth(session: AuthSession | undefined) {
+  set auth(session: any | undefined) {
     if (session?.accessToken != this._auth?.accessToken) this.websocket?.close(4009, "Reauthenticating")
     this._auth = session
     if (!this.identified) this.identify()
@@ -107,15 +106,15 @@ export class AetherClient {
     return this.config && this.config["utils.superuser"] == true
   }
 
-  async getSession(): Promise<AuthSession> {
-    this.auth = (await getSession().catch(() => null)) as AuthSession
+  async getSession(): Promise<any> {
+    this.auth = (await getSession().catch(() => null)) as any
     if (!this.auth) return this.auth
     else if (!this.auth.accessToken) {
       await sleep(2000)
       return this.getSession()
     }
     this.auth.refresh = this.getSession.bind(this)
-    return this.auth as AuthSession
+    return this.auth as any
   }
 
   async signOut() {
@@ -360,8 +359,19 @@ export class AetherClient {
     }
     this.identified = true // should already be true but just in case
     if (typeof this.auth?.refresh == "function") await this.auth.refresh()
-    if (this.auth?.user?.image && data.auth?.user?.avatar && !this.auth?.user?.image.includes(data.auth?.user?.avatar))
-      this.auth.user.image = getAvatarImage(data.auth.user, process.env.USE_MOD_SIX == "true")
+    if (
+      this.auth?.user?.image &&
+      data.auth?.user?.avatar &&
+      !this.auth?.user?.image.includes(data.auth?.user?.avatar)
+    ) {
+      const user = data.auth.user
+      this.auth.user.image = getAvatarImageUrl(
+        user.avatar,
+        user.id,
+        user.discriminator,
+        process.env.USE_MOD_SIX == "true",
+      )
+    }
     if (this.auth && data.auth?.user?.banner && !this.auth?.user?.banner?.includes(data.auth?.user?.banner))
       this.auth.user.banner = getBannerImage(data.auth.user)
     while (this.queue.length) this.send(this.queue.pop())
@@ -418,8 +428,15 @@ export class AetherClient {
       this.auth?.user?.image &&
       identified.auth?.user?.avatar &&
       !this.auth?.user?.image.includes(identified.auth?.user?.avatar)
-    )
-      this.auth.user.image = getAvatarImage(identified.auth.user, process.env.USE_MOD_SIX == "true")
+    ) {
+      const user = identified.auth.user
+      this.auth.user.image = getAvatarImageUrl(
+        user.avatar,
+        user.id,
+        user.discriminator,
+        process.env.USE_MOD_SIX == "true",
+      )
+    }
     if (this.auth && identified.auth?.user?.banner && !this.auth?.user?.banner?.includes(identified.auth?.user?.banner))
       this.auth.user.banner = getBannerImage(identified.auth.user)
     while (this.queue.length) this.send(this.queue.pop())

@@ -1,29 +1,35 @@
-import { StatusCodes } from "http-status-codes"
-
 import { createDataArchive, getDataRequest } from "@/lib/aether"
-import { AnyObject, AuthenticatedApiHandler, GetCollectData, PostCollectData } from "@/types"
-import { error, withSession } from "@/lib/api/api-handler-utils"
+import { AnyObject, GetCollectData, PostCollectData } from "@/types"
+import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
 import { NetworkError } from "@/utils/fetcher"
+import { ApiErrorResponse, methodNotAllowed, respondWithError, respondWithSuccess } from "@/lib/api/response"
 
-const handler: AuthenticatedApiHandler<PostCollectData | GetCollectData | AnyObject> = async (session, req, res) => {
+const handler: AuthenticatedApiHandler<PostCollectData | GetCollectData | AnyObject> = async (req, res, session) => {
   if (req.method !== "POST" && req.method !== "GET") {
-    error(res, StatusCodes.METHOD_NOT_ALLOWED)
+    respondWithError(res, methodNotAllowed())
     return
   }
 
   try {
     if (req.method === "POST") {
       const url = await createDataArchive(session.accessToken)
-      res.json({ url })
+      respondWithSuccess(res, { url })
     } else if (req.method === "GET") {
       const data = await getDataRequest(session.accessToken)
-      res.json(data)
+      respondWithSuccess(res, data)
     }
   } catch (err) {
     if (err instanceof NetworkError && typeof err.data != "undefined") {
-      typeof err.data == "object" ? res.status(err.code).json(err.data) : res.status(err.code).send(err.data)
-    } else throw err
+      if (typeof err.data == "object") {
+        // TODO: better error response
+        respondWithError(res, err.data as any as ApiErrorResponse)
+      } else {
+        res.status(err.code).send(err.data)
+      }
+    } else {
+      throw err
+    }
   }
 }
 
-export default withSession(handler)
+export default withAuth(handler)

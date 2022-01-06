@@ -1,27 +1,28 @@
-import { StatusCodes } from "http-status-codes"
-
 import { createUserReminder } from "@/lib/aether"
-import { AuthenticatedApiHandler } from "@/types"
-import { error, withSession } from "@/lib/api/api-handler-utils"
+import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
 import { NetworkError } from "@/utils/fetcher"
+import { badRequest, methodNotAllowed, respondWithError, respondWithSuccess } from "@/lib/api/response"
 
-const handler: AuthenticatedApiHandler = async (session, req, res) => {
+// TODO: typing
+const handler: AuthenticatedApiHandler<any> = async (req, res, session) => {
   if (req.method !== "POST") {
-    error(res, StatusCodes.METHOD_NOT_ALLOWED)
+    respondWithError(res, methodNotAllowed())
     return
   }
+
+  // TODO: validation
   let body: { reminder: string; timestamp: number }
   try {
     body = JSON.parse(req.body)
   } catch {
-    error(res, StatusCodes.BAD_REQUEST)
+    respondWithError(res, badRequest())
     return
   }
 
   const reminder = await createUserReminder(session.accessToken, req.body).catch((e) => e)
   if (reminder instanceof NetworkError) return res.status(reminder.code).json(reminder.data as any)
-  res.json(body)
-  return
+
+  respondWithSuccess(res, body)
 }
 
-export default withSession(handler)
+export default withAuth(handler)

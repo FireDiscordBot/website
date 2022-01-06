@@ -11,6 +11,7 @@ import { PostBillingPortalResponse } from "@/types"
 import useCurrentSubscription from "@/hooks/use-current-subscription"
 import useSession from "@/hooks/use-session"
 import { capitalize, formatDateTime } from "@/utils/formatting"
+import { ApiResponse } from "@/lib/api/response"
 
 type DetailLineProps = {
   title: string
@@ -36,11 +37,13 @@ const SubscriptionCard = ({ onClickSelectPlan }: Props) => {
 
   const onClickBillingPortal = async (event: React.MouseEvent) => {
     event.preventDefault()
-    const json: PostBillingPortalResponse = await fetcher("/api/user/billingPortal", {
+    const res: ApiResponse<PostBillingPortalResponse> = await fetcher("/api/user/billingPortal", {
       method: "POST",
     })
 
-    document.location.assign(json.url)
+    if (res.success) {
+      document.location.assign(res.data.url)
+    }
   }
 
   let details: React.ReactNode = undefined

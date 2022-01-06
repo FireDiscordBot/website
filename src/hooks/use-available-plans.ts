@@ -1,14 +1,15 @@
 import useSWR, { SWRConfiguration } from "swr"
 
 import { Plan } from "@/interfaces/fire"
+import { ApiResponse } from "@/lib/api/response"
 
-const useAvailablePlans = (load = true, config?: SWRConfiguration<Plan[]>) => {
-  const { data, error } = useSWR<Plan[]>(load ? "/api/stripe/subscriptions" : null, config)
+const useAvailablePlans = (load = true, config?: SWRConfiguration<ApiResponse<Plan[]>>) => {
+  const { data: res, error } = useSWR<ApiResponse<Plan[]>>(load ? "/api/stripe/subscriptions" : null, config)
 
   return {
-    plans: data,
-    isLoading: !error && !data,
-    isError: error,
+    plans: res?.success ? res.data : undefined,
+    isLoading: !error && !res,
+    isError: error || !res?.success,
   }
 }
 

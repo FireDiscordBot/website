@@ -1,17 +1,20 @@
 import useSWR from "swr"
 
 import { GetSubscriptionResponse } from "@/types"
+import { ApiResponse } from "@/lib/api/response"
 
 const useCurrentSubscription = (hasSession = true) => {
-  const { data, error } = useSWR<GetSubscriptionResponse>(hasSession ? `/api/user/subscription` : null)
+  const { data: res, error } = useSWR<ApiResponse<GetSubscriptionResponse>>(
+    hasSession ? `/api/user/subscription` : null,
+  )
 
-  const hasSubscription = data && data.hasSubscription
-  const subscription = data?.hasSubscription ? data?.subscription : undefined
+  const hasSubscription = res?.success && res.data.hasSubscription
+  const subscription = res?.success && res.data.hasSubscription ? res.data.subscription : undefined
 
   return {
     hasSubscription,
     subscription,
-    isLoading: !error && !data,
+    isLoading: !error && !res,
     error,
   } as const
 }

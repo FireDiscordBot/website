@@ -39,6 +39,7 @@ const Reminders = () => {
   const [futureDate, setFutureDate] = useState<Date | null>(null)
   const [futureText, setFutureText] = useState("")
 
+  // TODO: fix
   const { data } = useSWR<Reminder[]>(session ? "/api/user/reminders" : null, {
     revalidateOnMount: true,
     revalidateOnFocus: false,
@@ -69,6 +70,7 @@ const Reminders = () => {
   }
 
   const handleReminderCreate = async () => {
+    // TODO: rewrite
     const reminder = await fetch(`/api/user/reminders/create`, {
       method: "POST",
       body: JSON.stringify({ reminder: futureText, timestamp: dayjs(futureDate).valueOf() }),
@@ -106,6 +108,7 @@ const Reminders = () => {
         autoHideDuration: 5000,
       })
     } else toDelete = toDelete.filter((timestamp) => timestamp != reminder.timestamp)
+    // TODO: rewrite
     const deleted = await fetch(`/api/user/reminders/${reminder.timestamp}`, {
       method: "DELETE",
     })

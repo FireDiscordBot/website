@@ -1,13 +1,17 @@
-import { StatusCodes } from "http-status-codes"
-
-import { createErrorResponse } from "@/utils/fetcher"
 import { toggleGuildPremium } from "@/lib/aether"
-import { AuthenticatedApiHandler, PutTogglePremiumGuildResponse } from "@/types"
-import { error, withSession } from "@/lib/api/api-handler-utils"
+import { PutTogglePremiumGuildResponse } from "@/types"
+import { withAuth, AuthenticatedApiHandler } from "@/lib/api/auth"
+import {
+  badRequest,
+  internalServerError,
+  methodNotAllowed,
+  respondWithError,
+  respondWithSuccess,
+} from "@/lib/api/response"
 
-const handler: AuthenticatedApiHandler<PutTogglePremiumGuildResponse> = async (session, req, res) => {
-  if (req.method != "PUT" && req.method != "DELETE") {
-    error(res, StatusCodes.METHOD_NOT_ALLOWED)
+const handler: AuthenticatedApiHandler<PutTogglePremiumGuildResponse> = async (req, res, session) => {
+  if (req.method !== "PUT" && req.method !== "DELETE") {
+    respondWithError(res, methodNotAllowed())
     return
   }
 
@@ -15,18 +19,20 @@ const handler: AuthenticatedApiHandler<PutTogglePremiumGuildResponse> = async (s
   const subId = req.query.sub
 
   if (typeof guildId !== "string" || typeof subId !== "string") {
-    error(res, StatusCodes.BAD_REQUEST)
+    respondWithError(res, badRequest())
     return
   }
 
   try {
     const premiumGuilds = await toggleGuildPremium(session.accessToken, subId, guildId, req.method)
 
-    res.json(premiumGuilds)
+    respondWithSuccess(res, premiumGuilds)
   } catch (e: any) {
-    const errorResponse = createErrorResponse(e)
-    error(res, errorResponse.code, errorResponse.error)
+    // const errorResponse = createErrorResponse(e)
+    // error(res, errorResponse.code, errorResponse.error)
+    // TODO: handle errors
+    respondWithError(res, internalServerError())
   }
 }
 
-export default withSession(handler)
+export default withAuth(handler)

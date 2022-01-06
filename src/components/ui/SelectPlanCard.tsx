@@ -19,6 +19,7 @@ type Props = {
 }
 
 const SelectPlanCard = ({ open, onClose, onClickPlan, loadPlans }: Props) => {
+  // TODO: stop using SWR here
   const { plans } = useAvailablePlans(loadPlans, {
     revalidateOnFocus: false,
   })

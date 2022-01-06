@@ -1,5 +1,4 @@
 import { WebsiteGateway } from "@/interfaces/aether"
-import { AuthSession } from "@/interfaces/auth"
 import { AetherClient } from "@/lib/ws/aether-client"
 import { Websocket } from "@/lib/ws/websocket"
 import { EventEmitter } from "events"
@@ -13,7 +12,7 @@ const useWebsocket = (emitter: EventEmitter) => {
   React.useEffect(() => {
     let ws: Websocket
     const initHandler = async () => {
-      const session = (await getSession()) as AuthSession
+      const session = await getSession()
       const handler = new AetherClient(session, emitter)
       setHandler(handler)
       const gateway = await handler.api.gateway.website.get<WebsiteGateway>({ version: 2 })

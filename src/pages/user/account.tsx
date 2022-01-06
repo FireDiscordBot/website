@@ -1,4 +1,3 @@
-import * as React from "react"
 import Link from "next/link"
 import Button from "@mui/material/Button"
 import Tooltip from "@mui/material/Tooltip"
@@ -18,8 +17,9 @@ import Loading from "@/components/loading"
 import DiscordFlagImage from "@/components/ui/DiscordFlagImage"
 import useSession from "@/hooks/use-session"
 import useCurrentSubscription from "@/hooks/use-current-subscription"
-import { parseFlags } from "@/lib/discord"
+import { getAvatarImageUrl, parseFlags } from "@/lib/discord"
 import { GetCollectData } from "@/types"
+import { useEffect, useMemo } from "react"
 
 type DataRequestResponse =
   | { success: false; error: string }
@@ -44,12 +44,18 @@ const AccountPage = () => {
       autoHideDuration: 5000,
     })
 
+  // TODO: fix
   const { data: dataRequest, mutate } = useSWR<GetCollectData>(session ? "/api/user/data-archive" : null, {
     revalidateOnReconnect: false,
     revalidateOnFocus: false,
   })
 
-  React.useEffect(() => {
+  const avatarImageUrl = useMemo(
+    () => (session ? getAvatarImageUrl(session.user.avatar, session.user.id, session.user.discriminator) : ""),
+    [session],
+  )
+
+  useEffect(() => {
     setErrorMessage(error?.message)
   }, [error])
 
@@ -142,11 +148,11 @@ const AccountPage = () => {
       </Typography>
       <Card sx={{ marginBottom: (theme) => theme.spacing(2) }}>
         <CardContent sx={{ display: "flex" }}>
-          <Avatar src={session.user.image} sx={{ width: "80px", height: "80px" }} />
+          <Avatar src={avatarImageUrl} sx={{ width: "80px", height: "80px" }} />
           <Box display="flex" flexDirection="column" mr={0} ml={2} mt="auto" mb="auto">
             <div>
               <Typography variant="body1" component="span" fontWeight={700}>
-                {session.user.name}
+                {session.user.username}
               </Typography>
               <Typography variant="body1" color="textSecondary" component="span">
                 #{session.user.discriminator}

@@ -1,6 +1,7 @@
 import { getReasonPhrase, StatusCodes } from "http-status-codes"
 
-import { AnyObject, ApiErrorResponse } from "@/types"
+import { AnyObject } from "@/types"
+import { ApiErrorResponse } from "@/lib/api/response"
 
 export class NetworkError extends Error {
   data?: AnyObject
@@ -18,17 +19,18 @@ export const createErrorResponse = (error: Error): ApiErrorResponse => {
   if (error instanceof NetworkError && typeof error.data == "object" && error.data?.hasOwnProperty("message")) {
     // convert discord errors into the same format used by aether/inv.wtf
     // 'tis hacky but it works, better than 500s and exceptions
-    ;(error.data as ApiErrorResponse).error = (error.data as { message: string; code: number })?.message
-    ;(error.data as ApiErrorResponse).code = error.code
+    const data = error.data as any as ApiErrorResponse
+    data.message = (error.data as { message: string; code: number })?.message
+    data.statusCode = error.code
   }
   if (error instanceof NetworkError && typeof error.data == "object") {
-    return <ApiErrorResponse>error.data
+    return error.data as any as ApiErrorResponse
   } else {
     const code = StatusCodes.INTERNAL_SERVER_ERROR
     return {
       success: false,
-      code,
-      error: getReasonPhrase(code),
+      statusCode: code,
+      message: getReasonPhrase(code),
     }
   }
 }

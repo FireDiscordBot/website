@@ -44,13 +44,18 @@ export const fetchUser = async (accessToken: string): Promise<APIUser & { cached
   return user
 }
 
-export const getAvatarImage = (user: APIUser | PartialOAuthUser, useModSix = false) => {
-  if (user.avatar === null) {
-    const defaultAvatarNumber = useModSix ? parseInt(user.discriminator) % 6 : parseInt(user.discriminator) % 5
-    return `https://cdn.discordapp.com/embed/avatars/${defaultAvatarNumber}.png?ts=${+new Date()}`
+export const getAvatarImageUrl = (
+  avatar: string | null,
+  userId: string,
+  userDiscriminator: string,
+  useModSix = false,
+) => {
+  if (typeof avatar !== "string") {
+    const defaultAvatarNumber = useModSix ? parseInt(userDiscriminator) % 6 : parseInt(userDiscriminator) % 5
+    return `https://cdn.discordapp.com/embed/avatars/${defaultAvatarNumber}.png?ts=${new Date().getTime()}`
   } else {
-    const format = user.avatar.startsWith("a_") ? "gif" : "png"
-    return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${format}`
+    const format = avatar.startsWith("a_") ? "gif" : "png"
+    return `https://cdn.discordapp.com/avatars/${userId}/${avatar}.${format}`
   }
 }
 

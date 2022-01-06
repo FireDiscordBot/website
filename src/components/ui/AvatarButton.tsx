@@ -1,16 +1,21 @@
-import * as React from "react"
+import { getAvatarImageUrl } from "@/lib/discord"
 import Avatar from "@mui/material/Avatar"
 import IconButton, { IconButtonProps } from "@mui/material/IconButton"
+import type { Session } from "next-auth"
+import { useMemo } from "react"
 
-import { AuthUser } from "@/interfaces/auth"
-
-type Props = IconButtonProps<"button", { user: AuthUser }>
+type Props = IconButtonProps<"button", { user: Session["user"] }>
 
 const AvatarButton = ({ user, ...otherProps }: Props) => {
+  const avatarImageUrl = useMemo(
+    () => getAvatarImageUrl(user.avatar, user.id, user.discriminator),
+    [user.avatar, user.id, user.discriminator],
+  )
+
   return (
     <IconButton {...otherProps} sx={{ padding: (theme) => theme.spacing(1) }} size="large">
       <Avatar
-        src={user.image}
+        src={avatarImageUrl}
         sx={(theme) => ({
           boxShadow: theme.shadows[2],
           "&:hover": {

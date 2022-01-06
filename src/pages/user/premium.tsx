@@ -65,6 +65,7 @@ const PremiumPage = () => {
       autoHideDuration: 5000,
     })
 
+  // TODO: fix
   const {
     data: initialGuilds,
     isValidating,
@@ -138,10 +139,10 @@ const PremiumPage = () => {
       })
     } catch (e: any) {
       const errorResponse = createErrorResponse(e)
-      if (errorResponse.code == 404) {
+      if (errorResponse.statusCode == 404) {
         openUrl(discord.inviteUrl(guild.id), true)
       } else {
-        setErrorMessage(errorResponse.error)
+        setErrorMessage(errorResponse.message)
       }
       return
     }
@@ -183,7 +184,7 @@ const PremiumPage = () => {
         method: "POST",
       })
     } catch (e: any) {
-      setErrorMessage(createErrorResponse(e).error)
+      setErrorMessage(createErrorResponse(e).message)
       return
     }
 
