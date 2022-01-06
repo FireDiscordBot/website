@@ -90,7 +90,9 @@ const Reminders = () => {
       })
     else if (typeof window != "undefined" && window?.document?.getElementById("reminder-text") instanceof HTMLElement) {
       const element = window.document.getElementById("reminder-text")
-      if (element) element.innerText = ""
+      // @ts-ignore
+      if (element) element.value = ""
+      setFutureDate(null)
     }
   }
 
