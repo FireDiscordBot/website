@@ -27,11 +27,11 @@ const ListItemLink = ({
   )
 }
 
-type Props = NextSeoProps & {
+interface UserPageLayoutProps extends NextSeoProps {
   children: React.ReactNode
 }
 
-const UserPageLayout = ({ children, ...restProps }: Props) => {
+const UserPageLayout = ({ children, ...restProps }: UserPageLayoutProps) => {
   const router = useRouter()
 
   return (

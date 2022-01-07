@@ -1,13 +1,13 @@
 import Tooltip from "@mui/material/Tooltip"
 import Image from "next/image"
 
-import { DiscordFlag } from "@/interfaces/discord"
+import type { DiscordFlag } from "@/interfaces/discord"
 
-type Props = {
+interface DiscordFlagImageProps {
   flag: DiscordFlag
 }
 
-const DiscordFlagImage = ({ flag }: Props) => (
+const DiscordFlagImage = ({ flag }: DiscordFlagImageProps) => (
   <Tooltip title={flag.name}>
     <span>
       <Image

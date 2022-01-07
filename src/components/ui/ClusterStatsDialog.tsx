@@ -12,11 +12,11 @@ import { styled } from "@mui/material/styles"
 import CircularProgressCard from "./CircularProgressCard"
 import DialogTitle from "./DialogTitle"
 
-import { ClusterStats } from "@/interfaces/aether"
+import type { ClusterStats } from "@/interfaces/aether"
 import { handler } from "@/pages/_app"
 import { formatBytes, formatNumber } from "@/utils/formatting"
 
-type StatLineProps = {
+interface StatLineProps {
   title: string
   value: string
 }
@@ -46,13 +46,13 @@ const StyledPeopleIcon = styled(PeopleIcon)(({ theme }) => ({
   fontSize: theme.spacing(10),
 }))
 
-type Props = {
+interface ClusterStatsDialogProps {
   open?: boolean
   onClose: () => void
   clusterStats: ClusterStats
 }
 
-const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
+const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: ClusterStatsDialogProps) => {
   const open = props.open ?? false
 
   const restartCluster = () => {

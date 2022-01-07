@@ -4,7 +4,7 @@ import type { Plan } from "@/interfaces/fire"
 import type { ApiResponse } from "@/lib/api/response"
 
 const useAvailablePlans = (load = true, config?: SWRConfiguration<ApiResponse<Plan[]>>) => {
-  const { data: res, error } = useSWR<ApiResponse<Plan[]>>(load ? "/api/stripe/subscriptions" : null, config)
+  const { data: res, error } = useSWR<ApiResponse<Plan[]>>(load ? "/api/stripe/plans" : null, config)
 
   return {
     plans: res?.success ? res.data : undefined,

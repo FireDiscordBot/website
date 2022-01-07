@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography"
 
 import { formatNumber } from "@/utils/formatting"
 
-export type Props = CircularProgressProps & {
+export interface CustomCircularProgressProps extends CircularProgressProps {
   title: string
   value: number
   valueLabel?: string
@@ -12,7 +12,7 @@ export type Props = CircularProgressProps & {
   max?: number
 }
 
-const CustomCircularProgress = (props: Props) => {
+const CustomCircularProgress = (props: CustomCircularProgressProps) => {
   const min = props.min ?? 0
   const max = props.max ?? 100
   const percentage = ((props.value - min) * 100) / (max - min)

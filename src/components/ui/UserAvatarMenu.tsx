@@ -6,9 +6,11 @@ import MenuItem, { MenuItemProps } from "@mui/material/MenuItem"
 import MenuItemLink from "@/components/routing/MenuItemLink"
 import { handler } from "@/pages/_app"
 
-type Props = MenuProps & { onClickLogout: MenuItemProps["onClick"] }
+interface UserAvatarMenuProps extends MenuProps {
+  onClickLogout: MenuItemProps["onClick"]
+}
 
-const UserAvatarMenu = ({ onClickLogout, ...props }: Props) => (
+const UserAvatarMenu = ({ onClickLogout, ...props }: UserAvatarMenuProps) => (
   <Menu
     anchorOrigin={{
       vertical: "center",

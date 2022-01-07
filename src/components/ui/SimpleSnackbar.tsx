@@ -2,7 +2,7 @@ import Alert, { AlertColor } from "@mui/material/Alert"
 import Snackbar, { SnackbarCloseReason, SnackbarOrigin } from "@mui/material/Snackbar"
 import { useEffect, useState } from "react"
 
-type Props = {
+interface SimpleSnackbarProps {
   message: string | undefined | null
   autoHideDuration?: number
   severity?: AlertColor
@@ -18,7 +18,7 @@ const SimpleSnackbar = ({
   horizontal,
   vertical,
   onFinishCloseAnimation,
-}: Props) => {
+}: SimpleSnackbarProps) => {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {

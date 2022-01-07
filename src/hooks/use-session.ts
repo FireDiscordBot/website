@@ -1,8 +1,8 @@
-import { useEffect, useMemo } from "react"
 import { useSession as useNextAuthSession } from "next-auth/react"
 import Router from "next/router"
+import { useEffect, useMemo } from "react"
 
-type Options = {
+interface Options {
   redirectTo?: string
 }
 

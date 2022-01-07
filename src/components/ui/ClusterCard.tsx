@@ -5,12 +5,12 @@ import Typography from "@mui/material/Typography"
 
 import { ClusterStats } from "@/interfaces/aether"
 
-type Props = {
+interface ClusterCardProps {
   cluster: ClusterStats
   onClick: (id: number) => void
 }
 
-const ClusterCard = ({ cluster, onClick }: Props) => {
+const ClusterCard = ({ cluster, onClick }: ClusterCardProps) => {
   const onClickCard = () => onClick(cluster.id)
 
   return (

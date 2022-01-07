@@ -70,7 +70,7 @@ export interface PartialOAuthUser {
 /**
  * https://discord.com/developers/docs/resources/user#user-object-user-structure
  */
-export type APIUser = {
+export interface APIUser {
   id: string
   username: string
   discriminator: string
@@ -86,7 +86,7 @@ export type APIUser = {
   public_flags: number
 }
 
-export type APIUserPartial = {
+export interface APIUserPartial {
   id: string
   username: string
   avatar: string
@@ -99,7 +99,7 @@ export type APIUserPartial = {
 /**
  * https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-structure
  */
-export type APIMember = {
+export interface APIMember {
   user: APIUserPartial
   roles: string[]
   nick?: string
@@ -111,7 +111,7 @@ export type APIMember = {
   permissions: string
 }
 
-export type DiscordGuild = {
+export interface DiscordGuild {
   id: string
   name: string
   icon: string
@@ -120,12 +120,12 @@ export type DiscordGuild = {
   features: string[]
 }
 
-export type PremiumDiscordGuild = DiscordGuild & {
+export interface PremiumDiscordGuild extends DiscordGuild {
   premium: boolean
   managed: boolean | null
 }
 
-export type DiscordFlag = {
+export interface DiscordFlag {
   key: string
   value: number
   name: string

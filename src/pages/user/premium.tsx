@@ -10,7 +10,7 @@ import useSWR, { mutate } from "swr"
 import { emitter, handler } from "../_app"
 
 import UserPage from "@/components/layout/user-page"
-import Loading from "@/components/loading"
+import Loading from "@/components/ui/Loading"
 import SelectPlanCard from "@/components/ui/SelectPlanCard"
 import SubscriptionCard from "@/components/ui/SubscriptionCard"
 import UserGuildCard from "@/components/ui/UserGuildCard"
@@ -88,7 +88,7 @@ const PremiumPage = () => {
 
   useEffect(() => {
     if (!subscription && !isLoadingSubscription) {
-      mutate("/api/stripe/subscriptions", fetcher("/api/stripe/subscriptions"))
+      mutate("/api/stripe/plans", fetcher("/api/stripe/plans"))
     }
   }, [subscription, isLoadingSubscription])
 

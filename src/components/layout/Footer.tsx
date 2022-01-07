@@ -8,16 +8,14 @@ const StyledFooter = styled("footer")(({ theme }) => ({
   backgroundColor: theme.palette.grey[900],
 }))
 
-const Footer = () => {
-  return (
-    <StyledFooter>
-      <Container sx={{ display: "flex", justifyContent: "center" }}>
-        <Typography variant="caption" color="textSecondary">
-          © 2022 Fire Bot. All Rights Reserved.
-        </Typography>
-      </Container>
-    </StyledFooter>
-  )
-}
+const Footer = () => (
+  <StyledFooter>
+    <Container sx={{ display: "flex", justifyContent: "center" }}>
+      <Typography variant="caption" color="textSecondary">
+        © 2022 Fire Bot. All Rights Reserved.
+      </Typography>
+    </Container>
+  </StyledFooter>
+)
 
 export default Footer

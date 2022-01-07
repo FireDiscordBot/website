@@ -7,8 +7,8 @@ import Skeleton from "@mui/material/Skeleton"
 import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
 
-import { DiscoverableGuild } from "@/interfaces/aether"
-import { Invite } from "@/interfaces/discord"
+import type { DiscoverableGuild } from "@/interfaces/aether"
+import type { Invite } from "@/interfaces/discord"
 import { emitter, handler } from "@/pages/_app"
 import { formatNumber } from "@/utils/formatting"
 
@@ -30,16 +30,16 @@ const CardText = styled("div")(({ theme }) => ({
   overflow: "hidden",
 }))
 
-type Props = {
-  guild?: DiscoverableGuild
-}
-
-type JoinRequestResponse = { error: string; code: number } | { error: null; invite: Invite }
-
 const domain =
   process.env.NODE_ENV == "development" ? "http://localhost:1338/v2/discoverable/join" : "https://discover-v2.inv.wtf"
 
-const DiscoverableGuildCard = ({ guild }: Props) => {
+type JoinRequestResponse = { error: string; code: number } | { error: null; invite: Invite }
+
+interface DiscoverableGuildCardProps {
+  guild?: DiscoverableGuild
+}
+
+const DiscoverableGuildCard = ({ guild }: DiscoverableGuildCardProps) => {
   if (!guild) {
     return (
       <Skeleton animation="wave">

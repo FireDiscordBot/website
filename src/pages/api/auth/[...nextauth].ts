@@ -12,8 +12,7 @@ const discordProvider = DiscordProvider({
     discriminator: profile.discriminator,
     avatar: profile.avatar,
     banner: profile.banner,
-    // TODO
-    //   banner: getBannerImage(profile),
+    // TODO: banner color
     email: profile.email,
     publicFlags: profile.public_flags,
     premiumType: profile.premium_type,

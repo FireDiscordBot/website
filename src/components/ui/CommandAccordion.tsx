@@ -4,14 +4,14 @@ import AccordionDetails from "@mui/material/AccordionDetails"
 import AccordionSummary from "@mui/material/AccordionSummary"
 import Typography from "@mui/material/Typography"
 
-import { Command } from "@/interfaces/aether"
+import type { Command } from "@/interfaces/aether"
 
-type Props = {
+interface CommandAccordionProps {
   command: Command
   prefix: string
 }
 
-const CommandAccordion = ({ command, prefix }: Props) => (
+const CommandAccordion = ({ command, prefix }: CommandAccordionProps) => (
   <Accordion>
     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
       <Typography

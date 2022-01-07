@@ -7,12 +7,12 @@ import Typography from "@mui/material/Typography"
 
 import useCurrentSubscription from "@/hooks/use-current-subscription"
 import useSession from "@/hooks/use-session"
-import { ApiResponse } from "@/lib/api/response"
-import { PostBillingPortalResponse } from "@/types"
+import type { ApiResponse } from "@/lib/api/response"
+import type { PostBillingPortalResponse } from "@/types"
 import fetcher from "@/utils/fetcher"
 import { capitalize, formatDateTime } from "@/utils/formatting"
 
-type DetailLineProps = {
+interface DetailLineProps {
   title: string
   value: string
 }
@@ -26,11 +26,11 @@ const DetailLine = ({ title, value }: DetailLineProps) => (
   </Box>
 )
 
-type Props = {
+interface SubscriptionCardProps {
   onClickSelectPlan: () => void
 }
 
-const SubscriptionCard = ({ onClickSelectPlan }: Props) => {
+const SubscriptionCard = ({ onClickSelectPlan }: SubscriptionCardProps) => {
   const [session, loading] = useSession()
   const { subscription } = useCurrentSubscription(session != null && !loading)
 

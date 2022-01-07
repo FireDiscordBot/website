@@ -13,7 +13,7 @@ import { useState } from "react"
 import { handler } from "../_app"
 
 import SuperuserLayout, { SuperuserPageTypes } from "@/components/layout/superuser-page"
-import Loading from "@/components/loading"
+import Loading from "@/components/ui/Loading"
 import useSession from "@/hooks/use-session"
 
 const StyledFormControl = styled(FormControl)(({ theme }) => ({

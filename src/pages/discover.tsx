@@ -8,8 +8,8 @@ import { useEffect, useState } from "react"
 import { emitter, handler } from "./_app"
 
 import DefaultLayout from "@/components/layout/default"
-import Loading from "@/components/loading"
 import DiscoverableGuildCard from "@/components/ui/DiscoverableGuildCard"
+import Loading from "@/components/ui/Loading"
 import { DiscoverableGuild, DiscoveryUpdateOp } from "@/interfaces/aether"
 
 interface DiscoverySync {

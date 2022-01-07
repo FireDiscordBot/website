@@ -1,4 +1,4 @@
-export type Plan = {
+export interface Plan {
   id: string
   name: string
   images: string[]

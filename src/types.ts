@@ -1,10 +1,11 @@
 import type { PremiumDiscordGuild } from "./interfaces/discord"
+
 import type { Reminder } from "@/interfaces/aether"
 import type { Plan } from "@/interfaces/fire"
 
 export type AnyObject = Record<string, unknown>
 
-export type GetSubscriptionsResponse = Plan[]
+export type GetPlansResponse = Plan[]
 
 export type GetSubscriptionResponse =
   | {
@@ -25,9 +26,13 @@ export type GetSubscriptionResponse =
       }
     }
 
-export type PostSubscriptionResponse = { sessionId: string }
+export interface PostSubscriptionResponse {
+  sessionId: string
+}
 
-export type PostBillingPortalResponse = { url: string }
+export interface PostBillingPortalResponse {
+  url: string
+}
 
 export type GetGuildsResponse = PremiumDiscordGuild[]
 
@@ -35,7 +40,9 @@ export type GetRemindersResponse = Reminder[]
 
 export type PutTogglePremiumGuildResponse = string[]
 
-export type PostCollectData = { url: string }
+export interface PostCollectData {
+  url: string
+}
 
 export type GetCollectData =
   | { status: 0; last_request: null }

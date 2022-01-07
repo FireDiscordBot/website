@@ -26,12 +26,12 @@ const StyledCard = styled(Card)<StyledCard>(({ theme, premium }) => ({
   }),
 }))
 
-type Props = {
+interface UserGuildCardProps {
   guild?: PremiumDiscordGuild
   onClickToggle: (guild: PremiumDiscordGuild) => void
 }
 
-const UserGuildCard = ({ guild, onClickToggle }: Props) => {
+const UserGuildCard = ({ guild, onClickToggle }: UserGuildCardProps) => {
   const avatar = useMemo(() => {
     if (!guild) {
       return (

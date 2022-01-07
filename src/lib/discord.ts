@@ -63,7 +63,9 @@ export const getBannerImage = (user: APIUser | PartialOAuthUser) => {
   if (user.banner) {
     const format = user.banner?.startsWith("a_") ? "gif" : "png"
     return `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.${format}?size=1024`
-  } else return null
+  } else {
+    return null
+  }
 }
 
 export const getGuildIcon = (guild: UserGuild) => {
@@ -102,8 +104,7 @@ export const parseFlags = (flagsValue: number, premiumType: number) => {
   return parsedFlags.sort((a, b) => flags.indexOf(a) - flags.indexOf(b))
 }
 
-export const getMatches = (string: string, index: number) => {
-  index || (index = 1) // default to the first capturing group
+export const getMatches = (string: string, index = 1) => {
   const matches = []
   let match
   while ((match = messageLinkRegex.exec(string))) {

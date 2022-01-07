@@ -5,9 +5,9 @@ import { useMemo } from "react"
 
 import { getAvatarImageUrl } from "@/lib/discord"
 
-type Props = IconButtonProps<"button", { user: Session["user"] }>
+type AvatarButtonProps = IconButtonProps<"button", { user: Session["user"] }>
 
-const AvatarButton = ({ user, ...otherProps }: Props) => {
+const AvatarButton = ({ user, ...otherProps }: AvatarButtonProps) => {
   const avatarImageUrl = useMemo(
     () => getAvatarImageUrl(user.avatar, user.id, user.discriminator),
     [user.avatar, user.id, user.discriminator],

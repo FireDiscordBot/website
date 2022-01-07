@@ -4,7 +4,7 @@ import { useState } from "react"
 import DefaultLayout from "./default"
 import UserPageLayout from "./user-page"
 
-import Loading from "@/components/loading"
+import Loading from "@/components/ui/Loading"
 import { emitter, handler } from "@/pages/_app"
 
 export enum SuperuserPageTypes {
@@ -12,12 +12,12 @@ export enum SuperuserPageTypes {
   USER,
 }
 
-type Props = NextSeoProps & {
+interface SuperuserLayoutProps extends NextSeoProps {
   children?: React.ReactNode
   type: 1 | 2
 }
 
-const SuperuserLayout = ({ children, type, ...restProps }: Props) => {
+const SuperuserLayout = ({ children, type, ...restProps }: SuperuserLayoutProps) => {
   const [superuser, setSuperuser] = useState<boolean | null>(
     handler?.config ? (handler.config["utils.superuser"] as boolean) || false : null,
   )

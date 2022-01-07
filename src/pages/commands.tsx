@@ -14,8 +14,8 @@ import { ChangeEvent, useEffect, useState } from "react"
 import { emitter, handler } from "./_app"
 
 import DefaultLayout from "@/components/layout/default"
-import Loading from "@/components/loading"
 import CommandAccordion from "@/components/ui/CommandAccordion"
+import Loading from "@/components/ui/Loading"
 import { fire } from "@/constants"
 import { Command } from "@/interfaces/aether"
 

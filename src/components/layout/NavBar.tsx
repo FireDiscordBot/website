@@ -60,7 +60,10 @@ const NavBar = () => {
   if (loading) {
     authButton = <Typography variant="body2">Loading...</Typography>
   } else if (session) {
-    if (session.error == "RefreshFailed") signIn("discord")
+    if (session.error == "RefreshFailed") {
+      signIn("discord")
+    }
+
     const onClickAvatar = (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault()
       setAnchorEl(e.currentTarget)
@@ -87,6 +90,7 @@ const NavBar = () => {
       e.preventDefault()
       return signIn("discord")
     }
+
     authButton = (
       <Button color="inherit" onClick={onClick}>
         Login with Discord

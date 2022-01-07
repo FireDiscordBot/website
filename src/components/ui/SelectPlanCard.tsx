@@ -8,17 +8,17 @@ import ListItemText from "@mui/material/ListItemText"
 import DialogTitle from "./DialogTitle"
 
 import useAvailablePlans from "@/hooks/use-available-plans"
-import { Plan } from "@/interfaces/fire"
+import type { Plan } from "@/interfaces/fire"
 import { formatNumber } from "@/utils/formatting"
 
-type Props = {
+interface SelectPlanCardProps {
   open: boolean
   onClose: () => void
   onClickPlan: (plan: Plan) => void
   loadPlans: boolean
 }
 
-const SelectPlanCard = ({ open, onClose, onClickPlan, loadPlans }: Props) => {
+const SelectPlanCard = ({ open, onClose, onClickPlan, loadPlans }: SelectPlanCardProps) => {
   // TODO: stop using SWR here
   const { plans } = useAvailablePlans(loadPlans, {
     revalidateOnFocus: false,
