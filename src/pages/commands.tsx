@@ -74,7 +74,7 @@ const CommandsPage = () => {
     )
   }
 
-  const onChangeSelectedTab = (event: ChangeEvent<unknown>, _: number) => {
+  const onChangeSelectedTab = (event: ChangeEvent<unknown>) => {
     const categoryName = (event.target as HTMLSpanElement).textContent
     if (!categoryName) return
     const index = getCategories().indexOf(categoryName)

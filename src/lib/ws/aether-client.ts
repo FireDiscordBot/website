@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// TODO: rewrite
+
 import EventEmitter from "events"
 
 import { getSession, signIn, signOut } from "next-auth/react"

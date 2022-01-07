@@ -25,7 +25,7 @@ const SimpleSnackbar = ({
     setOpen(message != null)
   }, [message])
 
-  const handleCloseSnackbar = (_: any, reason: SnackbarCloseReason) => {
+  const handleCloseSnackbar = (_: unknown, reason: SnackbarCloseReason) => {
     if (reason != "clickaway") setOpen(false)
   }
 

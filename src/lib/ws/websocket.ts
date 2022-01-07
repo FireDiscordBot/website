@@ -10,6 +10,7 @@ else {
 }
 
 export class Websocket extends WebSocket {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handlers: Map<string, (value: any) => void>
   aether?: AetherClient
   connectedTo: string

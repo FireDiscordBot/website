@@ -27,7 +27,7 @@ const handler: AuthenticatedApiHandler<PutTogglePremiumGuildResponse> = async (r
     const premiumGuilds = await toggleGuildPremium(session.accessToken, subId, guildId, req.method)
 
     respondWithSuccess(res, premiumGuilds)
-  } catch (e: any) {
+  } catch (e) {
     // const errorResponse = createErrorResponse(e)
     // error(res, errorResponse.code, errorResponse.error)
     // TODO: handle errors

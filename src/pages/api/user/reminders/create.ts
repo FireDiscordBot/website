@@ -4,6 +4,7 @@ import { badRequest, methodNotAllowed, respondWithError, respondWithSuccess } fr
 import { NetworkError } from "@/utils/fetcher"
 
 // TODO: typing
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handler: AuthenticatedApiHandler<any> = async (req, res, session) => {
   if (req.method !== "POST") {
     respondWithError(res, methodNotAllowed())
@@ -20,7 +21,11 @@ const handler: AuthenticatedApiHandler<any> = async (req, res, session) => {
   }
 
   const reminder = await createUserReminder(session.accessToken, req.body).catch((e) => e)
-  if (reminder instanceof NetworkError) return res.status(reminder.code).json(reminder.data as any)
+  if (reminder instanceof NetworkError) {
+    // TODO: handle this better
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return res.status(reminder.code).json(reminder.data as any)
+  }
 
   respondWithSuccess(res, body)
 }

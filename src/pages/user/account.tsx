@@ -71,8 +71,11 @@ const AccountPage = () => {
 
   const onClickRequestData = async (event: React.MouseEvent) => {
     event.preventDefault()
-    if (document?.getElementById("request-data")?.className)
-      document.getElementById("request-data")!.className += " Mui-disabled"
+    // TODO
+    const reqDataEl = document.getElementById("request-data")
+    if (reqDataEl) {
+      reqDataEl.className += " Mui-disabled"
+    }
     await mutate(undefined, true)
 
     if (typeof dataRequest?.status == "number" && dataRequest.status != 0) {

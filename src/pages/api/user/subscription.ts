@@ -34,8 +34,8 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (_req, res, 
 
   try {
     customerId = await fetchCustomerId(session.accessToken)
-  } catch (e: any) {
-    const errorResponse = createErrorResponse(e)
+  } catch (e) {
+    const errorResponse = createErrorResponse(e as Error)
     if (errorResponse.message.includes("Customer Not Found")) {
       respondWithSuccess(res, {
         hasSubscription: false,

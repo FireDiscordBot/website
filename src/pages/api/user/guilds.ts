@@ -13,8 +13,8 @@ const handler: AuthenticatedApiHandler<GetGuildsResponse> = async (req, res, ses
   try {
     const premiumGuilds = await fetchPremiumGuilds(session.accessToken, req.query.sessionId.toString())
     respondWithSuccess(res, premiumGuilds)
-  } catch (err: any) {
-    const errorResponse = createErrorResponse(err)
+  } catch (err) {
+    const errorResponse = createErrorResponse(err as Error)
     if (!errorResponse.message.includes("No Subscription Found")) {
       // TODO: handle errors
       respondWithError(res, internalServerError())
