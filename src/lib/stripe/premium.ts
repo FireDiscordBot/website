@@ -1,9 +1,10 @@
 import Stripe from "stripe"
 
-import stripe from "@/api/server-stripe"
-import { Plan } from "@/interfaces/fire"
+import { PremiumPlan } from "./types"
 
-export const fetchPlans = async () => {
+import stripe from "@/lib/stripe"
+
+export const fetchPlans = async (): Promise<PremiumPlan[]> => {
   const pricesList = await stripe.prices.list({
     active: true,
     type: "recurring",
@@ -13,8 +14,8 @@ export const fetchPlans = async () => {
     expand: ["data.product"],
   })
 
-  const plans: Plan[] = pricesList.data
-    .map((price) => {
+  const plans = pricesList.data
+    .map((price): PremiumPlan => {
       const product = price.product as Stripe.Product
       return {
         id: price.id,

@@ -22,7 +22,7 @@ const handler: AuthenticatedApiHandler<PostCollectData | GetCollectData | AnyObj
     if (err instanceof NetworkError && typeof err.data != "undefined") {
       if (typeof err.data == "object") {
         // TODO: better error response
-        respondWithError(res, err.data as any as ApiErrorResponse)
+        respondWithError(res, err.data as unknown as ApiErrorResponse)
       } else {
         res.status(err.code).send(err.data)
       }

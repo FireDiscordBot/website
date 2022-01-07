@@ -77,7 +77,7 @@ const CommandsPage = () => {
   const onChangeSelectedTab = (event: ChangeEvent<unknown>, _: number) => {
     const categoryName = (event.target as HTMLSpanElement).textContent
     if (!categoryName) return
-    let index = getCategories().indexOf(categoryName)
+    const index = getCategories().indexOf(categoryName)
     setSelectedCategoryIndex(index)
     if (!cachedCategories.includes(categoryName) && categoryName != "All")
       handler.handleSubscribe("/commands", {

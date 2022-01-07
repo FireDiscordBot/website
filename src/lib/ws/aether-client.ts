@@ -122,7 +122,7 @@ export class AetherClient {
 
   async signOut() {
     if (typeof window == "undefined") return
-    await signOut().catch(() => {})
+    await signOut().catch(() => ({}))
   }
 
   async signIn() {

@@ -1,11 +1,11 @@
 import type { PremiumDiscordGuild } from "./interfaces/discord"
 
 import type { Reminder } from "@/interfaces/aether"
-import type { Plan } from "@/interfaces/fire"
+import type { PremiumPlan } from "./lib/stripe/types"
 
 export type AnyObject = Record<string, unknown>
 
-export type GetPlansResponse = Plan[]
+export type GetPlansResponse = PremiumPlan[]
 
 export type GetSubscriptionResponse =
   | {

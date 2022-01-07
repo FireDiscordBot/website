@@ -171,9 +171,12 @@ const AdminPage = () => {
                   setExperimentType("")
                   setID("")
                   setBucket(0)
-                  if (typeof document != "undefined" && !!document.getElementById("apply-to-id"))
-                    // @ts-ignore
-                    document.getElementById("apply-to-id").value = ""
+                  if (typeof document != "undefined") {
+                    const el = document.getElementById("apply-to-id") as HTMLInputElement | null
+                    if (el) {
+                      el.value = ""
+                    }
+                  }
                 }
               }}
             >

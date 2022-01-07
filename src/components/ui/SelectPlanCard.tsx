@@ -8,13 +8,13 @@ import ListItemText from "@mui/material/ListItemText"
 import DialogTitle from "./DialogTitle"
 
 import useAvailablePlans from "@/hooks/use-available-plans"
-import type { Plan } from "@/interfaces/fire"
+import { PremiumPlan } from "@/lib/stripe/types"
 import { formatNumber } from "@/utils/formatting"
 
 interface SelectPlanCardProps {
   open: boolean
   onClose: () => void
-  onClickPlan: (plan: Plan) => void
+  onClickPlan: (plan: PremiumPlan) => void
   loadPlans: boolean
 }
 

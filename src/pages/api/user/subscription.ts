@@ -1,6 +1,5 @@
-import { Stripe } from "stripe"
+import type { Stripe } from "stripe"
 
-import stripe from "@/api/server-stripe"
 import { createStripeCheckoutSession, fetchCustomerId } from "@/lib/aether"
 import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import {
@@ -10,10 +9,13 @@ import {
   respondWithError,
   respondWithSuccess,
 } from "@/lib/api/response"
+import stripe from "@/lib/stripe"
 import { GetSubscriptionResponse, PostSubscriptionResponse } from "@/types"
 import { createErrorResponse } from "@/utils/fetcher"
 
-const subscriptionComparator = (first: Stripe.Subscription, second: Stripe.Subscription) => {
+type SubscriptionWithPlan = Stripe.Subscription & { plan: Stripe.Plan }
+
+const subscriptionComparator = (first: SubscriptionWithPlan, second: SubscriptionWithPlan) => {
   const getStatusWeight = (status: Stripe.Subscription.Status) => {
     switch (status) {
       case "active":
@@ -50,7 +52,7 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (_req, res, 
     expand: ["data.plan.product"],
   })
 
-  const subscriptions = response.data.sort(subscriptionComparator)
+  const subscriptions = (response.data as SubscriptionWithPlan[]).sort(subscriptionComparator)
   const hasSubscription = subscriptions.some((subscription) =>
     ["trialing", "active", "past_due"].includes(subscription.status),
   )
@@ -63,8 +65,15 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (_req, res, 
   }
 
   const subscription = subscriptions[0]
-  // @ts-ignore
-  const product: Stripe.Product = subscription.plan.product
+  const product = subscription.plan.product
+
+  if (!product || typeof product !== "object" || product.deleted) {
+    // TODO: maybe handle this better
+    respondWithSuccess(res, {
+      hasSubscription: false,
+    })
+    return
+  }
 
   let servers = parseInt(product.metadata.servers ?? "0", 10)
   if (subscription.metadata?.custom_limit)

@@ -100,8 +100,10 @@ const StatsPage = () => {
           setClusterStats(clusterStatsCopy)
         }
       }
-      // @ts-ignore
-      if (handler) handler.cachedStats = clusterStats
+      if (handler) {
+        // @ts-expect-error This class will be rewrote soon
+        handler.cachedStats = clusterStats
+      }
     })
   }, [clusterStats, initialStats?.clusterCount])
 

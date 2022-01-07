@@ -1,4 +1,4 @@
-export interface Plan {
+export interface PremiumPlan {
   id: string
   name: string
   images: string[]

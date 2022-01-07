@@ -18,7 +18,7 @@ import { discord, stripe as stripeConstants } from "@/constants"
 import useCurrentSubscription from "@/hooks/use-current-subscription"
 import useSession from "@/hooks/use-session"
 import { PremiumDiscordGuild } from "@/interfaces/discord"
-import { Plan } from "@/interfaces/fire"
+import { PremiumPlan } from "@/lib/stripe/types"
 import { PostSubscriptionResponse } from "@/types"
 import fetcher, { createErrorResponse } from "@/utils/fetcher"
 import { openUrl } from "@/utils/open-url"
@@ -137,8 +137,8 @@ const PremiumPage = () => {
       premiumGuilds = await fetcher(`/api/user/subscriptions/${subscription.id}/guilds/${guild.id}/premium`, {
         method: guild.premium ? "DELETE" : "PUT",
       })
-    } catch (e: any) {
-      const errorResponse = createErrorResponse(e)
+    } catch (e) {
+      const errorResponse = createErrorResponse(e as Error)
       if (errorResponse.statusCode == 404) {
         openUrl(discord.inviteUrl(guild.id), true)
       } else {
@@ -169,7 +169,7 @@ const PremiumPage = () => {
     mutateGuilds(newInitialGuilds, false)
   }
 
-  const onClickPlan = async (plan: Plan) => {
+  const onClickPlan = async (plan: PremiumPlan) => {
     const stripe = await stripePromise
 
     if (!stripe) {
@@ -183,8 +183,8 @@ const PremiumPage = () => {
       json = await fetcher(`/api/user/subscription?servers=${plan.servers}`, {
         method: "POST",
       })
-    } catch (e: any) {
-      setErrorMessage(createErrorResponse(e).message)
+    } catch (e) {
+      setErrorMessage(createErrorResponse(e as Error).message)
       return
     }
 
