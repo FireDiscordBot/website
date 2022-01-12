@@ -1,5 +1,5 @@
 import type { Reminder } from "@/interfaces/aether"
-import { fetchUserReminders } from "@/lib/aether"
+import { fetchUserReminders } from "@/lib/aether/api"
 import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { internalServerError, respondWithError, respondWithSuccess } from "@/lib/api/response"
 import type { GetRemindersResponse } from "@/types"

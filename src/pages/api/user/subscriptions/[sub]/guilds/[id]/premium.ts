@@ -1,4 +1,4 @@
-import { toggleGuildPremium } from "@/lib/aether"
+import { toggleGuildPremium } from "@/lib/aether/api"
 import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import {
   badRequest,

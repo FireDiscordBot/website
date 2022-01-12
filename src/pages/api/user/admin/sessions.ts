@@ -1,5 +1,5 @@
 import { AdminSessionData } from "@/interfaces/aether"
-import { getSessions } from "@/lib/aether"
+import { getSessions } from "@/lib/aether/api"
 import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { internalServerError, methodNotAllowed, respondWithError, respondWithSuccess } from "@/lib/api/response"
 import { AnyObject } from "@/types"

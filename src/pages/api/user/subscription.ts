@@ -1,6 +1,6 @@
 import type { Stripe } from "stripe"
 
-import { createStripeCheckoutSession, fetchCustomerId } from "@/lib/aether"
+import { createStripeCheckoutSession, fetchCustomerId } from "@/lib/aether/api"
 import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import {
   badRequest,

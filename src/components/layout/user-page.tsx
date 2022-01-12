@@ -1,4 +1,4 @@
-import { AccountCircle, Code, Event, Star } from "@mui/icons-material"
+import { AccountCircle, Event, Star } from "@mui/icons-material"
 import { ListItemIcon } from "@mui/material"
 import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
@@ -12,7 +12,7 @@ import { NextRouter, useRouter } from "next/router"
 
 import DefaultLayout from "./default"
 
-import { handler } from "@/pages/_app"
+// import { handler } from "@/pages/_app"
 
 const ListItemLink = ({
   router,
@@ -59,14 +59,14 @@ const UserPageLayout = ({ children, ...restProps }: UserPageLayoutProps) => {
                   </ListItemIcon>
                   <ListItemText primary="Reminders" />
                 </ListItemLink>
-                {(handler?.isSuperuser() || handler?.router?.route == "/user/admin") && (
+                {/* {(handler?.isSuperuser() || handler?.router?.route == "/user/admin") && (
                   <ListItemLink href="/user/admin" router={router}>
                     <ListItemIcon>
                       <Code />
                     </ListItemIcon>
                     <ListItemText primary="Admin" />
                   </ListItemLink>
-                )}
+                )} */}
               </List>
             </Paper>
           </Grid>

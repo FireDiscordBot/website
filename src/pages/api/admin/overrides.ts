@@ -1,5 +1,5 @@
 import { BuildOverride } from "@/interfaces/aether"
-import { getBuildOverrides } from "@/lib/aether"
+import { getBuildOverrides } from "@/lib/aether/api"
 import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { methodNotAllowed, respondWithError, respondWithSuccess } from "@/lib/api/response"
 

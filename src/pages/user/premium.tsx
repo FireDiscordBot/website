@@ -7,8 +7,6 @@ import { loadStripe } from "@stripe/stripe-js"
 import { useEffect, useMemo, useState } from "react"
 import useSWR, { mutate } from "swr"
 
-import { emitter, handler } from "../_app"
-
 import UserPage from "@/components/layout/user-page"
 import Loading from "@/components/ui/Loading"
 import SelectPlanCard from "@/components/ui/SelectPlanCard"
@@ -55,15 +53,18 @@ const PremiumPage = () => {
     isLoading: isLoadingSubscription,
     error: subscriptionError,
   } = useCurrentSubscription(session != null && !loading)
-  const setErrorMessage = (text: string | null) =>
-    text &&
-    emitter.emit("NOTIFICATION", {
-      text,
-      severity: "error",
-      horizontal: "right",
-      vertical: "top",
-      autoHideDuration: 5000,
-    })
+  const setErrorMessage = (text: string | null) => {
+    if (text) {
+      // TODO
+      // emitter.emit("NOTIFICATION", {
+      //   text,
+      //   severity: "error",
+      //   horizontal: "right",
+      //   vertical: "top",
+      //   autoHideDuration: 5000,
+      // })
+    }
+  }
 
   // TODO: fix
   const {
@@ -71,13 +72,11 @@ const PremiumPage = () => {
     isValidating,
     mutate: mutateGuilds,
     error: guildsError,
-  } = useSWR<PremiumDiscordGuild[]>(
-    session ? (handler?.session ? `/api/user/guilds?sessionId=${handler.session}` : null) : null,
-    {
-      revalidateOnReconnect: false,
-      revalidateOnFocus: false,
-    },
-  )
+    // TODO: ?sessionId=x
+  } = useSWR<PremiumDiscordGuild[]>(session ? `/api/user/guilds` : null, {
+    revalidateOnReconnect: false,
+    revalidateOnFocus: false,
+  })
   const premiumGuildsCount = useMemo(
     () => initialGuilds?.filter((guild) => guild.premium && guild.managed)?.length ?? 0,
     [initialGuilds],

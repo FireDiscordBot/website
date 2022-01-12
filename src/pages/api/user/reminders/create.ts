@@ -1,4 +1,4 @@
-import { createUserReminder } from "@/lib/aether"
+import { createUserReminder } from "@/lib/aether/api"
 import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { badRequest, methodNotAllowed, respondWithError, respondWithSuccess } from "@/lib/api/response"
 import { NetworkError } from "@/utils/fetcher"

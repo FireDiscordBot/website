@@ -2,18 +2,51 @@ import { fire } from "@/constants"
 import { AdminSessionData, BuildOverride, Reminder } from "@/interfaces/aether"
 import { PremiumDiscordGuild } from "@/interfaces/discord"
 import { GetCollectData } from "@/types"
-import fetcher from "@/utils/fetcher"
 
-export const requestWithAuth = <R = never>(accessToken: string, path: string, method?: string, body?: unknown) =>
-  fetcher<R>(`${fire.aetherApiUrl}/${path}`, {
-    body: body as BodyInit,
-    method: method ?? "GET",
+const request = async <R = void, B = unknown>(
+  path: string,
+  method = "GET",
+  headers?: HeadersInit,
+  body?: B,
+  options?: RequestInit,
+): Promise<R> => {
+  const response = await fetch(`${fire.aetherApiUrl}/${path}`, {
+    method,
+    body: body ? JSON.stringify(body) : null,
     headers: {
       "User-Agent": "Fire Website",
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
+      ...headers,
     },
+    ...options,
   })
+
+  if (!(response.status >= 200 && response.status <= 300)) {
+    throw {}
+  }
+
+  return response.json()
+}
+
+const requestWithAuth = <R = void, B = unknown>(
+  accessToken: string,
+  path: string,
+  method = "GET",
+  body?: B,
+  options?: RequestInit,
+) =>
+  request<R, B>(
+    path,
+    method,
+    {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body,
+    options,
+  )
+
+export const fetchWebsiteGateway = (accessToken: string) => {
+  return requestWithAuth<{ url: string }>(accessToken, "v2/gateway/website", "GET")
+}
 
 export const fetchCustomerId = async (accessToken: string) => {
   const json = await requestWithAuth<{ id: string }>(accessToken, `stripe/customer`)
@@ -35,7 +68,7 @@ export const createStripePortalSession = async (accessToken: string) => {
 }
 
 export const fetchPremiumGuilds = async (accessToken: string, sessionId: string) => {
-  return await requestWithAuth<PremiumDiscordGuild[]>(accessToken, `guilds/premium?sessionId=${sessionId}`)
+  return requestWithAuth<PremiumDiscordGuild[]>(accessToken, `guilds/premium?sessionId=${sessionId}`)
 }
 
 export const toggleGuildPremium = async (
@@ -44,7 +77,7 @@ export const toggleGuildPremium = async (
   guildId: string,
   method: "PUT" | "DELETE",
 ) => {
-  return await requestWithAuth<string[]>(accessToken, `subscriptions/${subId}/guilds/${guildId}/premium`, method)
+  return requestWithAuth<string[]>(accessToken, `subscriptions/${subId}/guilds/${guildId}/premium`, method)
 }
 
 export const createDataArchive = async (accessToken: string) => {
@@ -58,21 +91,21 @@ export const getDataRequest = async (accessToken: string) => {
 }
 
 export const fetchUserReminders = async (accessToken: string) => {
-  return await requestWithAuth<Reminder[]>(accessToken, `user/reminders`)
+  return requestWithAuth<Reminder[]>(accessToken, `user/reminders`)
 }
 
 export const createUserReminder = async (accessToken: string, body: { reminder: string; timestamp: number }) => {
-  return await requestWithAuth<unknown>(accessToken, `user/reminders`, "POST", body)
+  return requestWithAuth<void>(accessToken, `user/reminders`, "POST", body)
 }
 
 export const deleteUserReminder = async (accessToken: string, timestamp: string) => {
-  return await requestWithAuth<unknown>(accessToken, `user/reminders/${timestamp}`, "DELETE")
+  return requestWithAuth<void>(accessToken, `user/reminders/${timestamp}`, "DELETE")
 }
 
 export const getBuildOverrides = async (accessToken: string) => {
-  return await requestWithAuth<BuildOverride[]>(accessToken, `__development/overrides`, "GET")
+  return requestWithAuth<BuildOverride[]>(accessToken, `__development/overrides`, "GET")
 }
 
 export const getSessions = async (accessToken: string) => {
-  return await requestWithAuth<AdminSessionData[]>(accessToken, `sessions`)
+  return requestWithAuth<AdminSessionData[]>(accessToken, `sessions`)
 }

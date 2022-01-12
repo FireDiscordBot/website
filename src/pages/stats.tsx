@@ -8,8 +8,6 @@ import { styled } from "@mui/material/styles"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useState } from "react"
 
-import { emitter, handler } from "./_app"
-
 import DefaultLayout from "@/components/layout/default"
 import CircularProgressCard from "@/components/ui/CircularProgressCard"
 import ClusterCard from "@/components/ui/ClusterCard"
@@ -36,8 +34,8 @@ const StyledCardContent = styled(CardContent)({
 const StatsPage = () => {
   const router = useRouter()
 
-  const [initialStats, setInitialStats] = useState<InitialStats | undefined>(undefined)
-  const [clusterStats, setClusterStats] = useState<ClusterStats[]>([])
+  const [initialStats] = useState<InitialStats | undefined>(undefined)
+  const [clusterStats] = useState<ClusterStats[]>([])
   const [selectedClusterStats, setSelectedClusterStats] = useState<ClusterStats | undefined>(undefined)
 
   const findClusterStats = useCallback(
@@ -47,14 +45,15 @@ const StatsPage = () => {
     [clusterStats],
   )
   const onClickClusterCard = (id: number) => setSelectedClusterStats(findClusterStats(id))
-  const onClickClusterError = (id: number) =>
-    emitter.emit("NOTIFICATION", {
-      text: `Cluster ${id} is currently unavailable`,
-      severity: "error",
-      horizontal: "right",
-      vertical: "top",
-      autoHideDuration: 5000,
-    })
+  const onClickClusterError = (_id: number) => {
+    // emitter.emit("NOTIFICATION", {
+    //   text: `Cluster ${id} is currently unavailable`,
+    //   severity: "error",
+    //   horizontal: "right",
+    //   vertical: "top",
+    //   autoHideDuration: 5000,
+    // })
+  }
   const onCloseClusterDialog = () => {
     setSelectedClusterStats(undefined)
     delete router.query.cluster
@@ -62,49 +61,50 @@ const StatsPage = () => {
   }
 
   useEffect(() => {
-    emitter.removeAllListeners("REALTIME_STATS")
-    emitter.on("REALTIME_STATS", (stats) => {
-      const clusterStatsCopy = [...clusterStats]
-      if (stats.id == -1) {
-        setInitialStats(stats as InitialStats)
-        if (!clusterStats.length)
-          setClusterStats(
-            Array.from({ length: (stats as InitialStats).clusterCount ?? 1 }).map((_, index) => ({
-              id: index,
-              error: true,
-              name: "",
-              env: "",
-              uptime: "",
-              cpu: 0,
-              ramBytes: 0,
-              totalRamBytes: 0,
-              version: "",
-              versions: "",
-              guilds: 0,
-              unavailableGuilds: 0,
-              users: 0,
-              commands: 0,
-              restPing: 0,
-              shards: [],
-            })),
-          )
-        else if (clusterStats.length > (stats as InitialStats).clusterCount)
-          setClusterStats(clusterStats.slice(0, (stats as InitialStats).clusterCount))
-      } else {
-        const index = clusterStatsCopy.findIndex((cluster) => cluster.id === stats.id)
-        if (index == -1) {
-          clusterStatsCopy.push(stats as ClusterStats)
-          setClusterStats(clusterStatsCopy)
-        } else {
-          clusterStatsCopy[index] = stats as ClusterStats
-          setClusterStats(clusterStatsCopy)
-        }
-      }
-      if (handler) {
-        // @ts-expect-error This class will be rewrote soon
-        handler.cachedStats = clusterStats
-      }
-    })
+    // TODO
+    // emitter.removeAllListeners("REALTIME_STATS")
+    // emitter.on("REALTIME_STATS", (stats) => {
+    //   const clusterStatsCopy = [...clusterStats]
+    //   if (stats.id == -1) {
+    //     setInitialStats(stats as InitialStats)
+    //     if (!clusterStats.length)
+    //       setClusterStats(
+    //         Array.from({ length: (stats as InitialStats).clusterCount ?? 1 }).map((_, index) => ({
+    //           id: index,
+    //           error: true,
+    //           name: "",
+    //           env: "",
+    //           uptime: "",
+    //           cpu: 0,
+    //           ramBytes: 0,
+    //           totalRamBytes: 0,
+    //           version: "",
+    //           versions: "",
+    //           guilds: 0,
+    //           unavailableGuilds: 0,
+    //           users: 0,
+    //           commands: 0,
+    //           restPing: 0,
+    //           shards: [],
+    //         })),
+    //       )
+    //     else if (clusterStats.length > (stats as InitialStats).clusterCount)
+    //       setClusterStats(clusterStats.slice(0, (stats as InitialStats).clusterCount))
+    //   } else {
+    //     const index = clusterStatsCopy.findIndex((cluster) => cluster.id === stats.id)
+    //     if (index == -1) {
+    //       clusterStatsCopy.push(stats as ClusterStats)
+    //       setClusterStats(clusterStatsCopy)
+    //     } else {
+    //       clusterStatsCopy[index] = stats as ClusterStats
+    //       setClusterStats(clusterStatsCopy)
+    //     }
+    //   }
+    //   if (handler) {
+    //     // @ts-expect-error This class will be rewrote soon
+    //     handler.cachedStats = clusterStats
+    //   }
+    // })
   }, [clusterStats, initialStats?.clusterCount])
 
   useEffect(() => {

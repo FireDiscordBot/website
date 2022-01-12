@@ -1,4 +1,4 @@
-import { createDataArchive, getDataRequest } from "@/lib/aether"
+import { createDataArchive, getDataRequest } from "@/lib/aether/api"
 import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { ApiErrorResponse, methodNotAllowed, respondWithError, respondWithSuccess } from "@/lib/api/response"
 import { AnyObject, GetCollectData, PostCollectData } from "@/types"

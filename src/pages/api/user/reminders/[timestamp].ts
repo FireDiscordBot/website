@@ -1,4 +1,4 @@
-import { deleteUserReminder } from "@/lib/aether"
+import { deleteUserReminder } from "@/lib/aether/api"
 import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { badRequest, respondWithError, respondWithSuccess } from "@/lib/api/response"
 import { NetworkError } from "@/utils/fetcher"

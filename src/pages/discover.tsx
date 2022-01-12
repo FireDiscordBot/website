@@ -5,17 +5,15 @@ import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
 import { useEffect, useState } from "react"
 
-import { emitter, handler } from "./_app"
-
 import DefaultLayout from "@/components/layout/default"
 import DiscoverableGuildCard from "@/components/ui/DiscoverableGuildCard"
 import Loading from "@/components/ui/Loading"
-import { DiscoverableGuild, DiscoveryUpdateOp } from "@/interfaces/aether"
+import { DiscoverableGuild } from "@/interfaces/aether"
 
-interface DiscoverySync {
-  op: DiscoveryUpdateOp
-  guilds: DiscoverableGuild[]
-}
+// interface DiscoverySync {
+//   op: DiscoveryUpdateOp
+//   guilds: DiscoverableGuild[]
+// }
 
 export function shuffleArray<T>(array: T[]): T[] {
   for (let i = array.length - 1; i > 0; i--) {
@@ -51,9 +49,9 @@ const paginate = function (array: DiscoverableGuild[], index: number, size: numb
 }
 
 const DiscoverPage = () => {
-  const [sortIds, setSortIds] = useState<string[] | null>(null)
+  const [sortIds] = useState<string[] | null>(null)
   const [guilds, setGuilds] = useState<DiscoverableGuild[]>([])
-  const [initialGuilds, setInitialGuilds] = useState<DiscoverableGuild[]>([])
+  const [initialGuilds] = useState<DiscoverableGuild[]>([])
   const [lastSub, setLastSub] = useState<string[]>([])
 
   const [page, setPage] = useState(1)
@@ -66,7 +64,8 @@ const DiscoverPage = () => {
       9,
     )
     viewable?.push(...guilds.filter((g) => g.featured))
-    if (viewable?.length && handler) handler.handleSubscribe("/discover", { guildIds: viewable.map((g) => g.id) })
+    // TODO
+    // if (viewable?.length && handler) handler.handleSubscribe("/discover", { guildIds: viewable.map((g) => g.id) })
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -81,88 +80,85 @@ const DiscoverPage = () => {
     viewable?.push(...set.filter((g) => g.featured))
     if (!viewable.length) return
     const subIds = viewable.map((g) => g.id).sort()
-    if ((subIds?.length != lastSub.length || !subIds.every((id, i) => lastSub[i] == id)) && handler) {
+    if (subIds?.length != lastSub.length || !subIds.every((id, i) => lastSub[i] == id)) {
       setLastSub(subIds.sort())
-      handler.handleSubscribe("/discover", { guildIds: subIds })
+      // TODO
+      // handler.handleSubscribe("/discover", { guildIds: subIds })
     }
   }
 
   useEffect(() => {
-    const setGuildsWithSort = (updated: DiscoverySync | DiscoverableGuild[]) => {
-      if (Array.isArray(updated)) {
-        // this will always be sending the full list and usually only on the first load
-        // so we'll just set the initialGuilds to the full list.
-
-        if (sortIds == null) {
-          updated = shuffleArray(updated)
-          setSortIds(updated.map((guild) => guild.id))
-        }
-        const sorted = getSortedGuilds(updated, sortIds ?? [], true)
-        setInitialGuilds(sorted)
-        setAndSubscribe(sorted)
-
-        // if a filter is currently applied, this will reset the list to be unfiltered
-        // so we reset the textbox value too
-        if (typeof document != "undefined" && document.getElementById("guild-filter") != null)
-          (document.getElementById("guild-filter") as HTMLInputElement).value = ""
-      } else if (guilds && updated.guilds.length) {
-        switch (updated.op) {
-          case DiscoveryUpdateOp.SYNC: {
-            const newGuilds = [...guilds]
-            for (const guild of updated.guilds) {
-              const index = newGuilds?.findIndex((g) => g.id == guild.id)
-              if (typeof index == "number") newGuilds[index] = guild
-            }
-            setAndSubscribe(newGuilds)
-            break
-          }
-          case DiscoveryUpdateOp.ADD: {
-            const newGuilds = shuffleArray(updated.guilds)
-
-            // prevent duplicates
-            setInitialGuilds(initialGuilds.filter((g) => !newGuilds.find((u) => u.id == g.id)))
-
-            setAndSubscribe([...guilds.filter((g) => !newGuilds.find((u) => u.id == g.id)), ...newGuilds])
-            if (sortIds) setSortIds([...sortIds, ...newGuilds.map((guild) => guild.id)])
-            else setSortIds(newGuilds.map((guild) => guild.id))
-            setInitialGuilds([...initialGuilds, ...newGuilds])
-            break
-          }
-          case DiscoveryUpdateOp.REMOVE: {
-            const removeGuilds = updated.guilds
-
-            setAndSubscribe(guilds.filter((g) => !removeGuilds.find((u) => u.id == g.id)))
-            if (sortIds) setSortIds(sortIds.filter((id) => !removeGuilds.find((u) => u.id == id)) ?? [])
-            setInitialGuilds(initialGuilds.filter((g) => !removeGuilds.find((u) => u.id == g.id)))
-            break
-          }
-          case DiscoveryUpdateOp.ADD_OR_SYNC: {
-            const newGuilds = [...guilds]
-            const newSortIds = sortIds ? [...sortIds] : []
-            const newInitialGuilds = [...initialGuilds]
-            for (const guild of updated.guilds) {
-              if (newGuilds.find((g) => g.id == guild.id)) {
-                const index = newGuilds.findIndex((g) => g.id == guild.id)
-                if (typeof index == "number") newGuilds[index] = guild
-              } else if (newInitialGuilds.find((g) => g.id == guild.id)) {
-                const initialIndex = newInitialGuilds.findIndex((g) => g.id == guild.id)
-                if (typeof initialIndex == "number") newInitialGuilds[initialIndex] = guild
-              } else {
-                newGuilds.push(guild)
-                newInitialGuilds.push(guild)
-                newSortIds.push(guild.id)
-              }
-            }
-            setAndSubscribe(newGuilds)
-            setInitialGuilds(newInitialGuilds)
-            if (!sortIds || sortIds.length != newSortIds.length) setSortIds(newSortIds)
-            break
-          }
-        }
-      }
-    }
-    emitter.removeAllListeners("DISCOVERY_UPDATE")
-    emitter.on("DISCOVERY_UPDATE", setGuildsWithSort)
+    // TODO
+    // const setGuildsWithSort = (updated: DiscoverySync | DiscoverableGuild[]) => {
+    //   if (Array.isArray(updated)) {
+    //     // this will always be sending the full list and usually only on the first load
+    //     // so we'll just set the initialGuilds to the full list.
+    //     if (sortIds == null) {
+    //       updated = shuffleArray(updated)
+    //       setSortIds(updated.map((guild) => guild.id))
+    //     }
+    //     const sorted = getSortedGuilds(updated, sortIds ?? [], true)
+    //     setInitialGuilds(sorted)
+    //     setAndSubscribe(sorted)
+    //     // if a filter is currently applied, this will reset the list to be unfiltered
+    //     // so we reset the textbox value too
+    //     if (typeof document != "undefined" && document.getElementById("guild-filter") != null)
+    //       (document.getElementById("guild-filter") as HTMLInputElement).value = ""
+    //   } else if (guilds && updated.guilds.length) {
+    //     switch (updated.op) {
+    //       case DiscoveryUpdateOp.SYNC: {
+    //         const newGuilds = [...guilds]
+    //         for (const guild of updated.guilds) {
+    //           const index = newGuilds?.findIndex((g) => g.id == guild.id)
+    //           if (typeof index == "number") newGuilds[index] = guild
+    //         }
+    //         setAndSubscribe(newGuilds)
+    //         break
+    //       }
+    //       case DiscoveryUpdateOp.ADD: {
+    //         const newGuilds = shuffleArray(updated.guilds)
+    //         // prevent duplicates
+    //         setInitialGuilds(initialGuilds.filter((g) => !newGuilds.find((u) => u.id == g.id)))
+    //         setAndSubscribe([...guilds.filter((g) => !newGuilds.find((u) => u.id == g.id)), ...newGuilds])
+    //         if (sortIds) setSortIds([...sortIds, ...newGuilds.map((guild) => guild.id)])
+    //         else setSortIds(newGuilds.map((guild) => guild.id))
+    //         setInitialGuilds([...initialGuilds, ...newGuilds])
+    //         break
+    //       }
+    //       case DiscoveryUpdateOp.REMOVE: {
+    //         const removeGuilds = updated.guilds
+    //         setAndSubscribe(guilds.filter((g) => !removeGuilds.find((u) => u.id == g.id)))
+    //         if (sortIds) setSortIds(sortIds.filter((id) => !removeGuilds.find((u) => u.id == id)) ?? [])
+    //         setInitialGuilds(initialGuilds.filter((g) => !removeGuilds.find((u) => u.id == g.id)))
+    //         break
+    //       }
+    //       case DiscoveryUpdateOp.ADD_OR_SYNC: {
+    //         const newGuilds = [...guilds]
+    //         const newSortIds = sortIds ? [...sortIds] : []
+    //         const newInitialGuilds = [...initialGuilds]
+    //         for (const guild of updated.guilds) {
+    //           if (newGuilds.find((g) => g.id == guild.id)) {
+    //             const index = newGuilds.findIndex((g) => g.id == guild.id)
+    //             if (typeof index == "number") newGuilds[index] = guild
+    //           } else if (newInitialGuilds.find((g) => g.id == guild.id)) {
+    //             const initialIndex = newInitialGuilds.findIndex((g) => g.id == guild.id)
+    //             if (typeof initialIndex == "number") newInitialGuilds[initialIndex] = guild
+    //           } else {
+    //             newGuilds.push(guild)
+    //             newInitialGuilds.push(guild)
+    //             newSortIds.push(guild.id)
+    //           }
+    //         }
+    //         setAndSubscribe(newGuilds)
+    //         setInitialGuilds(newInitialGuilds)
+    //         if (!sortIds || sortIds.length != newSortIds.length) setSortIds(newSortIds)
+    //         break
+    //       }
+    //     }
+    //   }
+    // }
+    // emitter.removeAllListeners("DISCOVERY_UPDATE")
+    // emitter.on("DISCOVERY_UPDATE", setGuildsWithSort)
   }, [guilds, initialGuilds, page, setAndSubscribe, sortIds])
 
   const handleTextChange = (value: string | null | undefined) => {

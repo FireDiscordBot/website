@@ -1,9 +1,11 @@
+import { EventEmitter } from "events"
+
+import { getSession } from "next-auth/react"
+import { useEffect, useState } from "react"
+
 import { WebsiteGateway } from "@/interfaces/aether"
 import { AetherClient } from "@/lib/ws/aether-client"
 import { Websocket } from "@/lib/ws/websocket"
-import { EventEmitter } from "events"
-import { getSession } from "next-auth/react"
-import { useEffect, useState } from "react"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 

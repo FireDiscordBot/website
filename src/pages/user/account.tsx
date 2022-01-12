@@ -11,8 +11,6 @@ import Link from "next/link"
 import { useEffect, useMemo } from "react"
 import useSWR from "swr"
 
-import { emitter, handler } from "../_app"
-
 import UserPageLayout from "@/components/layout/user-page"
 import DiscordFlagImage from "@/components/ui/DiscordFlagImage"
 import Loading from "@/components/ui/Loading"
@@ -35,14 +33,15 @@ type DataRequestResponse =
 const AccountPage = () => {
   const [session, loading] = useSession({ redirectTo: "/" })
   const { subscription, isLoading, error } = useCurrentSubscription(session != null && !loading)
-  const setErrorMessage = (text: string) =>
-    emitter.emit("NOTIFICATION", {
-      text,
-      severity: "error",
-      horizontal: "right",
-      vertical: "top",
-      autoHideDuration: 5000,
-    })
+  const setErrorMessage = (_text: string) => {
+    // emitter.emit("NOTIFICATION", {
+    //   text,
+    //   severity: "error",
+    //   horizontal: "right",
+    //   vertical: "top",
+    //   autoHideDuration: 5000,
+    // })
+  }
 
   // TODO: fix
   const { data: dataRequest, mutate } = useSWR<GetCollectData>(session ? "/api/user/data-archive" : null, {
@@ -63,10 +62,7 @@ const AccountPage = () => {
     return <Loading />
   }
 
-  const flags = parseFlags(
-    handler?.auth?.user.publicFlags ?? session.user.publicFlags,
-    handler?.auth?.user.premiumType ?? session.user.premiumType,
-  )
+  const flags = parseFlags(session.user.publicFlags, session.user.premiumType)
   const flagsElements = flags.map((flag, index) => <DiscordFlagImage flag={flag} key={index} />)
 
   const onClickRequestData = async (event: React.MouseEvent) => {
@@ -81,7 +77,8 @@ const AccountPage = () => {
     if (typeof dataRequest?.status == "number" && dataRequest.status != 0) {
       const link = document.createElement("a")
       link.href = dataRequest.url
-      link.download = `${handler.session}.zip`
+      // TODO
+      // link.download = `${handler.session}.zip`
       link.click()
       return link.remove()
     }
@@ -99,49 +96,52 @@ const AccountPage = () => {
     // openUrl(json.url, true, true)
 
     const dataResponse = await requestData().catch(() => {
-      emitter.emit("NOTIFICATION", {
-        text: "Failed to request data",
-        severity: "error",
-        horizontal: "right",
-        vertical: "top",
-        autoHideDuration: 5000,
-      })
+      // emitter.emit("NOTIFICATION", {
+      //   text: "Failed to request data",
+      //   severity: "error",
+      //   horizontal: "right",
+      //   vertical: "top",
+      //   autoHideDuration: 5000,
+      // })
       return null
     })
     if (!dataResponse) return
-    if (!dataResponse.success)
-      return emitter.emit("NOTIFICATION", {
-        text: dataResponse.error,
-        severity: "error",
-        horizontal: "right",
-        vertical: "top",
-        autoHideDuration: 5000,
-      })
-    else {
+    if (!dataResponse.success) {
+      // TODO
+      // return emitter.emit("NOTIFICATION", {
+      //   text: dataResponse.error,
+      //   severity: "error",
+      //   horizontal: "right",
+      //   vertical: "top",
+      //   autoHideDuration: 5000,
+      // })
+    } else {
       const link = document.createElement("a")
       const file = dataResponse.data
         ? new Blob([Buffer.from(dataResponse.data.data)], { type: "application/zip" })
         : null
       link.href = file ? URL.createObjectURL(file) : dataResponse.url
-      link.download = `${handler.session}.zip`
+      // TODO
+      // link.download = `${handler.session}.zip`
       link.click()
       link.remove()
     }
   }
 
   const requestData = async (): Promise<DataRequestResponse> =>
-    new Promise((resolve, reject) => {
-      if (!handler) return resolve({ success: false, error: "NO_HANDLER" })
-      const nonce = (+new Date()).toString()
-      handler.websocket?.handlers.set(nonce, resolve)
-      handler.requestData(nonce)
+    new Promise((resolve) => {
+      return resolve({ success: false, error: "NO_HANDLER" })
+      // TODO
+      // const nonce = (+new Date()).toString()
+      // handler.websocket?.handlers.set(nonce, resolve)
+      // handler.requestData(nonce)
 
-      setTimeout(() => {
-        if (handler.websocket?.handlers.has(nonce)) {
-          handler.websocket.handlers.delete(nonce)
-          reject("Data request timed out")
-        }
-      }, 10000)
+      // setTimeout(() => {
+      //   if (handler.websocket?.handlers.has(nonce)) {
+      //     handler.websocket.handlers.delete(nonce)
+      //     reject("Data request timed out")
+      //   }
+      // }, 10000)
     })
 
   return (

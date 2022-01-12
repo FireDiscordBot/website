@@ -10,8 +10,6 @@ import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
 import { useState } from "react"
 
-import { handler } from "../_app"
-
 import SuperuserLayout, { SuperuserPageTypes } from "@/components/layout/superuser-page"
 import Loading from "@/components/ui/Loading"
 import useSession from "@/hooks/use-session"
@@ -21,13 +19,13 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   minWidth: 180,
 }))
 
-const snowflakeRegex = /\d{15,21}/
+// const snowflakeRegex = /\d{15,21}/
 
 const AdminPage = () => {
   const [session, loading] = useSession({ redirectTo: "/" })
   const [experiment, setExperiment] = useState<string>("")
   const [experimentType, setExperimentType] = useState<string>("")
-  const [applyToID, setID] = useState<string>("")
+  // const [applyToID, setID] = useState<string>("")
   const [bucket, setBucket] = useState<number>(0)
 
   const handleExperimentChange = (event: SelectChangeEvent) => {
@@ -35,8 +33,9 @@ const AdminPage = () => {
   }
 
   const handleExperimentTypeChange = (event: SelectChangeEvent) => {
-    if (experiment && handler?.experiments.find((e) => e.id == experiment)?.kind != event.target.value)
-      setExperiment("")
+    // TODO
+    // if (experiment && handler?.experiments.find((e) => e.id == experiment)?.kind != event.target.value)
+    //   setExperiment("")
     setExperimentType(event.target.value as string)
   }
 
@@ -44,8 +43,9 @@ const AdminPage = () => {
     setBucket(parseInt(event.target.value))
   }
 
-  const handleApplyToIDChange = (value: string) => {
-    if (snowflakeRegex.test(value)) setID(value)
+  const handleApplyToIDChange = (_value: string) => {
+    // TODO
+    // if (snowflakeRegex.test(value)) setID(value)
   }
 
   if (!session || loading) {
@@ -94,13 +94,13 @@ const AdminPage = () => {
               required
               disabled={!experimentType}
             >
-              {handler?.experiments
+              {/* {handler?.experiments
                 .filter((exp) => exp.kind == experimentType)
                 .map((exp) => (
                   <MenuItem key={exp.id} value={exp.id}>
                     {exp.label}
                   </MenuItem>
-                ))}
+                ))} */}
             </Select>
           </StyledFormControl>
           <StyledFormControl>
@@ -113,13 +113,13 @@ const AdminPage = () => {
               disabled={!experiment}
               required
             >
-              {handler?.experiments
+              {/* {handler?.experiments
                 .find((exp) => exp.id == experiment)
                 ?.treatments.map((t) => (
                   <MenuItem key={t.id} value={t.id}>
                     {t.label}
                   </MenuItem>
-                ))}
+                ))} */}
             </Select>
           </StyledFormControl>
           <StyledFormControl>
@@ -138,46 +138,47 @@ const AdminPage = () => {
             <Button
               variant={"outlined"}
               onClick={() => {
-                if (!experiment)
-                  handler?.emitter.emit("NOTIFICATION", {
-                    text: "You must select an experiment",
-                    severity: "error",
-                    horizontal: "right",
-                    vertical: "top",
-                    autoHideDuration: 3000,
-                  })
-                else if (
-                  typeof bucket != "number" ||
-                  !handler?.experiments.find((e) => e.id == experiment)?.treatments.find((t) => t.id == bucket)
-                )
-                  handler?.emitter.emit("NOTIFICATION", {
-                    text: "You must select a valid treatment",
-                    severity: "error",
-                    horizontal: "right",
-                    vertical: "top",
-                    autoHideDuration: 3000,
-                  })
-                else if (!applyToID)
-                  handler?.emitter.emit("NOTIFICATION", {
-                    text: `You must input a valid ${experimentType} id`,
-                    severity: "error",
-                    horizontal: "right",
-                    vertical: "top",
-                    autoHideDuration: 3000,
-                  })
-                else if (handler) {
-                  handler.applyExperiment(experiment, applyToID, bucket)
-                  setExperiment("")
-                  setExperimentType("")
-                  setID("")
-                  setBucket(0)
-                  if (typeof document != "undefined") {
-                    const el = document.getElementById("apply-to-id") as HTMLInputElement | null
-                    if (el) {
-                      el.value = ""
-                    }
-                  }
-                }
+                // TODO
+                // if (!experiment) {
+                //   // handler?.emitter.emit("NOTIFICATION", {
+                //   //   text: "You must select an experiment",
+                //   //   severity: "error",
+                //   //   horizontal: "right",
+                //   //   vertical: "top",
+                //   //   autoHideDuration: 3000,
+                //   // })
+                // } else if (
+                //   typeof bucket != "number" ||
+                //   !handler?.experiments.find((e) => e.id == experiment)?.treatments.find((t) => t.id == bucket)
+                // )
+                //   handler?.emitter.emit("NOTIFICATION", {
+                //     text: "You must select a valid treatment",
+                //     severity: "error",
+                //     horizontal: "right",
+                //     vertical: "top",
+                //     autoHideDuration: 3000,
+                //   })
+                // else if (!applyToID)
+                //   handler?.emitter.emit("NOTIFICATION", {
+                //     text: `You must input a valid ${experimentType} id`,
+                //     severity: "error",
+                //     horizontal: "right",
+                //     vertical: "top",
+                //     autoHideDuration: 3000,
+                //   })
+                // else if (handler) {
+                //   handler.applyExperiment(experiment, applyToID, bucket)
+                //   setExperiment("")
+                //   setExperimentType("")
+                //   setID("")
+                //   setBucket(0)
+                //   if (typeof document != "undefined") {
+                //     const el = document.getElementById("apply-to-id") as HTMLInputElement | null
+                //     if (el) {
+                //       el.value = ""
+                //     }
+                //   }
+                // }
               }}
             >
               Submit

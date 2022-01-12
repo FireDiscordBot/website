@@ -11,11 +11,7 @@ import useMediaQuery from "@mui/material/useMediaQuery"
 import { useRouter } from "next/router"
 import { ChangeEvent, useEffect, useState } from "react"
 
-import { emitter, handler } from "./_app"
-
 import DefaultLayout from "@/components/layout/default"
-import CommandAccordion from "@/components/ui/CommandAccordion"
-import Loading from "@/components/ui/Loading"
 import { fire } from "@/constants"
 import { Command } from "@/interfaces/aether"
 
@@ -36,42 +32,49 @@ const CommandsPage = () => {
   const router = useRouter()
 
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"))
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const [prefix, setPrefix] = useState(fire.defaultPrefix)
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState<number>(0)
   const [preFilterCategoryIndex, setPreFilterCategoryIndex] = useState<number>(0)
-  const [commands, setCommandsState] = useState<Command[]>(
-    handler?.commands
-      ? handler.commands.filter((c) => c.category == handler.commandCategories[selectedCategoryIndex])
-      : [],
+  const [commands] = useState<Command[]>(
+    // TODO
+    // handler?.commands
+    //   ? handler.commands.filter((c) => c.category == handler.commandCategories[selectedCategoryIndex])
+    //   :
+    [],
   )
   const [filter, setFilter] = useState<string>("")
-  const [filterTimeout, setFilterTimeout] = useState<NodeJS.Timeout | null>(null)
-  const [cachedCategories, setCachedCategories] = useState<string[]>([])
+  const [filterTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [cachedCategories] = useState<string[]>([])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const getCategories = () => {
-    if (!handler) return []
-    const categories = filter
-      ? [
-          "All",
-          ...handler.commandCategories.filter((cat) =>
-            handler.commands.find((c) => c.category == cat && c.name.includes(filter)),
-          ),
-        ]
-      : handler.commandCategories
-    if (categories.length == 2 && categories[0] == "All") return categories.slice(1)
-    return categories
+  const getCategories = (): string[] => {
+    // TODO
+    // if (!handler)
+    return []
+    // const categories = filter
+    //   ? [
+    //       "All",
+    //       ...handler.commandCategories.filter((cat) =>
+    //         handler.commands.find((c) => c.category == cat && c.name.includes(filter)),
+    //       ),
+    //     ]
+    //   : handler.commandCategories
+    // if (categories.length == 2 && categories[0] == "All") return categories.slice(1)
+    // return categories
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const updateCommandsList = (category: string) => {
-    setCommandsState(
-      filter
-        ? category == "All"
-          ? handler.commands.filter((c) => c.name.includes(filter))
-          : handler.commands.filter((c) => c.category == category && c.name.includes(filter))
-        : handler.commands.filter((c) => c.category == category),
-    )
+  const updateCommandsList = (_category: string) => {
+    // TODO
+    // setCommandsState(
+    //   filter
+    //     ? category == "All"
+    //       ? handler.commands.filter((c) => c.name.includes(filter))
+    //       : handler.commands.filter((c) => c.category == category && c.name.includes(filter))
+    //     : handler.commands.filter((c) => c.category == category),
+    // )
   }
 
   const onChangeSelectedTab = (event: ChangeEvent<unknown>) => {
@@ -79,11 +82,12 @@ const CommandsPage = () => {
     if (!categoryName) return
     const index = getCategories().indexOf(categoryName)
     setSelectedCategoryIndex(index)
-    if (!cachedCategories.includes(categoryName) && categoryName != "All")
-      handler.handleSubscribe("/commands", {
-        category: categoryName,
-      })
-    if (handler) updateCommandsList(categoryName)
+    // TODO
+    // if (!cachedCategories.includes(categoryName) && categoryName != "All")
+    //   handler.handleSubscribe("/commands", {
+    //     category: categoryName,
+    //   })
+    // if (handler) updateCommandsList(categoryName)
   }
 
   const handleTextChange = (f: string) => {
@@ -97,29 +101,30 @@ const CommandsPage = () => {
       setSelectedCategoryIndex(0)
     }
     if (filterTimeout) clearTimeout(filterTimeout)
-    if (handler) {
-      if (filter) setFilterTimeout(setTimeout(() => handler.handleSubscribe("/commands", { filter }), 250))
-      updateCommandsList(getCategories()[selectedCategoryIndex])
-    }
+    // TODO
+    // if (handler) {
+    //   if (filter) setFilterTimeout(setTimeout(() => handler.handleSubscribe("/commands", { filter }), 250))
+    //   updateCommandsList(getCategories()[selectedCategoryIndex])
+    // }
   }
 
   useEffect(() => {
-    const setCommands = (commands: Command[]) => {
-      if (!handler) return
-      handler.commands = [...handler.commands, ...commands]
-      // remove duplicates
-      handler.commands = handler.commands.filter(
-        (c, index) => handler.commands.findIndex((c2) => c2.name === c.name) === index,
-      )
-      updateCommandsList(getCategories()[selectedCategoryIndex])
-    }
-
-    emitter.removeAllListeners("COMMANDS_UPDATE")
-    emitter.on("COMMANDS_UPDATE", (update) => {
-      setCommands(update.commands)
-      if (update.full && update.commands[0].category && !cachedCategories.includes(update.commands[0].category))
-        setCachedCategories([...cachedCategories, update.commands[0].category])
-    })
+    // TODO
+    // const setCommands = (commands: Command[]) => {
+    // if (!handler) return
+    // handler.commands = [...handler.commands, ...commands]
+    // // remove duplicates
+    // handler.commands = handler.commands.filter(
+    //   (c, index) => handler.commands.findIndex((c2) => c2.name === c.name) === index,
+    // )
+    // updateCommandsList(getCategories()[selectedCategoryIndex])
+    // }
+    // emitter.removeAllListeners("COMMANDS_UPDATE")
+    // emitter.on("COMMANDS_UPDATE", (update) => {
+    //   setCommands(update.commands)
+    //   if (update.full && update.commands[0].category && !cachedCategories.includes(update.commands[0].category))
+    //     setCachedCategories([...cachedCategories, update.commands[0].category])
+    // })
   }, [cachedCategories, commands, filter, getCategories, selectedCategoryIndex, updateCommandsList])
 
   useEffect(() => {
@@ -159,14 +164,14 @@ const CommandsPage = () => {
           </Grid>
           <Grid item xs={12} md={12}>
             <Box paddingTop={3} width="100%" key={0}>
-              {handler?.commandCategories?.length && commands.length ? (
+              {/* {handler?.commandCategories?.length && commands.length ? (
                 // TODO: put subcommands inside the main command's CommandAccordion
                 commands
                   .filter((command) => !!command.description)
                   .map((command, index) => <CommandAccordion command={command} prefix={prefix} key={index} />)
               ) : (
                 <Loading />
-              )}
+              )} */}
             </Box>
           </Grid>
         </Grid>

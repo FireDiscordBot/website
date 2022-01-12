@@ -1,6 +1,5 @@
 import PeopleIcon from "@mui/icons-material/People"
 import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import Dialog from "@mui/material/Dialog"
@@ -13,7 +12,7 @@ import CircularProgressCard from "./CircularProgressCard"
 import DialogTitle from "./DialogTitle"
 
 import type { ClusterStats } from "@/interfaces/aether"
-import { handler } from "@/pages/_app"
+// import { handler } from "@/pages/_app"
 import { formatBytes, formatNumber } from "@/utils/formatting"
 
 interface StatLineProps {
@@ -55,24 +54,25 @@ interface ClusterStatsDialogProps {
 const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: ClusterStatsDialogProps) => {
   const open = props.open ?? false
 
-  const restartCluster = () => {
-    if (!handler) return
-    handler.restartCluster({
-      id: clusterStats.id,
-      reason: `Restart requested by ${handler.user?.username}#${handler.user?.discriminator}`,
-    })
-  }
+  // TODO
+  // const restartCluster = () => {
+  // if (!handler) return
+  // handler.restartCluster({
+  //   id: clusterStats.id,
+  //   reason: `Restart requested by ${handler.user?.username}#${handler.user?.discriminator}`,
+  // })
+  // }
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md">
       <DialogTitle onClose={onClose}>
         Cluster {clusterStats.id} ({clusterStats.name})
       </DialogTitle>
-      {handler?.isSuperuser() && (
+      {/* {handler?.isSuperuser() && (
         <Button size="small" onClick={restartCluster}>
           Restart
         </Button>
-      )}
+      )} */}
       <DialogContent
         dividers
         sx={{

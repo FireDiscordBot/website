@@ -1,4 +1,4 @@
-import { createStripePortalSession } from "@/lib/aether"
+import { createStripePortalSession } from "@/lib/aether/api"
 import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { methodNotAllowed, respondWithError, respondWithSuccess } from "@/lib/api/response"
 import { PostBillingPortalResponse } from "@/types"

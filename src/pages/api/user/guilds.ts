@@ -1,4 +1,4 @@
-import { fetchPremiumGuilds } from "@/lib/aether"
+import { fetchPremiumGuilds } from "@/lib/aether/api"
 import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { badRequest, internalServerError, respondWithError, respondWithSuccess } from "@/lib/api/response"
 import { GetGuildsResponse } from "@/types"

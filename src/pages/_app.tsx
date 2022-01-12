@@ -5,13 +5,12 @@ import CssBaseline from "@mui/material/CssBaseline"
 import { ThemeProvider } from "@mui/material/styles"
 import { SessionProvider } from "next-auth/react"
 import { DefaultSeo } from "next-seo"
-import { AppProps } from "next/app"
+import type { AppProps } from "next/app"
 import Head from "next/head"
 import { SWRConfig } from "swr"
 
+import { AetherProvider } from "@/components/providers/AetherProvider"
 import { defaultSeoConfig } from "@/constants"
-import { AetherClient } from "@/lib/ws/aether-client"
-import { Emitter } from "@/lib/ws/socket-emitter"
 import theme from "@/theme"
 import createEmotionCache from "@/utils/createEmotionCache"
 import fetcher from "@/utils/fetcher"
@@ -23,8 +22,18 @@ if (isBrowser()) {
   import("@/utils/load-nprogress")
 }
 
-export const emitter = new Emitter()
-export let handler: AetherClient
+if (isBrowser() && process.env.NODE_ENV === "production") {
+  console.log(
+    `%c STOP!
+
+%cUNLESS YOU KNOW WHAT YOU'RE DOING, DO NOT COPY/PASTE ANYTHING IN HERE!
+DOING SO COULD REVEAL SENSITIVE INFORMATION SUCH AS YOUR EMAIL OR ACCESS TOKEN
+
+IT'S BEST TO JUST CLOSE THIS WINDOW AND PRETEND IT DOES NOT EXIST.`,
+    "background: #C95D63; color: white; font-size: xxx-large; border-radius: 8px 8px 8px 8px;",
+    "background: #353A47; color: white; font-size: medium; border-radius: 0 0 0 0",
+  )
+}
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -47,8 +56,10 @@ function FireApp(props: FireAppProps) {
           <SWRConfig value={{ fetcher: fetcher }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <SessionProvider session={pageProps.session}>
-                <CssBaseline />
-                <Component {...pageProps} />
+                <AetherProvider>
+                  <CssBaseline />
+                  <Component {...pageProps} />
+                </AetherProvider>
               </SessionProvider>
             </LocalizationProvider>
           </SWRConfig>

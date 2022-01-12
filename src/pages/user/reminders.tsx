@@ -11,11 +11,8 @@ import Tooltip from "@mui/material/Tooltip"
 import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
 import dayjs from "dayjs"
-import { StatusCodes } from "http-status-codes"
 import { useEffect, useState } from "react"
 import useSWR from "swr"
-
-import { emitter } from "../_app"
 
 import UserPageLayout from "@/components/layout/user-page"
 import useSession from "@/hooks/use-session"
@@ -44,11 +41,12 @@ const Reminders = () => {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   })
-  const [reminders, setReminders] = useState<Reminder[] | undefined>(data)
+  const [reminders] = useState<Reminder[] | undefined>(data)
 
   useEffect(() => {
-    emitter.removeAllListeners("REMINDERS_UPDATE")
-    emitter.on("REMINDERS_UPDATE", setReminders)
+    // TODO
+    // emitter.removeAllListeners("REMINDERS_UPDATE")
+    // emitter.on("REMINDERS_UPDATE", setReminders)
   }, [reminders])
 
   useEffect(() => {
@@ -74,22 +72,26 @@ const Reminders = () => {
       method: "POST",
       body: JSON.stringify({ reminder: futureText, timestamp: dayjs(futureDate).valueOf() }),
     })
-    if (!reminder.ok)
-      emitter.emit("NOTIFICATION", {
-        text:
-          reminder.status == StatusCodes.PRECONDITION_FAILED
-            ? (
-                await reminder.json().catch(() => {
-                  return { error: "Failed to create reminder" }
-                })
-              ).error
-            : "Failed to create reminder",
-        severity: "error",
-        horizontal: "right",
-        vertical: "top",
-        autoHideDuration: 3000,
-      })
-    else if (typeof window != "undefined" && window?.document?.getElementById("reminder-text") instanceof HTMLElement) {
+    if (!reminder.ok) {
+      // TODO
+      // emitter.emit("NOTIFICATION", {
+      //   text:
+      //     reminder.status == StatusCodes.PRECONDITION_FAILED
+      //       ? (
+      //           await reminder.json().catch(() => {
+      //             return { error: "Failed to create reminder" }
+      //           })
+      //         ).error
+      //       : "Failed to create reminder",
+      //   severity: "error",
+      //   horizontal: "right",
+      //   vertical: "top",
+      //   autoHideDuration: 3000,
+      // })
+    } else if (
+      typeof window != "undefined" &&
+      window?.document?.getElementById("reminder-text") instanceof HTMLElement
+    ) {
       const element = window.document.getElementById("reminder-text")
       if (element) element.innerText = ""
     }
@@ -99,27 +101,33 @@ const Reminders = () => {
     if (!toDelete.includes(reminder.timestamp)) {
       toDelete.push(reminder.timestamp)
       setTimeout(() => (toDelete = toDelete.filter((timestamp) => timestamp != reminder.timestamp)), 5000)
-      return emitter.emit("NOTIFICATION", {
-        text: "Click again to confirm deletion",
-        severity: "warning",
-        horizontal: "right",
-        vertical: "top",
-        autoHideDuration: 5000,
-      })
+      // TODO
+      // return emitter.emit("NOTIFICATION", {
+      //   text: "Click again to confirm deletion",
+      //   severity: "warning",
+      //   horizontal: "right",
+      //   vertical: "top",
+      //   autoHideDuration: 5000,
+      // })
+      return
     } else toDelete = toDelete.filter((timestamp) => timestamp != reminder.timestamp)
     // TODO: rewrite
     const deleted = await fetch(`/api/user/reminders/${reminder.timestamp}`, {
       method: "DELETE",
     })
-    if (!deleted.ok)
-      emitter.emit("NOTIFICATION", {
-        text: "Failed to delete reminder",
-        severity: "error",
-        horizontal: "right",
-        vertical: "top",
-        autoHideDuration: 3000,
-      })
-    else emitter.emit("NOTIFICATION", undefined)
+
+    // TODO
+    if (!deleted.ok) {
+      // emitter.emit("NOTIFICATION", {
+      //   text: "Failed to delete reminder",
+      //   severity: "error",
+      //   horizontal: "right",
+      //   vertical: "top",
+      //   autoHideDuration: 3000,
+      // })
+    } else {
+      // emitter.emit("NOTIFICATION", undefined)
+    }
   }
 
   return (
