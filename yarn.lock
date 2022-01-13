@@ -439,6 +439,7 @@ __metadata:
     eslint-config-prettier: ^8.3.0
     events: ^3.3.0
     http-status-codes: ^2.1.4
+    isomorphic-ws: ^4.0.1
     next: 12.0.4
     next-auth: ^4.0.5
     next-seo: ^4.28.1
@@ -452,7 +453,7 @@ __metadata:
     swr: ^1.0.0
     typescript: ^4.5.4
     ua-parser-js: ^0.7.30
-    ws: ^8.2.1
+    ws: ^8.4.0
   languageName: unknown
   linkType: soft
 
@@ -3957,6 +3958,15 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
+"isomorphic-ws@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "isomorphic-ws@npm:4.0.1"
+  peerDependencies:
+    ws: "*"
+  checksum: d7190eadefdc28bdb93d67b5f0c603385aaf87724fa2974abb382ac1ec9756ed2cfb27065cbe76122879c2d452e2982bc4314317f3d6c737ddda6c047328771a
+  languageName: node
+  linkType: hard
+
 "jest-worker@npm:27.0.0-next.5":
   version: 27.0.0-next.5
   resolution: "jest-worker@npm:27.0.0-next.5"
@@ -6722,9 +6732,9 @@ typescript@^4.5.4:
   languageName: node
   linkType: hard
 
-"ws@npm:^8.2.1":
-  version: 8.2.1
-  resolution: "ws@npm:8.2.1"
+"ws@npm:^8.4.0":
+  version: 8.4.0
+  resolution: "ws@npm:8.4.0"
   peerDependencies:
     bufferutil: ^4.0.1
     utf-8-validate: ^5.0.2
@@ -6733,7 +6743,7 @@ typescript@^4.5.4:
       optional: true
     utf-8-validate:
       optional: true
-  checksum: 22906903c7952790a911627f99e3419d8f251a6a540d9ba4f334a7e0865d7ea7026d8ad23829c3c0f2843a9f15bdb91c646e7f8853a5a5ba25a57dea2cf7d416
+  checksum: 5e37ccf0ecb8d8019d88b07af079e8f74248b688ad3109ab57cd5e1c9a7392545f572914d0c27f25e8b83a6cfc09a89ac151c556ff4fae26d6f824077e4f8239
   languageName: node
   linkType: hard
 

@@ -4,7 +4,8 @@ import { useState } from "react"
 import { createContext, ReactNode } from "react"
 
 import { fetchWebsiteGateway } from "@/lib/aether/api"
-import { buildWebSocket } from "@/lib/aether/ws"
+import { AetherGateway } from "@/lib/aether/types"
+import { AetherClient } from "@/lib/aether/ws"
 
 export interface AetherConnectionState {
   status: "connected" | "disconnected"
@@ -19,39 +20,53 @@ interface AetherProviderProps {
 }
 
 export function AetherProvider(props: AetherProviderProps) {
-  const { data: session } = useSession()
-  const [ws, setWs] = useState<WebSocket | null>(null)
+  const { data: session, status: sessionStatus } = useSession()
+  const [gateway, setGateway] = useState<AetherGateway | null>(null)
+  const [client, setClient] = useState<AetherClient | null>(null)
   const [state] = useState<AetherConnectionState>({
     status: "disconnected",
   })
 
   useEffect(() => {
-    const accessToken = session?.accessToken
-    if (!accessToken) {
-      return
+    let active = true
+
+    async function load() {
+      active && setGateway(await fetchWebsiteGateway())
     }
-    if (ws?.readyState === WebSocket.OPEN) {
-      return
-    }
-
-    const connect = async () => {
-      const gateway = await fetchWebsiteGateway(accessToken)
-
-      const AetherWebSocket = buildWebSocket()
-      const ws = new AetherWebSocket(`${gateway.url}?encoding=zlib`, session)
-      // TODO: handle reconnecting
-
-      setWs(ws)
-    }
-
-    connect()
+    load()
 
     return () => {
-      ws?.close()
-      setWs(null)
+      active = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!gateway || sessionStatus === "loading") {
+      return
+    }
+
+    if (client && client.ws && client.ws.readyState === client.ws.OPEN) {
+      // Handles access token updates
+      client.setAuthSession(session)
+    } else {
+      // Initial connection
+      const newClient = new AetherClient(gateway, session)
+      newClient.connect()
+
+      if (process.env.NODE_ENV === "development") {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(global as any).aetherClient = newClient
+      }
+
+      setClient(newClient)
+    }
+
+    return () => {
+      client?.ws?.close()
+      setClient(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.accessToken])
+  }, [sessionStatus, session?.accessToken, gateway])
 
   return <AetherStateContext.Provider value={state}>{props.children}</AetherStateContext.Provider>
 }

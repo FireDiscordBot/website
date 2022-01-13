@@ -12,7 +12,7 @@ export interface AetherClientPayloads {
   [AetherClientOpcode.IDENTIFY_CLIENT]: {
     config: {
       subscribed: string
-      session: Session & {
+      session?: Session & {
         // Workaround for the current schema in Aether
         // TODO: ask Geek to change schema
         user: {
@@ -39,6 +39,15 @@ export interface AetherServerPayloads {
     config: Record<string, any>
     session: string
     sessions: AetherSession[]
+  }
+  [AetherServerOpcode.RESUME_CLIENT]: {
+    auth: {
+      // TODO: add typings
+      user: any
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    config: Record<string, any>
+    replayed: number
   }
   [AetherServerOpcode.HELLO]: {
     // TODO: add typings
@@ -97,3 +106,7 @@ type AetherMessage<Payloads> = {
 export type AetherClientMessage = AetherMessage<AetherClientPayloads>
 
 export type AetherServerMessage = AetherMessage<AetherServerPayloads>
+
+export interface AetherGateway {
+  url: string
+}

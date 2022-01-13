@@ -1,3 +1,5 @@
+import { AetherGateway } from "./types"
+
 import { fire } from "@/constants"
 import { AdminSessionData, BuildOverride, Reminder } from "@/interfaces/aether"
 import { PremiumDiscordGuild } from "@/interfaces/discord"
@@ -44,8 +46,8 @@ const requestWithAuth = <R = void, B = unknown>(
     options,
   )
 
-export const fetchWebsiteGateway = (accessToken: string) => {
-  return requestWithAuth<{ url: string }>(accessToken, "v2/gateway/website", "GET")
+export const fetchWebsiteGateway = () => {
+  return request<AetherGateway>("v2/gateway/website", "GET")
 }
 
 export const fetchCustomerId = async (accessToken: string) => {
