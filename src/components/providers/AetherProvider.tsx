@@ -5,7 +5,7 @@ import { createContext, ReactNode } from "react"
 
 import { fetchWebsiteGateway } from "@/lib/aether/api"
 import { AetherGateway } from "@/lib/aether/types"
-import { AetherClient } from "@/lib/aether/ws"
+import { AetherClient } from "@/lib/aether/AetherClient"
 
 export interface AetherConnectionState {
   status: "connected" | "disconnected"
@@ -41,28 +41,42 @@ export function AetherProvider(props: AetherProviderProps) {
   }, [])
 
   useEffect(() => {
+    console.log("[AetherProvider] useEffect", sessionStatus, session?.accessToken, gateway)
+
     if (!gateway || sessionStatus === "loading") {
       return
     }
 
     if (client && client.ws && client.ws.readyState === client.ws.OPEN) {
+      console.log("[AetherProvider] updating auth session")
       // Handles access token updates
       client.setAuthSession(session)
     } else {
+      console.log("[AetherProvider] starting connection")
       // Initial connection
       const newClient = new AetherClient(gateway, session)
       newClient.connect()
 
+      // Access to the client when developing locally
       if (process.env.NODE_ENV === "development") {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(global as any).aetherClient = newClient
+        ;(global as any).aetherClients = (global as any).aetherClients || []
+        ;(global as any).aetherClients.push(newClient)
       }
 
-      setClient(newClient)
+      setClient((prevClient) => {
+        // Little hack to prevent duplicated connections
+        if (prevClient && prevClient.ws && prevClient.ws.readyState === prevClient.ws.OPEN) {
+          console.log("[AetherProvider] found duplicated connection, closing it")
+          prevClient.disconnect()
+        }
+
+        return newClient
+      })
     }
 
     return () => {
-      client?.ws?.close()
+      client?.disconnect()
       setClient(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

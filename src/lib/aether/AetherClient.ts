@@ -8,6 +8,7 @@ import {
   AetherClientMessage,
   AetherClientOpcode,
   AetherClientPayloads,
+  AetherCloseCode,
   AetherGateway,
   AetherServerMessage,
   AetherServerOpcode,
@@ -79,7 +80,7 @@ export class AetherClient {
   connect() {
     if (this.ws && this.ws.readyState == WebSocket.OPEN) {
       this.debug("ws connection already open... closing")
-      this.ws.close()
+      this.disconnect()
     }
 
     const params = new URLSearchParams()
@@ -96,6 +97,29 @@ export class AetherClient {
     this.ws = new WebSocket(url)
     this.ws.onmessage = this.handleWsMessage.bind(this)
     this.ws.onclose = this.handleWsClose.bind(this)
+  }
+
+  disconnect(code = 1000, reason?: string) {
+    this.ws?.close(code, reason)
+  }
+
+  setAuthSession(authSession: Session | null) {
+    if (this.authSession?.accessToken === authSession?.accessToken) {
+      this.debug("auth session is the same, not updating")
+      return
+    }
+
+    this.authSession = authSession
+    if (!this.identified) {
+      this.identify()
+    } else {
+      // TODO: reconnect
+      this.connect()
+    }
+  }
+
+  isSuperuser() {
+    return this.userConfig && this.userConfig["utils.superuser"]
   }
 
   private handleWsMessage(event: WebSocket.MessageEvent) {
@@ -155,20 +179,35 @@ export class AetherClient {
     }
     this.heartbeatAcked = null
     this.identified = false
-  }
 
-  setAuthSession(authSession: Session | null) {
-    this.authSession = authSession
-    if (!this.identified) {
-      this.identify()
-    } else {
-      // TODO: reconnect
-      this.connect()
+    switch (event.code) {
+      case AetherCloseCode.CONNECTED_ANOTHER_SESSION:
+        this.debug("already connected in another session")
+        break
+      case AetherCloseCode.CONNECTED_ANOTHER_LOCATION:
+        this.debug("already connected from another location")
+        break
+      case AetherCloseCode.MISMATCHED_IDENTITY:
+        this.debug("mismatched identity")
+
+        this.aetherSessionId = null
+        this.currentSequence = null
+
+        // TODO: try to reload session
+        break
+      case AetherCloseCode.SHUTTING_DOWN:
+        this.debug("Aether shutting down")
+
+        this.aetherSessionId = null
+        this.currentSequence = null
+        break
+      case AetherCloseCode.MISSING_REQUIRED_SCOPES:
+        this.debug("missing required scopes")
+        // TODO: redirects to login page
+        break
+      default:
+        break
     }
-  }
-
-  isSuperuser() {
-    return this.userConfig && this.userConfig["utils.superuser"]
   }
 
   private identify() {
@@ -221,7 +260,7 @@ export class AetherClient {
     this.heartbeatInterval = setInterval(() => {
       if (this.heartbeatAcked === false) {
         this.heartbeatAcked = null
-        this.ws?.close(4004, "Did not receive heartbeat ack")
+        this.ws?.close(AetherCloseCode.HEARTBEAT_EXPIRED, "Did not receive heartbeat ack")
         if (this.heartbeatInterval !== null) {
           clearInterval(this.heartbeatInterval)
         }
