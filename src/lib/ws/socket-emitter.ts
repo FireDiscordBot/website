@@ -4,6 +4,7 @@ import {
   ClusterStats,
   Command,
   DiscoverableGuild,
+  GuildSyncResponse,
   IdentifyResponse,
   InitialStats,
   Notification,
@@ -24,6 +25,7 @@ interface EmitterEvents {
   REMINDERS_UPDATE: (reminders: Reminder[]) => void
   CONFIG_UPDATE: (update: { name: string; value: unknown }) => void
   SESSIONS_REPLACE: (sessions: SessionInfo[]) => void
+  GUILD_SYNC: (sync: GuildSyncResponse) => void
 }
 
 export declare interface Emitter {

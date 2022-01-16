@@ -97,6 +97,13 @@ const PremiumPage = () => {
   }, [subscriptionError, guildsError])
 
   React.useEffect(() => {
+      emitter.removeAllListeners("GUILD_SYNC")
+      emitter.on("GUILD_SYNC", (s) => {
+          if (s.success == null && !guilds?.length) mutateGuilds(undefined, true)
+      })
+  })
+
+  React.useEffect(() => {
     if (!guilds) setGuilds(sort(initialGuilds))
   }, [guilds, initialGuilds])
 
@@ -243,7 +250,7 @@ const PremiumPage = () => {
             <Alert severity="error">No servers found</Alert>
           </Box>
         )}
-        {!isValidating && !subscription && (
+        {!isValidating && !isLoadingSubscription && !subscription && (
           <Box padding={2} width={"100%"}>
             <Alert severity="error">
               You must subscribe to premium before you can manage a server&#39;s premium status.

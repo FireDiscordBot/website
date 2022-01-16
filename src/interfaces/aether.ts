@@ -190,6 +190,17 @@ export type ClientInfo = {
 
 type UnavailableGuild = { id: string; unavailable: true }
 
+export type GuildSyncResponse = {
+    success: false,
+    code: number,
+    debug?: string
+} | {
+    success: true,
+    guilds: UnavailableGuild[]
+} | {
+    success: null,
+}
+
 interface TreatmentConfig {
   id: number
   label: string
