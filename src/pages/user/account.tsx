@@ -204,12 +204,15 @@ const AccountPage = () => {
 
   return (
     <UserPageLayout title="Account" noindex nofollow>
-      {!subscription && premiumPromotion?.text && (premiumPromotion?.expires ?? Number.MAX_VALUE) > +new Date() && (
-        <Box width={"100%"}>
-          <Alert severity="info">{premiumPromotion.text}</Alert>
-          <br></br>
-        </Box>
-      )}
+      {!isLoadingSubscription &&
+        !subscription &&
+        premiumPromotion?.text &&
+        (premiumPromotion?.expires ?? Number.MAX_VALUE) > +new Date() && (
+          <Box width={"100%"}>
+            <Alert severity="info" variant="outlined">{premiumPromotion.text}</Alert>
+            <br></br>
+          </Box>
+        )}
       <Typography variant="h4" gutterBottom>
         General info
       </Typography>
