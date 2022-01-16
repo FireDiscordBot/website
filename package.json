@@ -13,8 +13,7 @@
     "test:prettier": "prettier \"src/**/*.ts(x)?\" --list-different"
   },
   "dependencies": {
-    "@date-io/dayjs": "^2.11.0",
-    "@emotion/cache": "^11.7.1",
+    "@date-io/moment": "1.x",
     "@emotion/react": "^11.7.1",
     "@emotion/server": "^11.4.0",
     "@emotion/styled": "^11.6.0",
@@ -53,6 +52,5 @@
     "prettier": "^2.3.2",
     "typescript": "^4.5.4"
   },
-  "license": "MIT",
-  "packageManager": "yarn@3.1.1"
+  "license": "MIT"
 }
