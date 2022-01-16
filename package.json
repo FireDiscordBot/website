@@ -13,7 +13,7 @@
     "test:prettier": "prettier \"src/**/*.ts(x)?\" --list-different"
   },
   "dependencies": {
-    "@date-io/moment": "1.x",
+    "@date-io/dayjs": "^2.11.0",
     "@emotion/react": "^11.7.1",
     "@emotion/server": "^11.4.0",
     "@emotion/styled": "^11.6.0",
@@ -22,8 +22,8 @@
     "@mui/material": "^5.2.5",
     "@stripe/stripe-js": "^1.17.1",
     "clsx": "^1.1.1",
+    "dayjs": "^1.10.7",
     "http-status-codes": "^2.1.4",
-    "moment": "^2.29.1",
     "next": "^12.0.7",
     "next-auth": "^4.0.5",
     "next-seo": "^4.28.1",
