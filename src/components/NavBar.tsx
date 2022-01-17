@@ -15,6 +15,8 @@ import { useRouter } from "next/router"
 import * as React from "react"
 import AvatarButton from "./AvatarButton"
 import UserAvatarMenu from "./UserAvatarMenu"
+import { IconButton, Menu, MenuItem } from "@mui/material"
+import MenuIcon from "@mui/icons-material/Menu"
 
 interface StyledAppBarProps extends AppBarProps {
   scrolled: boolean
@@ -32,6 +34,24 @@ const StyledAppBar = styled(AppBar, {
 
 const NavBar = () => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null)
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null)
+
+  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElNav(event.currentTarget)
+  }
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget)
+  }
+
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null)
+  }
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null)
+  }
+
   const scrollTrigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 0,
@@ -99,17 +119,67 @@ const NavBar = () => {
         <Container>
           <Toolbar disableGutters>
             <NextLink href="/" passHref>
-              {homePageLink}
+              <Typography
+                sx={{ mr: 2, display: { xs: "none", md: "flex", textDecoration: "none", cursor: "pointer" } }}
+              >
+                {homePageLink}
+              </Typography>
             </NextLink>
-            <Box sx={{ flexGrow: 1 }} />
-            <Box
-              sx={(theme) => ({
-                margin: theme.spacing(0, 2),
-                "& a:not(:last-child)": {
-                  marginRight: theme.spacing(1),
-                },
-              })}
-            >
+            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleOpenNavMenu}
+                color="inherit"
+              >
+                <MenuIcon />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorElNav}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+                open={Boolean(anchorElNav)}
+                onClose={handleCloseNavMenu}
+                sx={{
+                  display: { xs: "block", md: "none" },
+                }}
+              >
+                <MenuItem onClick={() => {}}>
+                  <NextLink href="/discover" passHref>
+                    <Typography textAlign="center">Discover</Typography>
+                  </NextLink>
+                </MenuItem>
+                <MenuItem onClick={() => {}}>
+                  <NextLink href="/commands" passHref>
+                    <Typography textAlign="center">Commands</Typography>
+                  </NextLink>
+                </MenuItem>
+                <MenuItem onClick={() => {}}>
+                  <NextLink href="/stats" passHref>
+                    <Typography textAlign="center">Stats</Typography>
+                  </NextLink>
+                </MenuItem>
+              </Menu>
+            </Box>
+
+            <NextLink href="/" passHref>
+              <Typography
+                sx={{ flexGrow: 1, display: { xs: "flex", md: "none", textDecoration: "none", cursor: "pointer" } }}
+              >
+                {homePageLink}
+              </Typography>
+            </NextLink>
+            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
               <NextLink href="/discover" passHref>
                 <Button variant="text">Discover</Button>
               </NextLink>
