@@ -19,7 +19,9 @@ interface CategoriesTabsProps extends TabsProps {
   isMobile: boolean
 }
 
-const CategoriesTabs = styled(Tabs)<CategoriesTabsProps>(({ isMobile, theme }) => ({
+const CategoriesTabs = styled(Tabs, {
+  shouldForwardProp: (prop) => prop !== "isMobile",
+})<CategoriesTabsProps>(({ isMobile, theme }) => ({
   [`& .${tabsClasses.indicator}`]: {
     backgroundColor: red[700],
   },
