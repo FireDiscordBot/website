@@ -12,13 +12,17 @@ import {
   AetherGateway,
   AetherServerMessage,
   AetherServerOpcode,
+  ExperimentConfig,
 } from "./types"
+
+import { Command } from "@/interfaces/aether"
+import { DiscordGuild } from "@/interfaces/discord"
 
 function uncompress(data: string): AetherServerMessage | null {
   const inflated = inflateSync(Buffer.from(data, "base64"), {
     level: 5,
   })?.toString()
-  return !inflated ? null : (JSON.parse(inflated) as AetherServerMessage)
+  return !inflated ? null : JSON.parse(inflated)
 }
 
 function compress(msg: AetherClientMessage): string {
@@ -62,15 +66,19 @@ function buildClientInfo() {
 export class AetherClient {
   private gateway: AetherGateway
   private authSession: Session | null = null
-  ws: WebSocket | null = null
+  private ws: WebSocket | null = null
   private heartbeatInterval: NodeJS.Timeout | null = null
   private heartbeatAcked: boolean | null = null
   private currentSequence: number | null = null
   private currentRoute: string | null = null
   private aetherSessionId: string | null = null
-  identified = false
+  private identified = false
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private userConfig: Record<string, any> | null = null
+  // @ts-expect-error It will be used in the future
+  private experiments: ExperimentConfig[] = []
+  private guilds: DiscordGuild[] = []
+  private commands: Command[] = []
 
   constructor(gateway: AetherGateway, authSession: Session | null) {
     this.gateway = gateway
@@ -78,7 +86,7 @@ export class AetherClient {
   }
 
   connect() {
-    if (this.ws && this.ws.readyState == WebSocket.OPEN) {
+    if (this.connected) {
       this.debug("ws connection already open... closing")
       this.disconnect()
     }
@@ -113,13 +121,18 @@ export class AetherClient {
     if (!this.identified) {
       this.identify()
     } else {
-      // TODO: reconnect
+      this.disconnect(AetherCloseCode.SESSION_TIMEOUT, "Reauthenticating")
       this.connect()
     }
   }
 
   isSuperuser() {
     return this.userConfig && this.userConfig["utils.superuser"]
+  }
+
+  get connected() {
+    // The double exclamation mark casts the type to boolean
+    return !!this.ws && this.ws.readyState === WebSocket.OPEN
   }
 
   private handleWsMessage(event: WebSocket.MessageEvent) {
@@ -141,6 +154,15 @@ export class AetherClient {
         this.debug("received HELLO", msg.d)
 
         this.aetherSessionId = msg.d.sessionId
+        this.experiments = [...msg.d.guildExperiments, ...msg.d.userExperiments]
+        this.guilds = []
+
+        this.commands = [...this.commands, ...msg.d.firstCategory] // Prevents clearing commands when reconnecting
+        // Is this really necessary?
+        this.commands = this.commands.filter(
+          (c, index) => this.commands.findIndex((c2) => c2.name === c.name) === index,
+        )
+
         this.startSendingHeartbeats(msg.d.interval)
         this.identify()
         break
@@ -148,12 +170,23 @@ export class AetherClient {
         this.debug("received RESUME_CLIENT", msg.d)
 
         this.identified = true
+
+        const newGuilds = msg.d.guilds
+        if (this.authSession && (!newGuilds.length || newGuilds.length !== this.guilds.length)) {
+          this.requestGuildsSync()
+          this.guilds = []
+        }
+
         break
       case AetherServerOpcode.IDENTIFY_CLIENT:
         this.debug("received IDENTIFY_CLIENT", msg.d)
 
         this.identified = true
         this.userConfig = msg.d.config
+
+        if (this.authSession) {
+          this.requestGuildsSync()
+        }
         break
       case AetherServerOpcode.HEARTBEAT_ACK:
         this.debug("received HEARTBEAT_ACK")
@@ -164,6 +197,24 @@ export class AetherClient {
         break
       case AetherServerOpcode.PUSH_ROUTE:
         // TODO: handle push route
+        break
+      case AetherServerOpcode.GUILD_SYNC:
+        if (msg.d.success === false) {
+          this.debug("failed to sync guilds", msg.d.code)
+        }
+        break
+      case AetherServerOpcode.GUILD_CREATE:
+        const createdGuild = msg.d
+
+        // Only adds the guild if it's not already in the list
+        if (!this.guilds.find((g) => g.id == createdGuild.id)) {
+          this.guilds.push(createdGuild)
+        }
+        break
+      case AetherServerOpcode.GUILD_DELETE:
+        const deletedGuild = msg.d
+        // Removes the guild if it's in the list
+        this.guilds = this.guilds.filter((guild) => guild.id !== deletedGuild.id)
         break
       default:
         this.debug("Unknown opcode", msg)
@@ -211,7 +262,7 @@ export class AetherClient {
   }
 
   private identify() {
-    if (this.ws?.readyState !== WebSocket.OPEN) {
+    if (!this.connected) {
       this.debug("tried to identify with a closed connection")
       return
     }
@@ -252,6 +303,15 @@ export class AetherClient {
     })
   }
 
+  private requestGuildsSync() {
+    this.sendMessage({
+      op: AetherClientOpcode.GUILD_SYNC,
+      d: {
+        existing: this.guilds ?? [],
+      },
+    })
+  }
+
   private startSendingHeartbeats(interval: number) {
     if (this.heartbeatInterval !== null) {
       clearInterval(this.heartbeatInterval)
@@ -277,12 +337,12 @@ export class AetherClient {
   }
 
   private sendMessage(msg: AetherClientMessage) {
-    if (this.ws?.readyState != WebSocket.OPEN || (msg.op != AetherClientOpcode.IDENTIFY_CLIENT && !this.identified)) {
+    if (!this.connected || (msg.op != AetherClientOpcode.IDENTIFY_CLIENT && !this.identified)) {
       this.debug("Adding message to queue", msg)
       // TODO: add to queue
     } else {
       this.debug("Sending message", msg)
-      this.ws.send(compress(msg))
+      this.ws?.send(compress(msg))
     }
   }
 

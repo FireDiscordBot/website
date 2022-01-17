@@ -1,11 +1,31 @@
 import { Session } from "next-auth"
 
+import { Command } from "@/interfaces/aether"
+import { DiscordGuild } from "@/interfaces/discord"
+
 export interface AetherSession {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   clientInfo: any
   ip: string
   readyState: number
   sessionId: string
+}
+
+interface TreatmentConfig {
+  id: number
+  label: string
+}
+
+export interface ExperimentConfig {
+  id: string
+  label: string
+  kind: "user" | "guild"
+  treatments: TreatmentConfig[]
+}
+
+interface UnavailableGuild {
+  id: string
+  unavailable: true
 }
 
 export interface AetherClientPayloads {
@@ -27,6 +47,9 @@ export interface AetherClientPayloads {
     env: string
   }
   [AetherClientOpcode.HEARTBEAT]: number | null
+  [AetherClientOpcode.GUILD_SYNC]: {
+    existing?: DiscordGuild[]
+  }
 }
 
 export interface AetherServerPayloads {
@@ -48,13 +71,15 @@ export interface AetherServerPayloads {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     config: Record<string, any>
     replayed: number
+    guilds: UnavailableGuild[]
+    session: string
   }
   [AetherServerOpcode.HELLO]: {
     // TODO: add typings
-    guildExperiments: never
-    userExperiments: never
+    guildExperiments: ExperimentConfig[]
+    userExperiments: ExperimentConfig[]
     commandCategories: string[]
-    firstCategory: never
+    firstCategory: Command[]
     sessionId: string
     interval: number
   }
@@ -62,6 +87,14 @@ export interface AetherServerPayloads {
   [AetherServerOpcode.SESSIONS_REPLACE]: AetherSession[]
   [AetherServerOpcode.PUSH_ROUTE]: {
     route: string
+  }
+  [AetherServerOpcode.GUILD_SYNC]:
+    | { success: false; code: number } // error occured
+    | { success: true; guilds: UnavailableGuild[] } // success
+    | { success: null } // finished guild sync
+  [AetherServerOpcode.GUILD_CREATE]: DiscordGuild
+  [AetherServerOpcode.GUILD_DELETE]: {
+    id: string
   }
 }
 

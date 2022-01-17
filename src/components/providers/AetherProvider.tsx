@@ -3,9 +3,9 @@ import { useEffect } from "react"
 import { useState } from "react"
 import { createContext, ReactNode } from "react"
 
+import { AetherClient } from "@/lib/aether/AetherClient"
 import { fetchWebsiteGateway } from "@/lib/aether/api"
 import { AetherGateway } from "@/lib/aether/types"
-import { AetherClient } from "@/lib/aether/AetherClient"
 
 export interface AetherConnectionState {
   status: "connected" | "disconnected"
@@ -47,7 +47,7 @@ export function AetherProvider(props: AetherProviderProps) {
       return
     }
 
-    if (client && client.ws && client.ws.readyState === client.ws.OPEN) {
+    if (client && client.connected) {
       console.log("[AetherProvider] updating auth session")
       // Handles access token updates
       client.setAuthSession(session)
@@ -66,7 +66,7 @@ export function AetherProvider(props: AetherProviderProps) {
 
       setClient((prevClient) => {
         // Little hack to prevent duplicated connections
-        if (prevClient && prevClient.ws && prevClient.ws.readyState === prevClient.ws.OPEN) {
+        if (prevClient && prevClient.connected) {
           console.log("[AetherProvider] found duplicated connection, closing it")
           prevClient.disconnect()
         }
