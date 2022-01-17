@@ -1,4 +1,5 @@
 import { useSession } from "next-auth/react"
+import { useRouter } from "next/router"
 import { useEffect } from "react"
 import { useState } from "react"
 import { createContext, ReactNode } from "react"
@@ -21,6 +22,7 @@ interface AetherProviderProps {
 
 export function AetherProvider(props: AetherProviderProps) {
   const { data: session, status: sessionStatus } = useSession()
+  const router = useRouter()
   const [gateway, setGateway] = useState<AetherGateway | null>(null)
   const [client, setClient] = useState<AetherClient | null>(null)
   const [state] = useState<AetherConnectionState>({
@@ -53,8 +55,13 @@ export function AetherProvider(props: AetherProviderProps) {
       client.setAuthSession(session)
     } else {
       console.log("[AetherProvider] starting connection")
+
+      const handlePushRoute = (route: string) => {
+        router.push(route)
+      }
+
       // Initial connection
-      const newClient = new AetherClient(gateway, session)
+      const newClient = new AetherClient(gateway, session, router.pathname ?? location.pathname, handlePushRoute)
       newClient.connect()
 
       // Access to the client when developing locally
@@ -81,6 +88,20 @@ export function AetherProvider(props: AetherProviderProps) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionStatus, session?.accessToken, gateway])
+
+  useEffect(() => {
+    function handler(url: string) {
+      if (client && client.connected) {
+        client.setCurrentRoute(url)
+      }
+    }
+
+    router.events.on("routeChangeComplete", handler)
+
+    return () => {
+      router.events.off("routeChangeComplete", handler)
+    }
+  }, [router, client])
 
   return <AetherStateContext.Provider value={state}>{props.children}</AetherStateContext.Provider>
 }

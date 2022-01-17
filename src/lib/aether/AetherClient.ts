@@ -80,9 +80,18 @@ export class AetherClient {
   private guilds: DiscordGuild[] = []
   private commands: Command[] = []
 
-  constructor(gateway: AetherGateway, authSession: Session | null) {
+  private handlePushRoute?: (route: string) => void
+
+  constructor(
+    gateway: AetherGateway,
+    authSession: Session | null,
+    currentRoute: string | null,
+    handlePushRoute?: (route: string) => void,
+  ) {
     this.gateway = gateway
     this.authSession = authSession
+    this.currentRoute = currentRoute
+    this.handlePushRoute = handlePushRoute
   }
 
   connect() {
@@ -124,6 +133,20 @@ export class AetherClient {
       this.disconnect(AetherCloseCode.SESSION_TIMEOUT, "Reauthenticating")
       this.connect()
     }
+  }
+
+  setCurrentRoute(currentRoute: string) {
+    if (this.currentRoute === currentRoute) {
+      return
+    }
+
+    this.currentRoute = currentRoute
+    this.sendMessage({
+      op: AetherClientOpcode.SUBSCRIBE,
+      d: {
+        route: currentRoute,
+      },
+    })
   }
 
   isSuperuser() {
@@ -196,7 +219,9 @@ export class AetherClient {
         // I don't think we need to store this data
         break
       case AetherServerOpcode.PUSH_ROUTE:
-        // TODO: handle push route
+        this.debug("received PUSH_ROUTE", msg.d)
+        // Maybe a better way to do this
+        this.handlePushRoute?.(msg.d.route)
         break
       case AetherServerOpcode.GUILD_SYNC:
         if (msg.d.success === false) {
@@ -215,6 +240,9 @@ export class AetherClient {
         const deletedGuild = msg.d
         // Removes the guild if it's in the list
         this.guilds = this.guilds.filter((guild) => guild.id !== deletedGuild.id)
+        break
+      case AetherServerOpcode.REALTIME_STATS:
+        // TODO: handle realtime stats
         break
       default:
         this.debug("Unknown opcode", msg)

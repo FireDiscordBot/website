@@ -1,6 +1,6 @@
 import { Session } from "next-auth"
 
-import { Command } from "@/interfaces/aether"
+import { ClusterStats, Command, InitialStats } from "@/interfaces/aether"
 import { DiscordGuild } from "@/interfaces/discord"
 
 export interface AetherSession {
@@ -50,6 +50,9 @@ export interface AetherClientPayloads {
   [AetherClientOpcode.GUILD_SYNC]: {
     existing?: DiscordGuild[]
   }
+  [AetherClientOpcode.SUBSCRIBE]: {
+    route: string
+  }
 }
 
 export interface AetherServerPayloads {
@@ -96,6 +99,7 @@ export interface AetherServerPayloads {
   [AetherServerOpcode.GUILD_DELETE]: {
     id: string
   }
+  [AetherServerOpcode.REALTIME_STATS]: ClusterStats | InitialStats
 }
 
 export enum AetherClientOpcode {
