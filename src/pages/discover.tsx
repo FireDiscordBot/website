@@ -182,6 +182,7 @@ const DiscoverPage = () => {
             id="guild-filter"
             onChange={(value) => handleTextChange(value.target.value)}
             fullWidth
+            label="Search Servers"
             placeholder={"Find a server..."}
           />
         </Box>

@@ -136,12 +136,15 @@ const CommandsPage = () => {
     <DefaultLayout title="Commands">
       <Container>
         <Grid container>
-          <TextField
-            id="command-filter"
-            onChange={(value) => handleTextChange(value.target.value)}
-            fullWidth
-            placeholder={"Search Commands"}
-          />
+          <Box paddingBottom={2} width={"100%"}>
+            <TextField
+              id="command-filter"
+              onChange={(value) => handleTextChange(value.target.value)}
+              fullWidth
+              label="Search Commands"
+              placeholder={"Find a command..."}
+            />
+          </Box>
           <Grid item xs={12} md={12}>
             <Paper sx={{ height: "100%" }}>
               <CategoriesTabs
@@ -158,7 +161,7 @@ const CommandsPage = () => {
             </Paper>
           </Grid>
           <Grid item xs={12} md={12}>
-            <Box paddingTop={3} width="100%" key={0}>
+            <Box paddingTop={2} width="100%" key={0}>
               {handler?.commandCategories?.length && commands.length ? (
                 // TODO: put subcommands inside the main command's CommandAccordion
                 commands
