@@ -15,8 +15,10 @@ import { useRouter } from "next/router"
 import * as React from "react"
 import AvatarButton from "./AvatarButton"
 import UserAvatarMenu from "./UserAvatarMenu"
-import { IconButton, Menu, MenuItem } from "@mui/material"
+import { IconButton, ListItemIcon, ListItemText, Menu } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
+import MenuItemLink from "./MenuItemLink"
+import { Analytics, Code, TravelExplore } from "@mui/icons-material"
 
 interface StyledAppBarProps extends AppBarProps {
   scrolled: boolean
@@ -111,9 +113,7 @@ const NavBar = () => {
         <Container>
           <Toolbar disableGutters>
             <NextLink href="/" passHref>
-              <Typography
-                sx={{ mr: 2, display: { xs: "none", md: "flex", textDecoration: "none", cursor: "pointer" } }}
-              >
+              <Typography sx={{ display: { xs: "none", md: "flex", textDecoration: "none", cursor: "pointer" } }}>
                 {homePageLink}
               </Typography>
             </NextLink>
@@ -129,7 +129,6 @@ const NavBar = () => {
                 <MenuIcon />
               </IconButton>
               <Menu
-                id="menu-appbar"
                 anchorEl={anchorElNav}
                 anchorOrigin={{
                   vertical: "bottom",
@@ -146,32 +145,35 @@ const NavBar = () => {
                   display: { xs: "block", md: "none" },
                 }}
               >
-                <MenuItem onClick={() => {}}>
-                  <NextLink href="/discover" passHref>
-                    <Typography textAlign="center">Discover</Typography>
-                  </NextLink>
-                </MenuItem>
-                <MenuItem onClick={() => {}}>
-                  <NextLink href="/commands" passHref>
-                    <Typography textAlign="center">Commands</Typography>
-                  </NextLink>
-                </MenuItem>
-                <MenuItem onClick={() => {}}>
-                  <NextLink href="/stats" passHref>
-                    <Typography textAlign="center">Stats</Typography>
-                  </NextLink>
-                </MenuItem>
+                <MenuItemLink href="/discover">
+                  <ListItemIcon>
+                    <TravelExplore />
+                  </ListItemIcon>
+                  <ListItemText primary="Discover" />
+                </MenuItemLink>
+                <MenuItemLink href="/commands">
+                  <ListItemIcon>
+                    <Code />
+                  </ListItemIcon>
+                  <ListItemText primary="Commands" />
+                </MenuItemLink>
+                <MenuItemLink href="/stats">
+                  <ListItemIcon>
+                    <Analytics />
+                  </ListItemIcon>
+                  <ListItemText primary="Stats" />
+                </MenuItemLink>
               </Menu>
             </Box>
 
-            <NextLink href="/" passHref>
-              <Typography
-                sx={{ flexGrow: 1, display: { xs: "flex", md: "none", textDecoration: "none", cursor: "pointer" } }}
-              >
-                {homePageLink}
-              </Typography>
-            </NextLink>
-            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+            <Box sx={{ flexGrow: 1 }}>
+              <NextLink href="/" passHref>
+                <Typography sx={{ display: { xs: "flex", md: "none", textDecoration: "none", cursor: "pointer" } }}>
+                  {homePageLink}
+                </Typography>
+              </NextLink>
+            </Box>
+            <Box sx={{ display: { xs: "none", md: "flex" } }}>
               <NextLink href="/discover" passHref>
                 <Button variant="text">Discover</Button>
               </NextLink>
