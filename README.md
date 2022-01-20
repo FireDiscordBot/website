@@ -1,6 +1,6 @@
 # Fire Website
 
-Source Code of [Fire Website](https://fire.gaminggeek.dev)
+Source Code of [Fire Website](https://getfire.bot)
 
 ## Getting Started
 

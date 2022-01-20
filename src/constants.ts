@@ -38,7 +38,7 @@ export const defaultSeoConfig: DefaultSeoProps = {
   },
   openGraph: {
     type: "website",
-    url: "https://fire.gaminggeek.dev/",
+    url: "https://getfire.bot/",
     title: "Fire",
     description:
       "A Discord bot for all your needs. With memes, utilities, moderation and more. Fire is the only bot you will need.",
