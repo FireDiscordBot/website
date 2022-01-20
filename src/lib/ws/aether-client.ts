@@ -556,7 +556,8 @@ export class AetherClient {
       )
   }
 
-  PUSH_ROUTE(data: { route: string }) {
+  PUSH_ROUTE(data: { route: string; extra?: Record<string, unknown> }) {
+    if (data.extra?.forceLogin == true) return this.signIn()
     this.navigate(data.route)
   }
 
