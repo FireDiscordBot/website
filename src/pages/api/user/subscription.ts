@@ -92,7 +92,13 @@ const post: AuthenticatedApiHandler<PostSubscriptionResponse> = async (session, 
     return
   }
 
-  const stripeSessionId = await createStripeCheckoutSession(session.accessToken, servers)
+  let stripeSessionId: string
+  try {
+    stripeSessionId = await createStripeCheckoutSession(session.accessToken, servers)
+  } catch (e: any) {
+    const errorResponse = createErrorResponse(e)
+    return error(res, errorResponse.code, errorResponse.error)
+  }
 
   res.json({ sessionId: stripeSessionId })
 }
