@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react"
-import { useSession as useNextAuthSession } from "next-auth/react"
+import { signIn, useSession as useNextAuthSession } from "next-auth/react"
 import Router from "next/router"
 
 type Options = {
@@ -14,7 +14,7 @@ const useSession = ({ redirectTo }: Options = {}) => {
     if (!redirectTo || loading) return
 
     if (redirectTo && !data) {
-      Router.push(redirectTo)
+      redirectTo == "login" ? signIn("discord") : Router.push(redirectTo)
     }
   }, [data, loading, redirectTo])
 

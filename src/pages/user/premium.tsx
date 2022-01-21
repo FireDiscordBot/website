@@ -49,7 +49,7 @@ const sort = (guilds?: PremiumDiscordGuild[]) =>
   guilds?.length ? guilds.sort((a, b) => getSort(a) - getSort(b)) : undefined
 
 const PremiumPage = () => {
-  const [session, loading] = useSession({ redirectTo: "/" })
+  const [session, loading] = useSession({ redirectTo: "login" })
   const {
     subscription,
     isLoading: isLoadingSubscription,
@@ -97,10 +97,10 @@ const PremiumPage = () => {
   }, [subscriptionError, guildsError])
 
   React.useEffect(() => {
-      emitter.removeAllListeners("GUILD_SYNC")
-      emitter.on("GUILD_SYNC", (s) => {
-          if (s.success == null && !guilds?.length) mutateGuilds(undefined, true)
-      })
+    emitter.removeAllListeners("GUILD_SYNC")
+    emitter.on("GUILD_SYNC", (s) => {
+      if (s.success == null && !guilds?.length) mutateGuilds(undefined, true)
+    })
   })
 
   React.useEffect(() => {
