@@ -81,14 +81,21 @@ export type Category = {
   Note?: string
 }
 
-export type DiscoverableGuild = {
+type BadgeType = null | "PARTNERED" | "VERIFIED" | "BOOST_FRIENDS" | "BOOST_GROUPS" | "BOOST_COMMUNITIES"
+
+export interface DiscoverableGuild {
   name: string
   id: string
-  icon: string
-  splash: string
+  //   icon: string
+  iconProxy?: string
+  //   splash: string
+  splashProxy?: string
   vanity: string
   members: number
+  badge: BadgeType
   featured: boolean
+  shard?: number
+  cluster?: number
   key?: number
 }
 
@@ -190,16 +197,19 @@ export type ClientInfo = {
 
 type UnavailableGuild = { id: string; unavailable: true }
 
-export type GuildSyncResponse = {
-    success: false,
-    code: number,
-    debug?: string
-} | {
-    success: true,
-    guilds: UnavailableGuild[]
-} | {
-    success: null,
-}
+export type GuildSyncResponse =
+  | {
+      success: false
+      code: number
+      debug?: string
+    }
+  | {
+      success: true
+      guilds: UnavailableGuild[]
+    }
+  | {
+      success: null
+    }
 
 interface TreatmentConfig {
   id: number

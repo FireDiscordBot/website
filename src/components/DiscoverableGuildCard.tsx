@@ -108,9 +108,9 @@ const DiscoverableGuildCard = ({ guild }: Props) => {
             })
         }}
       >
-        <StyledCardMedia image={guild.splash} title={guild.name} />
+        <StyledCardMedia image={guild.splashProxy} title={guild.name} />
         <StyledCardContent>
-          <Avatar src={guild.icon} />
+          <Avatar src={guild.iconProxy} />
           <CardText>
             <Typography variant="h6" component="h2" noWrap>
               {guild.name}
