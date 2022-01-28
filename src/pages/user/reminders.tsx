@@ -155,7 +155,7 @@ const Reminders = () => {
           </Grid>
         </Grid>
         <Grid item xs={12} sm={12}>
-          {!loading && (
+          {!loading && reminders?.length && (
             <div>
               {reminders?.map((reminder, index) => (
                 <Box key={index} mb={1}>
@@ -215,6 +215,7 @@ const timeConverter = (start: Date, end: Date) => {
 }
 
 const getProgress = (reminder: Reminder) => {
+  if (!reminder.link) return 0 // temp fix, link should always exist
   const progress =
     ((Date.now() - getTimestamp(reminder.link)) / (reminder.timestamp - getTimestamp(reminder.link))) * 100
   return progress >= 100 ? 100 : progress
