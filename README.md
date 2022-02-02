@@ -10,7 +10,7 @@ purposes.
 ### Prerequisites
 
 1. [NodeJS](https://nodejs.org/) - JavaScript runtime built on Chrome's V8 JavaScript engine.
-2. [Yarn](https://yarnpkg.com/) - Fast, reliable, and secure dependency management for JavaScript.
+2. [pnpm](https://pnpm.io/) - Fast, disk space efficient package manager.
 
 ### Installing
 
@@ -21,10 +21,10 @@ git clone https://github.com/FireDiscordBot/website.git fire-website
 cd fire-website
 ```
 
-2. Install dependencies with Yarn
+2. Install dependencies with PNPM
 
 ```bash
-yarn
+pnpm install
 ```
 
 3. Rename the file `default.env.development.local` to `.env.development.local` and add your tokens
@@ -47,10 +47,10 @@ JWT_SECRET=XXX
   - `NEXT_AUTH_SECRET`: `openssl rand -base64 32`
   - `JWT_SECRET`: `openssl rand -base64 64`
 
-4. Run the development server with Yarn
+4. Run the development server with PNPM
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 ## Built With
