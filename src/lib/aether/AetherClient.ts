@@ -15,7 +15,7 @@ import {
   ExperimentConfig,
 } from "./types"
 
-import { Command } from "@/interfaces/aether"
+import { ClusterStats, Command } from "@/interfaces/aether"
 import { DiscordGuild } from "@/interfaces/discord"
 
 function uncompress(data: string): AetherServerMessage | null {
@@ -79,6 +79,7 @@ export class AetherClient {
   private experiments: ExperimentConfig[] = []
   private guilds: DiscordGuild[] = []
   private commands: Command[] = []
+  clusterStats: ClusterStats[] = []
 
   private handlePushRoute?: (route: string) => void
 
@@ -242,7 +243,20 @@ export class AetherClient {
         this.guilds = this.guilds.filter((guild) => guild.id !== deletedGuild.id)
         break
       case AetherServerOpcode.REALTIME_STATS:
-        // TODO: handle realtime stats
+        if (msg.d.id === -1) {
+          this.debug("received initial stats", msg.d)
+          return
+        }
+
+        const newClusterStat = msg.d as ClusterStats
+        const index = this.clusterStats.findIndex((clusterStat) => clusterStat.id === newClusterStat.id)
+
+        if (index !== -1) {
+          this.clusterStats[index] = newClusterStat
+        } else {
+          this.clusterStats.push(newClusterStat)
+        }
+
         break
       default:
         this.debug("Unknown opcode", msg)

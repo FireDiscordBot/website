@@ -8,13 +8,7 @@ import { AetherClient } from "@/lib/aether/AetherClient"
 import { fetchWebsiteGateway } from "@/lib/aether/api"
 import { AetherGateway } from "@/lib/aether/types"
 
-export interface AetherConnectionState {
-  status: "connected" | "disconnected"
-}
-
-const AetherStateContext = createContext<AetherConnectionState>({
-  status: "disconnected",
-})
+export const AetherClientContext = createContext<AetherClient | null>(null)
 
 interface AetherProviderProps {
   children: ReactNode
@@ -25,9 +19,6 @@ export function AetherProvider(props: AetherProviderProps) {
   const router = useRouter()
   const [gateway, setGateway] = useState<AetherGateway | null>(null)
   const [client, setClient] = useState<AetherClient | null>(null)
-  const [state] = useState<AetherConnectionState>({
-    status: "disconnected",
-  })
 
   useEffect(() => {
     let active = true
@@ -103,5 +94,5 @@ export function AetherProvider(props: AetherProviderProps) {
     }
   }, [router, client])
 
-  return <AetherStateContext.Provider value={state}>{props.children}</AetherStateContext.Provider>
+  return <AetherClientContext.Provider value={client}>{props.children}</AetherClientContext.Provider>
 }
