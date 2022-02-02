@@ -53,6 +53,10 @@ export interface AetherClientPayloads {
   [AetherClientOpcode.SUBSCRIBE]: {
     route: string
   }
+  [AetherClientOpcode.RESTART_CLUSTER]: {
+    id: number
+    reason: string
+  }
 }
 
 export interface AetherServerPayloads {

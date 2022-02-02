@@ -3,6 +3,7 @@ import { deflateSync, inflateSync } from "zlib"
 import WebSocket from "isomorphic-ws"
 import type { Session } from "next-auth"
 import { UAParser } from "ua-parser-js"
+import mitt from "mitt"
 
 import {
   AetherClientMessage,
@@ -63,6 +64,10 @@ function buildClientInfo() {
   return info
 }
 
+type AetherClientEvents = {
+  newCommands: Command[]
+}
+
 export class AetherClient {
   private gateway: AetherGateway
   private authSession: Session | null = null
@@ -80,6 +85,7 @@ export class AetherClient {
   private guilds: DiscordGuild[] = []
   private commands: Command[] = []
   clusterStats: ClusterStats[] = []
+  events = mitt<AetherClientEvents>()
 
   private handlePushRoute?: (route: string) => void
 
@@ -150,7 +156,22 @@ export class AetherClient {
     })
   }
 
-  isSuperuser() {
+  requestClusterRestart(clusterId: number) {
+    if (!this.authSession?.user || !this.superuser) {
+      return
+    }
+
+    const user = this.authSession.user
+    this.sendMessage({
+      op: AetherClientOpcode.RESTART_CLUSTER,
+      d: {
+        id: clusterId,
+        reason: `Restart requested by ${user.username}#${user.discriminator}`,
+      },
+    })
+  }
+
+  get superuser() {
     return this.userConfig && this.userConfig["utils.superuser"]
   }
 
@@ -168,6 +189,7 @@ export class AetherClient {
       return
     }
 
+    // Update current sequence if it's present in the received message
     if (typeof msg.s === "number") {
       this.debug("received new sequence", msg)
       this.currentSequence = msg.s
@@ -186,6 +208,7 @@ export class AetherClient {
         this.commands = this.commands.filter(
           (c, index) => this.commands.findIndex((c2) => c2.name === c.name) === index,
         )
+        this.events.emit("newCommands", this.commands)
 
         this.startSendingHeartbeats(msg.d.interval)
         this.identify()
@@ -236,11 +259,15 @@ export class AetherClient {
         if (!this.guilds.find((g) => g.id == createdGuild.id)) {
           this.guilds.push(createdGuild)
         }
+
+        // TODO: emit event
         break
       case AetherServerOpcode.GUILD_DELETE:
         const deletedGuild = msg.d
         // Removes the guild if it's in the list
         this.guilds = this.guilds.filter((guild) => guild.id !== deletedGuild.id)
+
+        // TODO: emit event
         break
       case AetherServerOpcode.REALTIME_STATS:
         if (msg.d.id === -1) {

@@ -5,7 +5,7 @@ import ListItem from "@mui/material/ListItem"
 import ListItemAvatar from "@mui/material/ListItemAvatar"
 import ListItemText from "@mui/material/ListItemText"
 
-import DialogTitle from "./DialogTitle"
+import DialogHeader from "./DialogHeader"
 
 import useAvailablePlans from "@/hooks/use-available-plans"
 import { PremiumPlan } from "@/lib/stripe/types"
@@ -26,7 +26,7 @@ const SelectPlanCard = ({ open, onClose, onClickPlan, loadPlans }: SelectPlanCar
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle onClose={onClose}>Plans</DialogTitle>
+      <DialogHeader title="Plans" onClose={onClose} />
       <List>
         {plans
           ?.filter((plan) => !plan.hidden)

@@ -1,8 +1,6 @@
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/router"
-import { useEffect } from "react"
-import { useState } from "react"
-import { createContext, ReactNode } from "react"
+import { useEffect, useState, createContext, ReactNode } from "react"
 
 import { AetherClient } from "@/lib/aether/AetherClient"
 import { fetchWebsiteGateway } from "@/lib/aether/api"

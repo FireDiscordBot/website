@@ -1,5 +1,6 @@
 import PeopleIcon from "@mui/icons-material/People"
 import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import Dialog from "@mui/material/Dialog"
@@ -7,12 +8,13 @@ import DialogContent from "@mui/material/DialogContent"
 import Grid from "@mui/material/Grid"
 import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
+import { useCallback } from "react"
 
 import CircularProgressCard from "./CircularProgressCard"
-import DialogTitle from "./DialogTitle"
+import DialogHeader from "./DialogHeader"
 
+import useAether from "@/hooks/use-aether"
 import type { ClusterStats } from "@/interfaces/aether"
-// import { handler } from "@/pages/_app"
 import { formatBytes, formatNumber } from "@/utils/formatting"
 
 interface StatLineProps {
@@ -51,28 +53,23 @@ interface ClusterStatsDialogProps {
   clusterStats: ClusterStats
 }
 
-const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: ClusterStatsDialogProps) => {
-  const open = props.open ?? false
+const ClusterStatsDialog = ({ onClose, clusterStats, open = false }: ClusterStatsDialogProps) => {
+  const aether = useAether()
 
-  // TODO
-  // const restartCluster = () => {
-  // if (!handler) return
-  // handler.restartCluster({
-  //   id: clusterStats.id,
-  //   reason: `Restart requested by ${handler.user?.username}#${handler.user?.discriminator}`,
-  // })
-  // }
+  // Maybe move to props
+  const restartCluster = useCallback(() => {
+    aether && aether.requestClusterRestart(clusterStats.id)
+  }, [aether, clusterStats.id])
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md">
-      <DialogTitle onClose={onClose}>
-        Cluster {clusterStats.id} ({clusterStats.name})
-      </DialogTitle>
-      {/* {handler?.isSuperuser() && (
-        <Button size="small" onClick={restartCluster}>
-          Restart
-        </Button>
-      )} */}
+      <DialogHeader title={`Cluster ${clusterStats.id} (${clusterStats.name})`} onClose={onClose}>
+        {aether?.superuser && (
+          <Button size="small" variant="contained" onClick={restartCluster}>
+            Restart
+          </Button>
+        )}
+      </DialogHeader>
       <DialogContent
         dividers
         sx={{

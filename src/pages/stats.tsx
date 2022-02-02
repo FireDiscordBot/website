@@ -14,6 +14,7 @@ import ClusterCard from "@/components/ui/ClusterCard"
 import ClusterStatsDialog from "@/components/ui/ClusterStatsDialog"
 import { ClusterStats, InitialStats } from "@/interfaces/aether"
 import { formatBytes, formatNumber } from "@/utils/formatting"
+import useAether from "@/hooks/use-aether"
 
 const StyledStorageIcon = styled(StorageIcon)(({ theme }) => ({
   fontSize: theme.spacing(10),
@@ -33,9 +34,9 @@ const StyledCardContent = styled(CardContent)({
 
 const StatsPage = () => {
   const router = useRouter()
+  const aether = useAether()
 
-  const [initialStats] = useState<InitialStats | undefined>(undefined)
-  const [clusterStats] = useState<ClusterStats[]>([])
+  const [clusterStats, setClusterStats] = useState<ClusterStats[]>([])
   const [selectedClusterStats, setSelectedClusterStats] = useState<ClusterStats | undefined>(undefined)
 
   const findClusterStats = useCallback(
@@ -44,6 +45,7 @@ const StatsPage = () => {
     },
     [clusterStats],
   )
+
   const onClickClusterCard = (id: number) => setSelectedClusterStats(findClusterStats(id))
   const onClickClusterError = (_id: number) => {
     // emitter.emit("NOTIFICATION", {
@@ -61,6 +63,13 @@ const StatsPage = () => {
   }
 
   useEffect(() => {
+    if (!aether) {
+      return
+    }
+
+    // TODO: change this to use aether.events
+    setClusterStats(aether.clusterStats)
+
     // TODO
     // emitter.removeAllListeners("REALTIME_STATS")
     // emitter.on("REALTIME_STATS", (stats) => {
@@ -105,7 +114,7 @@ const StatsPage = () => {
     //     handler.cachedStats = clusterStats
     //   }
     // })
-  }, [clusterStats, initialStats?.clusterCount])
+  }, [aether, clusterStats])
 
   useEffect(() => {
     if (typeof router.query.cluster === "string") {
