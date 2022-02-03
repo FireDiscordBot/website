@@ -14,6 +14,7 @@ import CircularProgressCard from "@/components/ui/CircularProgressCard"
 import ClusterCard from "@/components/ui/ClusterCard"
 import ClusterStatsDialog from "@/components/ui/ClusterStatsDialog"
 import useAether from "@/hooks/use-aether"
+import useAppSnackbar from "@/hooks/use-snackbar-control"
 import { ClusterStats, InitialStats } from "@/interfaces/aether"
 import { formatBytes, formatNumber } from "@/utils/formatting"
 
@@ -36,6 +37,7 @@ const StyledCardContent = styled(CardContent)({
 const StatsPage = () => {
   const router = useRouter()
   const aether = useAether()
+  const { showSnackbar } = useAppSnackbar()
 
   const [clusterStats, setClusterStats] = useState<ClusterStats[]>([])
   const [selectedClusterStats, setSelectedClusterStats] = useState<ClusterStats | undefined>(undefined)
@@ -60,15 +62,8 @@ const StatsPage = () => {
     [setSelectedClusterStats, findClusterStats, router],
   )
 
-  const onClickClusterError = (_id: number) => {
-    // TODO
-    // emitter.emit("NOTIFICATION", {
-    //   text: `Cluster ${id} is currently unavailable`,
-    //   severity: "error",
-    //   horizontal: "right",
-    //   vertical: "top",
-    //   autoHideDuration: 5000,
-    // })
+  const onClickClusterError = (id: number) => {
+    showSnackbar(`Cluster ${id} is currently unavailable`, 5000, "error")
   }
   const onCloseClusterDialog = () => selectClusterStats(undefined)
 

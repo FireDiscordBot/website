@@ -17,6 +17,7 @@ import Loading from "@/components/ui/Loading"
 import useAether from "@/hooks/use-aether"
 import useCurrentSubscription from "@/hooks/use-current-subscription"
 import useSession from "@/hooks/use-session"
+import useAppSnackbar from "@/hooks/use-snackbar-control"
 import { DataArchiveRequestResponse, LastDataArchive } from "@/lib/aether/types"
 import { ApiResponse } from "@/lib/api/response"
 import { getAvatarImageUrl, parseFlags } from "@/lib/discord"
@@ -26,8 +27,9 @@ import { openUrl } from "@/utils/open-url"
 const AccountPage = () => {
   const [session, loading] = useSession({ redirectTo: "/" })
   const aether = useAether()
-  const { subscription, isLoading, error } = useCurrentSubscription(session != null && !loading)
+  const { showSnackbar } = useAppSnackbar()
 
+  const { subscription, isLoading, error } = useCurrentSubscription(session != null && !loading)
   const [lastDataArchive, setLastDataArchive] = useState<LastDataArchive | undefined>(undefined)
   const [loadingDataArchive, setLoadingDataArchive] = useState(false)
   const avatarImageUrl = useMemo(
@@ -35,14 +37,8 @@ const AccountPage = () => {
     [session],
   )
 
-  const setErrorMessage = (_text: string) => {
-    // emitter.emit("NOTIFICATION", {
-    //   text,
-    //   severity: "error",
-    //   horizontal: "right",
-    //   vertical: "top",
-    //   autoHideDuration: 5000,
-    // })
+  const setErrorMessage = (text: string) => {
+    showSnackbar(text, 5000, "error")
   }
 
   useEffect(() => {
@@ -98,7 +94,7 @@ const AccountPage = () => {
 
   useEffect(() => {
     setErrorMessage(error?.message)
-  }, [error])
+  }, [error, setErrorMessage])
 
   if (!session || loading) {
     return <Loading />

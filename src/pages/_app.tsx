@@ -10,6 +10,8 @@ import Head from "next/head"
 import { SWRConfig } from "swr"
 
 import { AetherProvider } from "@/components/providers/AetherProvider"
+import { AppSnackbarProvider } from "@/components/providers/AppSnackbarProvider"
+import AppSnackbar from "@/components/ui/AppSnackbar"
 import { defaultSeoConfig } from "@/constants"
 import theme from "@/theme"
 import createEmotionCache from "@/utils/createEmotionCache"
@@ -56,10 +58,13 @@ function FireApp(props: FireAppProps) {
           <SWRConfig value={{ fetcher: fetcher }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <SessionProvider session={pageProps.session}>
-                <AetherProvider>
-                  <CssBaseline />
-                  <Component {...pageProps} />
-                </AetherProvider>
+                <AppSnackbarProvider>
+                  <AetherProvider>
+                    <CssBaseline />
+                    <Component {...pageProps} />
+                    <AppSnackbar />
+                  </AetherProvider>
+                </AppSnackbarProvider>
               </SessionProvider>
             </LocalizationProvider>
           </SWRConfig>

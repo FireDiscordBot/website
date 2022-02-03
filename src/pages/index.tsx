@@ -20,7 +20,7 @@ const FEATURES: Feature[] = [
   {
     title: "Integrations",
     text: `
-    Fire has a few integrations that allow you to retrieve content from external platforms 
+    Fire has a few integrations that allow you to retrieve content from external platforms
     such as Reddit and even the Google Assistant.
     `.trimStart(),
   },
@@ -34,7 +34,7 @@ const FEATURES: Feature[] = [
   {
     title: "Moderation",
     text: `
-    We know how hard moderation can be, so we try to make things easy. With commands to mute, 
+    We know how hard moderation can be, so we try to make things easy. With commands to mute,
     block (per-channel mute), kick and ban, moderation is a piece of cake!
     `.trimStart(),
   },
