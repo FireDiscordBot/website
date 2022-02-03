@@ -5,6 +5,7 @@ import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
 import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
+import { Handler } from "mitt"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useState } from "react"
 
@@ -12,10 +13,9 @@ import DefaultLayout from "@/components/layout/default"
 import CircularProgressCard from "@/components/ui/CircularProgressCard"
 import ClusterCard from "@/components/ui/ClusterCard"
 import ClusterStatsDialog from "@/components/ui/ClusterStatsDialog"
+import useAether from "@/hooks/use-aether"
 import { ClusterStats, InitialStats } from "@/interfaces/aether"
 import { formatBytes, formatNumber } from "@/utils/formatting"
-import useAether from "@/hooks/use-aether"
-import { Handler } from "mitt"
 
 const StyledStorageIcon = styled(StorageIcon)(({ theme }) => ({
   fontSize: theme.spacing(10),

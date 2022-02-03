@@ -1,9 +1,8 @@
-import { AetherGateway } from "./types"
+import { AetherGateway, DataArchiveRequest, LastDataArchive } from "./types"
 
 import { fire } from "@/constants"
 import { AdminSessionData, BuildOverride, Reminder } from "@/interfaces/aether"
 import { PremiumDiscordGuild } from "@/interfaces/discord"
-import { GetCollectData } from "@/types"
 
 const request = async <R = void, B = unknown>(
   path: string,
@@ -82,14 +81,12 @@ export const toggleGuildPremium = async (
   return requestWithAuth<string[]>(accessToken, `subscriptions/${subId}/guilds/${guildId}/premium`, method)
 }
 
-export const createDataArchive = async (accessToken: string) => {
-  const json = await requestWithAuth<{ url: string }>(accessToken, `data/collect`, "POST")
-  return json.url
+export const requestDataArchive = async (accessToken: string) => {
+  return requestWithAuth<DataArchiveRequest>(accessToken, `data/collect`, "POST")
 }
 
-export const getDataRequest = async (accessToken: string) => {
-  const json = await requestWithAuth<GetCollectData>(accessToken, `data/collect`, "GET")
-  return json
+export const fetchLastDataArchive = async (accessToken: string) => {
+  return requestWithAuth<LastDataArchive>(accessToken, `data/collect`, "GET")
 }
 
 export const fetchUserReminders = async (accessToken: string) => {

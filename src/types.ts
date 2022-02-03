@@ -39,12 +39,3 @@ export type GetGuildsResponse = PremiumDiscordGuild[]
 export type GetRemindersResponse = Reminder[]
 
 export type PutTogglePremiumGuildResponse = string[]
-
-export interface PostCollectData {
-  url: string
-}
-
-export type GetCollectData =
-  | { status: 0; last_request: null }
-  | { status: 1; last_request: number; url: string }
-  | { status: 2; last_request: null; url: string }

@@ -28,6 +28,26 @@ interface UnavailableGuild {
   unavailable: true
 }
 
+export interface DataArchiveRequest {
+  url: string
+}
+
+export type DataArchiveRequestResponse =
+  | {
+      data: null | {
+        type: "Buffer"
+        data: number[]
+      }
+      success: true
+      url: string
+    }
+  | { success: false; error: string }
+
+export type LastDataArchive =
+  | { status: 0; last_request: null }
+  | { status: 1; last_request: number; url: string }
+  | { status: 2; last_request: null; url: string }
+
 export interface AetherClientPayloads {
   [AetherClientOpcode.IDENTIFY_CLIENT]: {
     config: {
@@ -57,6 +77,7 @@ export interface AetherClientPayloads {
     id: number
     reason: string
   }
+  [AetherClientOpcode.DATA_REQUEST]: Record<string, never>
 }
 
 export interface AetherServerPayloads {
@@ -104,6 +125,7 @@ export interface AetherServerPayloads {
     id: string
   }
   [AetherServerOpcode.REALTIME_STATS]: ClusterStats | InitialStats
+  [AetherServerOpcode.DATA_REQUEST]: DataArchiveRequestResponse
 }
 
 export enum AetherClientOpcode {
@@ -131,6 +153,7 @@ export enum AetherServerOpcode {
   NOTIFICATION = 12,
   REMINDERS_UPDATE = 13,
   CONFIG_UPDATE = 14,
+  DATA_REQUEST = 16,
   PUSH_ROUTE = 17,
   SCHEMA_VALIDATION_ERROR = 19,
   SESSIONS_REPLACE = 20,

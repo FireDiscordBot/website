@@ -1,10 +1,15 @@
-import { createDataArchive, getDataRequest } from "@/lib/aether/api"
+import { requestDataArchive, fetchLastDataArchive } from "@/lib/aether/api"
+import { DataArchiveRequest, LastDataArchive } from "@/lib/aether/types"
 import { AuthenticatedApiHandler, withAuth } from "@/lib/api/auth"
 import { ApiErrorResponse, methodNotAllowed, respondWithError, respondWithSuccess } from "@/lib/api/response"
-import { AnyObject, GetCollectData, PostCollectData } from "@/types"
+import { AnyObject } from "@/types"
 import { NetworkError } from "@/utils/fetcher"
 
-const handler: AuthenticatedApiHandler<PostCollectData | GetCollectData | AnyObject> = async (req, res, session) => {
+const handler: AuthenticatedApiHandler<DataArchiveRequest | LastDataArchive | AnyObject> = async (
+  req,
+  res,
+  session,
+) => {
   if (req.method !== "POST" && req.method !== "GET") {
     respondWithError(res, methodNotAllowed())
     return
@@ -12,10 +17,10 @@ const handler: AuthenticatedApiHandler<PostCollectData | GetCollectData | AnyObj
 
   try {
     if (req.method === "POST") {
-      const url = await createDataArchive(session.accessToken)
-      respondWithSuccess(res, { url })
+      const data = await requestDataArchive(session.accessToken)
+      respondWithSuccess(res, data)
     } else if (req.method === "GET") {
-      const data = await getDataRequest(session.accessToken)
+      const data = await fetchLastDataArchive(session.accessToken)
       respondWithSuccess(res, data)
     }
   } catch (err) {

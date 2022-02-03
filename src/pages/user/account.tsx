@@ -7,32 +7,34 @@ import CardContent from "@mui/material/CardContent"
 import Skeleton from "@mui/material/Skeleton"
 import Tooltip from "@mui/material/Tooltip"
 import Typography from "@mui/material/Typography"
+import { Handler } from "mitt"
 import Link from "next/link"
-import { useEffect, useMemo } from "react"
-import useSWR from "swr"
+import { useEffect, useMemo, useState } from "react"
 
 import UserPageLayout from "@/components/layout/user-page"
 import DiscordFlagImage from "@/components/ui/DiscordFlagImage"
 import Loading from "@/components/ui/Loading"
+import useAether from "@/hooks/use-aether"
 import useCurrentSubscription from "@/hooks/use-current-subscription"
 import useSession from "@/hooks/use-session"
+import { DataArchiveRequestResponse, LastDataArchive } from "@/lib/aether/types"
+import { ApiResponse } from "@/lib/api/response"
 import { getAvatarImageUrl, parseFlags } from "@/lib/discord"
-import { GetCollectData } from "@/types"
-
-type DataRequestResponse =
-  | { success: false; error: string }
-  | {
-      success: true
-      url: string
-      data: {
-        type: "Buffer"
-        data: number[]
-      } | null
-    }
+import fetcher from "@/utils/fetcher"
+import { openUrl } from "@/utils/open-url"
 
 const AccountPage = () => {
   const [session, loading] = useSession({ redirectTo: "/" })
+  const aether = useAether()
   const { subscription, isLoading, error } = useCurrentSubscription(session != null && !loading)
+
+  const [lastDataArchive, setLastDataArchive] = useState<LastDataArchive | undefined>(undefined)
+  const [loadingDataArchive, setLoadingDataArchive] = useState(false)
+  const avatarImageUrl = useMemo(
+    () => (session ? getAvatarImageUrl(session.user.avatar, session.user.id, session.user.discriminator) : ""),
+    [session],
+  )
+
   const setErrorMessage = (_text: string) => {
     // emitter.emit("NOTIFICATION", {
     //   text,
@@ -43,16 +45,56 @@ const AccountPage = () => {
     // })
   }
 
-  // TODO: fix
-  const { data: dataRequest, mutate } = useSWR<GetCollectData>(session ? "/api/user/data-archive" : null, {
-    revalidateOnReconnect: false,
-    revalidateOnFocus: false,
-  })
+  useEffect(() => {
+    let active = true
 
-  const avatarImageUrl = useMemo(
-    () => (session ? getAvatarImageUrl(session.user.avatar, session.user.id, session.user.discriminator) : ""),
-    [session],
-  )
+    async function checkLastDataArchive() {
+      active && setLoadingDataArchive(true)
+
+      const lastDataArchive = await fetcher<ApiResponse<LastDataArchive>>("/api/user/dataArchive")
+
+      if (active) {
+        setLoadingDataArchive(false)
+        setLastDataArchive(lastDataArchive.success ? lastDataArchive.data : undefined)
+      }
+    }
+
+    checkLastDataArchive()
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!aether) {
+      return
+    }
+
+    const handleDataArchiveResponse: Handler<DataArchiveRequestResponse> = (response) => {
+      if (response.success) {
+        let url: string
+
+        if (response.data !== null) {
+          url = URL.createObjectURL(new Blob([Buffer.from(response.data.data)], { type: "application/zip" }))
+        } else {
+          url = response.url
+        }
+
+        openUrl(url, false, `${aether?.aetherSession}.zip`)
+      } else {
+        // TODO: display error
+      }
+
+      setLoadingDataArchive(false)
+    }
+
+    aether.events.on("dataArchiveRequestResponse", handleDataArchiveResponse)
+
+    return () => {
+      aether.events.off("dataArchiveRequestResponse", handleDataArchiveResponse)
+    }
+  }, [aether])
 
   useEffect(() => {
     setErrorMessage(error?.message)
@@ -67,82 +109,18 @@ const AccountPage = () => {
 
   const onClickRequestData = async (event: React.MouseEvent) => {
     event.preventDefault()
-    // TODO
-    const reqDataEl = document.getElementById("request-data")
-    if (reqDataEl) {
-      reqDataEl.className += " Mui-disabled"
-    }
-    await mutate(undefined, true)
 
-    if (typeof dataRequest?.status == "number" && dataRequest.status != 0) {
-      const link = document.createElement("a")
-      link.href = dataRequest.url
-      // TODO
-      // link.download = `${handler.session}.zip`
-      link.click()
-      return link.remove()
+    // TODO: don't disable button if there is available data for download
+    if (lastDataArchive && lastDataArchive.status !== 0) {
+      openUrl(lastDataArchive.url, false, `${aether?.aetherSession}.zip`)
+      return
     }
 
-    // let json: PostCollectData
-    // try {
-    //   json = await fetcher<PostCollectData>("/api/user/data-archive", {
-    //     method: "POST",
-    //   })
-    // } catch (e) {
-    //   setErrorMessage(createErrorResponse(e).error)
-    //   return
-    // }
+    setLoadingDataArchive(true)
 
-    // openUrl(json.url, true, true)
-
-    const dataResponse = await requestData().catch(() => {
-      // emitter.emit("NOTIFICATION", {
-      //   text: "Failed to request data",
-      //   severity: "error",
-      //   horizontal: "right",
-      //   vertical: "top",
-      //   autoHideDuration: 5000,
-      // })
-      return null
-    })
-    if (!dataResponse) return
-    if (!dataResponse.success) {
-      // TODO
-      // return emitter.emit("NOTIFICATION", {
-      //   text: dataResponse.error,
-      //   severity: "error",
-      //   horizontal: "right",
-      //   vertical: "top",
-      //   autoHideDuration: 5000,
-      // })
-    } else {
-      const link = document.createElement("a")
-      const file = dataResponse.data
-        ? new Blob([Buffer.from(dataResponse.data.data)], { type: "application/zip" })
-        : null
-      link.href = file ? URL.createObjectURL(file) : dataResponse.url
-      // TODO
-      // link.download = `${handler.session}.zip`
-      link.click()
-      link.remove()
-    }
+    aether?.requestDataArchive()
+    // TODO: 10 seconds timeout
   }
-
-  const requestData = async (): Promise<DataRequestResponse> =>
-    new Promise((resolve) => {
-      return resolve({ success: false, error: "NO_HANDLER" })
-      // TODO
-      // const nonce = (+new Date()).toString()
-      // handler.websocket?.handlers.set(nonce, resolve)
-      // handler.requestData(nonce)
-
-      // setTimeout(() => {
-      //   if (handler.websocket?.handlers.has(nonce)) {
-      //     handler.websocket.handlers.delete(nonce)
-      //     reject("Data request timed out")
-      //   }
-      // }, 10000)
-    })
 
   return (
     <UserPageLayout title="Account" noindex nofollow>
@@ -174,12 +152,12 @@ const AccountPage = () => {
           </Box>
         </CardContent>
         <CardActions>
-          {dataRequest && dataRequest.status != 0 && (
+          {lastDataArchive && lastDataArchive.status !== 0 && (
             <Tooltip
               title={
-                dataRequest.last_request
+                lastDataArchive.last_request
                   ? `You've recently requested a copy of your data. You can request again on ${new Date(
-                      dataRequest.last_request + 2592000000,
+                      lastDataArchive.last_request + 2592000000,
                     ).toDateString()}`
                   : "You've recently requested a copy of your data. You cannot request again at this time."
               }
@@ -191,12 +169,11 @@ const AccountPage = () => {
               </span>
             </Tooltip>
           )}
-          {!dataRequest ||
-            (dataRequest && dataRequest.status == 0 && (
-              <Button id="request-data" color="primary" onClick={onClickRequestData}>
-                Request collected data
-              </Button>
-            ))}
+          {(!lastDataArchive || lastDataArchive.status === 0) && (
+            <Button color="primary" disabled={loadingDataArchive} onClick={onClickRequestData}>
+              Request collected data
+            </Button>
+          )}
         </CardActions>
       </Card>
 

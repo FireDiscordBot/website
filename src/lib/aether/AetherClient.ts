@@ -1,9 +1,9 @@
 import { deflateSync, inflateSync } from "zlib"
 
 import WebSocket from "isomorphic-ws"
+import mitt from "mitt"
 import type { Session } from "next-auth"
 import { UAParser } from "ua-parser-js"
-import mitt from "mitt"
 
 import {
   AetherClientMessage,
@@ -13,6 +13,7 @@ import {
   AetherGateway,
   AetherServerMessage,
   AetherServerOpcode,
+  DataArchiveRequestResponse,
   ExperimentConfig,
 } from "./types"
 
@@ -68,6 +69,7 @@ export type AetherClientEvents = {
   newCommands: Command[]
   newInitialClusterStats: InitialStats
   newClusterStats: ClusterStats
+  dataArchiveRequestResponse: DataArchiveRequestResponse
 }
 
 export class AetherClient {
@@ -170,6 +172,17 @@ export class AetherClient {
         reason: `Restart requested by ${user.username}#${user.discriminator}`,
       },
     })
+  }
+
+  requestDataArchive() {
+    this.sendMessage({
+      op: AetherClientOpcode.DATA_REQUEST,
+      d: {},
+    })
+  }
+
+  get aetherSession() {
+    return this.aetherSessionId
   }
 
   get superuser() {
@@ -276,6 +289,9 @@ export class AetherClient {
         } else {
           this.events.emit("newClusterStats", msg.d as ClusterStats)
         }
+        break
+      case AetherServerOpcode.DATA_REQUEST:
+        this.events.emit("dataArchiveRequestResponse", msg.d)
         break
       default:
         this.debug("Unknown opcode", msg)
