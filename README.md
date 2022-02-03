@@ -1,6 +1,6 @@
 # Fire Website
 
-Source Code of [Fire Website](https://fire.gaminggeek.dev)
+Source Code of [Fire Website](https://getfire.bot/)
 
 ## Getting Started
 
@@ -29,7 +29,7 @@ pnpm install
 
 3. Rename the file `default.env.development.local` to `.env.development.local` and add your tokens
 
-```
+```text
 NEXT_PUBLIC_DISCORD_CLIENT_ID=XXX
 DISCORD_CLIENT_SECRET=XXX
 NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY=XXX
