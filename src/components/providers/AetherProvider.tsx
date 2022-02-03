@@ -32,19 +32,14 @@ export function AetherProvider(props: AetherProviderProps) {
   }, [])
 
   useEffect(() => {
-    console.log("[AetherProvider] useEffect", sessionStatus, session?.accessToken, gateway)
-
     if (!gateway || sessionStatus === "loading") {
       return
     }
 
     if (client && client.connected) {
-      console.log("[AetherProvider] updating auth session")
       // Handles access token updates
       client.setAuthSession(session)
     } else {
-      console.log("[AetherProvider] starting connection")
-
       const handlePushRoute = (route: string) => {
         router.push(route)
       }
@@ -63,7 +58,6 @@ export function AetherProvider(props: AetherProviderProps) {
       setClient((prevClient) => {
         // Little hack to prevent duplicated connections
         if (prevClient && prevClient.connected) {
-          console.log("[AetherProvider] found duplicated connection, closing it")
           prevClient.disconnect()
         }
 
