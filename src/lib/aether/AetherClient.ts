@@ -16,7 +16,7 @@ import {
   ExperimentConfig,
 } from "./types"
 
-import { ClusterStats, Command } from "@/interfaces/aether"
+import { ClusterStats, Command, InitialStats } from "@/interfaces/aether"
 import { DiscordGuild } from "@/interfaces/discord"
 
 function uncompress(data: string): AetherServerMessage | null {
@@ -64,8 +64,10 @@ function buildClientInfo() {
   return info
 }
 
-type AetherClientEvents = {
+export type AetherClientEvents = {
   newCommands: Command[]
+  newInitialClusterStats: InitialStats
+  newClusterStats: ClusterStats
 }
 
 export class AetherClient {
@@ -84,7 +86,6 @@ export class AetherClient {
   private experiments: ExperimentConfig[] = []
   private guilds: DiscordGuild[] = []
   private commands: Command[] = []
-  clusterStats: ClusterStats[] = []
   events = mitt<AetherClientEvents>()
 
   private handlePushRoute?: (route: string) => void
@@ -271,19 +272,10 @@ export class AetherClient {
         break
       case AetherServerOpcode.REALTIME_STATS:
         if (msg.d.id === -1) {
-          this.debug("received initial stats", msg.d)
-          return
-        }
-
-        const newClusterStat = msg.d as ClusterStats
-        const index = this.clusterStats.findIndex((clusterStat) => clusterStat.id === newClusterStat.id)
-
-        if (index !== -1) {
-          this.clusterStats[index] = newClusterStat
+          this.events.emit("newInitialClusterStats", msg.d as InitialStats)
         } else {
-          this.clusterStats.push(newClusterStat)
+          this.events.emit("newClusterStats", msg.d as ClusterStats)
         }
-
         break
       default:
         this.debug("Unknown opcode", msg)

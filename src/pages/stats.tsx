@@ -15,6 +15,7 @@ import ClusterStatsDialog from "@/components/ui/ClusterStatsDialog"
 import { ClusterStats, InitialStats } from "@/interfaces/aether"
 import { formatBytes, formatNumber } from "@/utils/formatting"
 import useAether from "@/hooks/use-aether"
+import { Handler } from "mitt"
 
 const StyledStorageIcon = styled(StorageIcon)(({ theme }) => ({
   fontSize: theme.spacing(10),
@@ -46,8 +47,21 @@ const StatsPage = () => {
     [clusterStats],
   )
 
-  const onClickClusterCard = (id: number) => setSelectedClusterStats(findClusterStats(id))
+  const selectClusterStats = useCallback(
+    (id: number | undefined, updateQuery = true) => {
+      if (typeof id !== "undefined") {
+        setSelectedClusterStats(findClusterStats(id))
+        updateQuery && router.push(`/stats`, `/stats?cluster=${id}`, { shallow: true })
+      } else {
+        setSelectedClusterStats(undefined)
+        updateQuery && router.push("/stats", undefined, { shallow: true })
+      }
+    },
+    [setSelectedClusterStats, findClusterStats, router],
+  )
+
   const onClickClusterError = (_id: number) => {
+    // TODO
     // emitter.emit("NOTIFICATION", {
     //   text: `Cluster ${id} is currently unavailable`,
     //   severity: "error",
@@ -56,80 +70,48 @@ const StatsPage = () => {
     //   autoHideDuration: 5000,
     // })
   }
-  const onCloseClusterDialog = () => {
-    setSelectedClusterStats(undefined)
-    delete router.query.cluster
-    window?.history.replaceState(null, "", "/stats")
-  }
+  const onCloseClusterDialog = () => selectClusterStats(undefined)
 
   useEffect(() => {
     if (!aether) {
       return
     }
 
-    // TODO: change this to use aether.events
-    setClusterStats(aether.clusterStats)
+    const handleNewInitialClusterStats: Handler<InitialStats> = (_initialStats) => {
+      if (clusterStats.length === 0) {
+        // TODO: create empty cluster stats
+      }
+    }
 
-    // TODO
-    // emitter.removeAllListeners("REALTIME_STATS")
-    // emitter.on("REALTIME_STATS", (stats) => {
-    //   const clusterStatsCopy = [...clusterStats]
-    //   if (stats.id == -1) {
-    //     setInitialStats(stats as InitialStats)
-    //     if (!clusterStats.length)
-    //       setClusterStats(
-    //         Array.from({ length: (stats as InitialStats).clusterCount ?? 1 }).map((_, index) => ({
-    //           id: index,
-    //           error: true,
-    //           name: "",
-    //           env: "",
-    //           uptime: "",
-    //           cpu: 0,
-    //           ramBytes: 0,
-    //           totalRamBytes: 0,
-    //           version: "",
-    //           versions: "",
-    //           guilds: 0,
-    //           unavailableGuilds: 0,
-    //           users: 0,
-    //           commands: 0,
-    //           restPing: 0,
-    //           shards: [],
-    //         })),
-    //       )
-    //     else if (clusterStats.length > (stats as InitialStats).clusterCount)
-    //       setClusterStats(clusterStats.slice(0, (stats as InitialStats).clusterCount))
-    //   } else {
-    //     const index = clusterStatsCopy.findIndex((cluster) => cluster.id === stats.id)
-    //     if (index == -1) {
-    //       clusterStatsCopy.push(stats as ClusterStats)
-    //       setClusterStats(clusterStatsCopy)
-    //     } else {
-    //       clusterStatsCopy[index] = stats as ClusterStats
-    //       setClusterStats(clusterStatsCopy)
-    //     }
-    //   }
-    //   if (handler) {
-    //     // @ts-expect-error This class will be rewrote soon
-    //     handler.cachedStats = clusterStats
-    //   }
-    // })
-  }, [aether, clusterStats])
+    const handleNewClusterStats: Handler<ClusterStats> = (clusterStat) => {
+      const newClusterStats = [...clusterStats]
+
+      const index = newClusterStats.findIndex((cluster) => cluster.id === clusterStat.id)
+      if (index == -1) {
+        newClusterStats.push(clusterStat)
+      } else {
+        newClusterStats[index] = clusterStat
+      }
+
+      setClusterStats(newClusterStats)
+    }
+
+    aether.events.on("newInitialClusterStats", handleNewInitialClusterStats)
+    aether.events.on("newClusterStats", handleNewClusterStats)
+
+    return () => {
+      aether.events.off("newInitialClusterStats", handleNewInitialClusterStats)
+      aether.events.off("newClusterStats", handleNewClusterStats)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aether])
 
   useEffect(() => {
     if (typeof router.query.cluster === "string") {
       const clusterId = parseInt(router.query.cluster, 10)
-      setSelectedClusterStats(findClusterStats(clusterId))
-      window?.history.replaceState(null, "", `/stats?cluster=${clusterId}`)
+      selectClusterStats(clusterId, false)
     }
-  }, [findClusterStats, router.query, selectedClusterStats])
-
-  useEffect(() => {
-    if (selectedClusterStats) {
-      setSelectedClusterStats(findClusterStats(selectedClusterStats.id))
-      window?.history.replaceState(null, "", `/stats?cluster=${selectedClusterStats.id}`)
-    }
-  }, [findClusterStats, clusterStats, selectedClusterStats])
+  }, [router.query, selectClusterStats])
 
   return (
     <DefaultLayout title="Stats">
@@ -187,7 +169,7 @@ const StatsPage = () => {
 
           {clusterStats.map((cluster) => (
             <Grid item key={cluster.id}>
-              <ClusterCard cluster={cluster} onClick={cluster.error ? onClickClusterError : onClickClusterCard} />
+              <ClusterCard cluster={cluster} onClick={cluster.error ? onClickClusterError : selectClusterStats} />
             </Grid>
           ))}
         </Grid>
