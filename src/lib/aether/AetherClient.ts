@@ -1,10 +1,12 @@
 import { deflateSync, inflateSync } from "zlib"
 
+import type { AlertColor } from "@mui/material/Alert"
 import WebSocket from "isomorphic-ws"
 import mitt from "mitt"
 import type { Session } from "next-auth"
 import { UAParser } from "ua-parser-js"
 
+import { fetchWebsiteGateway } from "./api"
 import {
   AetherClientMessage,
   AetherClientOpcode,
@@ -17,9 +19,8 @@ import {
   ExperimentConfig,
 } from "./types"
 
-import { ClusterStats, Command, InitialStats } from "@/interfaces/aether"
-import { DiscordGuild } from "@/interfaces/discord"
-import { fetchWebsiteGateway } from "./api"
+import type { ClusterStats, Command, InitialStats } from "@/interfaces/aether"
+import type { DiscordGuild } from "@/interfaces/discord"
 
 function uncompress(data: string): AetherServerMessage | null {
   const inflated = inflateSync(Buffer.from(data, "base64"), {
@@ -71,6 +72,7 @@ export type AetherClientEvents = {
   newInitialClusterStats: InitialStats
   newClusterStats: ClusterStats
   dataArchiveRequestResponse: DataArchiveRequestResponse
+  notification: [string, AlertColor]
 }
 
 export class AetherClient {
@@ -335,11 +337,15 @@ export class AetherClient {
     switch (event.code) {
       case AetherCloseCode.CONNECTED_ANOTHER_SESSION:
         this.debug("already connected in another session")
+
         reconnectTimeoutTime = -1
+        this.emitNotification("Connected to WebSocket in another session")
         break
       case AetherCloseCode.CONNECTED_ANOTHER_LOCATION:
         this.debug("already connected from another location")
+
         reconnectTimeoutTime = -1
+        this.emitNotification("Connected to WebSocket from another location")
         break
       case AetherCloseCode.MISMATCHED_IDENTITY:
         this.debug("mismatched identity")
@@ -380,10 +386,15 @@ export class AetherClient {
         this.debug(`being rate limited for ${time}ms`)
         reconnectTimeoutTime += time
         break
+      case AetherCloseCode.INVALID_SESSION:
+        this.debug("invalid session")
+
+        reconnectTimeoutTime = -1
+        this.emitNotification("Invalid WS session")
+        break
       case AetherCloseCode.INCOMPATIBLE_ENVIRONMENT:
       case AetherCloseCode.TOO_MANY_CONNECTIONS:
       case AetherCloseCode.SESSION_TIMEOUT:
-      case AetherCloseCode.INVALID_SESSION:
       case AetherCloseCode.INTERNAL_SERVER_ERROR:
       case AetherCloseCode.NORMAL_DISCONNECT:
         reconnectTimeoutTime = -1
@@ -475,6 +486,10 @@ export class AetherClient {
         d: this.currentSequence ?? null,
       })
     }, interval)
+  }
+
+  private emitNotification(message: string, severity: AlertColor = "error") {
+    this.events.emit("notification", [message, severity])
   }
 
   private sendMessage(msg: AetherClientMessage) {

@@ -1,10 +1,13 @@
+import type { AlertColor } from "@mui/material/Alert"
+import type { Handler } from "mitt"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/router"
 import { useEffect, useState, createContext, ReactNode } from "react"
 
+import useAppSnackbar from "@/hooks/use-snackbar-control"
 import { AetherClient } from "@/lib/aether/AetherClient"
 import { fetchWebsiteGateway } from "@/lib/aether/api"
-import { AetherGateway } from "@/lib/aether/types"
+import type { AetherGateway } from "@/lib/aether/types"
 
 export const AetherClientContext = createContext<AetherClient | null>(null)
 
@@ -15,6 +18,7 @@ interface AetherProviderProps {
 export function AetherProvider(props: AetherProviderProps) {
   const { data: session, status: sessionStatus } = useSession()
   const router = useRouter()
+  const { showSnackbar } = useAppSnackbar()
   const [gateway, setGateway] = useState<AetherGateway | null>(null)
   const [client, setClient] = useState<AetherClient | null>(null)
 
@@ -85,6 +89,22 @@ export function AetherProvider(props: AetherProviderProps) {
       router.events.off("routeChangeComplete", handler)
     }
   }, [router, client])
+
+  useEffect(() => {
+    if (!client) {
+      return
+    }
+
+    const handleNotification: Handler<[string, AlertColor]> = ([message, severity]) => {
+      showSnackbar(message, 5000, severity)
+    }
+
+    client.events.on("notification", handleNotification)
+
+    return () => {
+      client && client.events.off("notification", handleNotification)
+    }
+  }, [showSnackbar, client])
 
   return <AetherClientContext.Provider value={client}>{props.children}</AetherClientContext.Provider>
 }
