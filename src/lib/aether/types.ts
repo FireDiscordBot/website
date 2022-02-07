@@ -172,6 +172,7 @@ export type AetherClientMessage = AetherMessage<AetherClientPayloads>
 export type AetherServerMessage = AetherMessage<AetherServerPayloads>
 
 export enum AetherCloseCode {
+  NORMAL_DISCONNECT = 1000,
   INVALID_PAYLOAD = 1007,
   INCOMPATIBLE_ENVIRONMENT = 1008,
   SHUTTING_DOWN = 1012,
@@ -190,6 +191,15 @@ export enum AetherCloseCode {
   INTERNAL_SERVER_ERROR = 4999,
 }
 
+interface AetherGatewayRateLimit {
+  remaining: number
+  resetAfter: number
+}
+
 export interface AetherGateway {
   url: string
+  limits: {
+    connect: AetherGatewayRateLimit
+    connectGlobal: AetherGatewayRateLimit
+  }
 }

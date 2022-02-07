@@ -19,6 +19,7 @@ import {
 
 import { ClusterStats, Command, InitialStats } from "@/interfaces/aether"
 import { DiscordGuild } from "@/interfaces/discord"
+import { fetchWebsiteGateway } from "./api"
 
 function uncompress(data: string): AetherServerMessage | null {
   const inflated = inflateSync(Buffer.from(data, "base64"), {
@@ -89,6 +90,7 @@ export class AetherClient {
   private guilds: DiscordGuild[] = []
   private commands: Command[] = []
   events = mitt<AetherClientEvents>()
+  private reconnectTimeout: NodeJS.Timeout | null = null
 
   private handlePushRoute?: (route: string) => void
 
@@ -122,6 +124,7 @@ export class AetherClient {
     const url = `${this.gateway.url}?${params.toString()}`
     this.debug("connecting to", url)
     this.ws = new WebSocket(url)
+    this.ws.onopen = this.handleWsOpen.bind(this)
     this.ws.onmessage = this.handleWsMessage.bind(this)
     this.ws.onclose = this.handleWsClose.bind(this)
   }
@@ -192,6 +195,25 @@ export class AetherClient {
   get connected() {
     // The double exclamation mark casts the type to boolean
     return !!this.ws && this.ws.readyState === WebSocket.OPEN
+  }
+
+  private handleWsOpen() {
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout)
+    }
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval)
+    }
+
+    this.guilds = []
+    this.commands = []
+    this.experiments = []
+    this.userConfig = null
+    this.aetherSessionId = null
+    this.currentSequence = null
+    this.identified = false
+
+    this.debug("connection open")
   }
 
   private handleWsMessage(event: WebSocket.MessageEvent) {
@@ -299,7 +321,7 @@ export class AetherClient {
     }
   }
 
-  private handleWsClose(event: WebSocket.CloseEvent) {
+  private async handleWsClose(event: WebSocket.CloseEvent) {
     this.debug("WebSocket closed", event)
 
     if (this.heartbeatInterval) {
@@ -308,12 +330,16 @@ export class AetherClient {
     this.heartbeatAcked = null
     this.identified = false
 
+    let reconnectTimeoutTime = 2500
+
     switch (event.code) {
       case AetherCloseCode.CONNECTED_ANOTHER_SESSION:
         this.debug("already connected in another session")
+        reconnectTimeoutTime = -1
         break
       case AetherCloseCode.CONNECTED_ANOTHER_LOCATION:
         this.debug("already connected from another location")
+        reconnectTimeoutTime = -1
         break
       case AetherCloseCode.MISMATCHED_IDENTITY:
         this.debug("mismatched identity")
@@ -322,19 +348,57 @@ export class AetherClient {
         this.currentSequence = null
 
         // TODO: try to reload session
+        reconnectTimeoutTime = -1
         break
       case AetherCloseCode.SHUTTING_DOWN:
         this.debug("Aether shutting down")
 
         this.aetherSessionId = null
         this.currentSequence = null
+
+        reconnectTimeoutTime = process.env.NODE_ENV === "development" ? 15000 : 3000
         break
       case AetherCloseCode.MISSING_REQUIRED_SCOPES:
         this.debug("missing required scopes")
-        // TODO: redirects to login page
+        if (event.reason == "Required scopes are missing") {
+          // TODO: redirects to login page
+          reconnectTimeoutTime = -1
+        }
+        break
+      case AetherCloseCode.SESSION_CONNECTIONS_EXCEEDED:
+        this.debug("session connections exceeded")
+
+        this.gateway = await fetchWebsiteGateway()
+
+        let time = 0
+        if (!this.gateway.limits.connect.remaining) {
+          time += this.gateway.limits.connect.resetAfter
+        } else if (!this.gateway.limits.connectGlobal.remaining) {
+          time += this.gateway.limits.connectGlobal.resetAfter
+        }
+
+        this.debug(`being rate limited for ${time}ms`)
+        reconnectTimeoutTime += time
+        break
+      case AetherCloseCode.INCOMPATIBLE_ENVIRONMENT:
+      case AetherCloseCode.TOO_MANY_CONNECTIONS:
+      case AetherCloseCode.SESSION_TIMEOUT:
+      case AetherCloseCode.INVALID_SESSION:
+      case AetherCloseCode.INTERNAL_SERVER_ERROR:
+      case AetherCloseCode.NORMAL_DISCONNECT:
+        reconnectTimeoutTime = -1
         break
       default:
         break
+    }
+
+    this.debug("reconnectTimeoutTime", reconnectTimeoutTime)
+
+    if (reconnectTimeoutTime !== -1) {
+      this.reconnectTimeout = setTimeout(() => {
+        this.debug("reconnecting")
+        this.connect()
+      }, reconnectTimeoutTime)
     }
   }
 
