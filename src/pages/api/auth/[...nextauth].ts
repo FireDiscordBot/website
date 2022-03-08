@@ -48,8 +48,14 @@ const refreshToken = async (token: AuthToken): Promise<AuthToken> => {
     body: new URLSearchParams(data),
   })
 
-  if (!response.ok)
-    return fresh[token.refreshToken] ? (fresh[token.refreshToken] as AuthToken) : { ...token, error: "RefreshFailed" }
+  if (!response.ok) {
+    if (fresh[token.refreshToken]) return fresh[token.refreshToken] as AuthToken
+    console.log(
+      `[NextAuth] Failed to refresh token for ${token.name}#${token.discriminator} (${token.id}) - ${response.status}`,
+      await response.json().catch(() => "Non JSON body"),
+    )
+    return { ...token, error: "RefreshFailed" }
+  }
 
   const refreshed = (await response.json()) as AccessTokenResponse
 
