@@ -22,6 +22,7 @@ import SubscriptionCard from "@/components/SubscriptionCard"
 import useCurrentSubscription from "@/hooks/use-current-subscription"
 import useSession from "@/hooks/use-session"
 import { PremiumDiscordGuild } from "@/interfaces/discord"
+import TrialWarningCard from "@/components/TrialWarningCard"
 
 if (!stripeConstants.publicKey) {
   throw Error("Env variable NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY not defined")
@@ -84,6 +85,7 @@ const PremiumPage = () => {
   const [guilds, setGuilds] = React.useState(sort(initialGuilds))
 
   const [plansDialogOpen, setPlansDialogOpen] = React.useState(false)
+  const [trialWarningDialogGuild, setTrialWarningDialogGuild] = React.useState<PremiumDiscordGuild | null>(null)
 
   React.useEffect(() => {
     if (!subscription && !isLoadingSubscription) {
@@ -126,9 +128,14 @@ const PremiumPage = () => {
     setGuilds(sort(filteredGuilds))
   }
 
-  const onClickToggle = async (guild: PremiumDiscordGuild) => {
+  const onClickToggle = async (guild: PremiumDiscordGuild, skipTrialWarning = false) => {
     if (!subscription) {
       setErrorMessage("No subscription")
+      return
+    }
+
+    if (guild.premium && subscription.status == "trialing" && !skipTrialWarning) {
+      setTrialWarningDialogGuild(guild)
       return
     }
 
@@ -279,6 +286,17 @@ const PremiumPage = () => {
         onClose={onClosePlansDialog}
         onClickPlan={onClickPlan}
         loadPlans={!subscription && !isLoadingSubscription}
+      />
+      <TrialWarningCard
+        open={!!trialWarningDialogGuild}
+        onClose={() => setTrialWarningDialogGuild(null)}
+        onContinue={() => {
+          if (trialWarningDialogGuild) {
+            onClickToggle(trialWarningDialogGuild, true)
+          }
+          setTrialWarningDialogGuild(null)
+        }}
+        guild={trialWarningDialogGuild}
       />
     </UserPage>
   )
