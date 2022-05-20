@@ -33,13 +33,22 @@ export const defaultSeoConfig: DefaultSeoProps = {
   description:
     "A Discord bot for all your needs. With memes, utilities, moderation and more. Fire is the only bot you will need.",
   twitter: {
+    handle: "@gaminggeekdev", // twitter:creator
     site: "@FireDiscordBot",
-    cardType: "",
+    cardType: "summary",
   },
   openGraph: {
     type: "website",
     url: "https://getfire.bot/",
     title: "Fire",
+    images: [
+      {
+        url: "https://getfire.bot/img/avatar",
+        width: 1024,
+        height: 1024,
+        alt: "A white Fire logo with a red background, the logo used as the bot's profile picture.",
+      },
+    ],
     description:
       "A Discord bot for all your needs. With memes, utilities, moderation and more. Fire is the only bot you will need.",
   },
