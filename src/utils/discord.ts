@@ -1,31 +1,7 @@
-import { APIUser, DiscordFlag, DiscordGuild, flags, PartialOAuthUser } from "@/interfaces/discord"
+import { APIUser, DiscordFlag, flags, PartialOAuthUser } from "@/interfaces/discord"
 import { UserGuild } from "@/interfaces/aether"
 import { messageLinkRegex } from "@/constants"
 import fetcher from "@/utils/fetcher"
-
-export const fetchGuilds = async (accessToken: string): Promise<DiscordGuild[]> => {
-  const guilds: DiscordGuild[] = await fetcher("https://discord.com/api/v9/users/@me/guilds?with_counts=true", {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  })
-  if (!guilds) return []
-
-  if (guilds.length == 100) {
-    // for the odd chance someone is in over 100
-    const moreGuilds: DiscordGuild[] = await fetcher(
-      `https://discord.com/api/v9/users/@me/guilds?after=${guilds[guilds.length - 1].id}&with_counts=true`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    )
-    if (moreGuilds.length) guilds.push(...moreGuilds)
-  }
-
-  return guilds
-}
 
 const userCache = new Map<string, APIUser>()
 
