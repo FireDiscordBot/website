@@ -4,6 +4,7 @@ import SelectPlanCard from "@/components/SelectPlanCard"
 import { stripe as stripeConstants } from "@/constants"
 import useCurrentSubscription from "@/hooks/use-current-subscription"
 import useSession from "@/hooks/use-session"
+import { DiscordGuild } from "@/interfaces/discord"
 import { Plan } from "@/interfaces/fire"
 import UserPageLayout from "@/layouts/user-page"
 import { GetCollectData, PostSubscriptionResponse, PromotionMessage } from "@/types"
@@ -24,6 +25,8 @@ import Link from "next/link"
 import * as React from "react"
 import useSWR, { mutate } from "swr"
 import { emitter, handler } from "../_app"
+
+type PremiumGuildWithoutPremiumProperties = DiscordGuild & { premium?: undefined; managed?: undefined }
 
 if (!stripeConstants.publicKey) {
   throw Error("Env variable NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY not defined")
@@ -97,6 +100,41 @@ const AccountPage = () => {
     handler?.auth?.user.premiumType ?? session.user.premiumType,
   )
   const flagsElements = flags.map((flag, index) => <DiscordFlagImage flag={flag} key={index} />)
+
+  const onClickSaveServers = async (event: React.MouseEvent) => {
+    event.preventDefault()
+    if (!handler?.session)
+      return emitter.emit("NOTIFICATION", {
+        text: "No Aether session, unable to request servers",
+        severity: "error",
+        horizontal: "right",
+        vertical: "top",
+        autoHideDuration: 5000,
+      })
+    const guilds = (await fetcher(`/api/user/guilds?sessionId=${handler.session}`, {
+      method: "GET",
+    }).catch(() => null)) as PremiumGuildWithoutPremiumProperties[]
+    if (!guilds?.length)
+      return emitter.emit("NOTIFICATION", {
+        text: "Failed to fetch servers list",
+        severity: "error",
+        horizontal: "right",
+        vertical: "top",
+        autoHideDuration: 5000,
+      })
+    const serverList = guilds.map((guild) => {
+      // we set these to undefined so they're not included when we save the server list
+      guild.premium = undefined
+      guild.managed = undefined
+      return guild
+    })
+    const link = document.createElement("a")
+    const file = new Blob([Buffer.from(JSON.stringify(serverList, null, 4))], { type: "application/json" })
+    link.href = URL.createObjectURL(file)
+    link.download = `servers-${handler.session}.json`
+    link.click()
+    link.remove()
+  }
 
   const onClickRequestData = async (event: React.MouseEvent) => {
     event.preventDefault()
@@ -209,7 +247,9 @@ const AccountPage = () => {
         premiumPromotion?.text &&
         (premiumPromotion?.expires ?? Number.MAX_VALUE) > +new Date() && (
           <Box width={"100%"}>
-            <Alert severity="info" variant="outlined">{premiumPromotion.text}</Alert>
+            <Alert severity="info" variant="outlined">
+              {premiumPromotion.text}
+            </Alert>
             <br></br>
           </Box>
         )}
@@ -264,6 +304,13 @@ const AccountPage = () => {
                 Request collected data
               </Button>
             ))}
+          <Tooltip title={"Downloads your server list as a machine readable JSON file"}>
+            <span>
+              <Button color="primary" onClick={onClickSaveServers}>
+                Save server list
+              </Button>
+            </span>
+          </Tooltip>
         </CardActions>
       </Card>
 
