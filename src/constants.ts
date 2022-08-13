@@ -27,6 +27,8 @@ export const stripe = {
   secretKey: process.env.STRIPE_API_SECRET_KEY,
 }
 
+export const PAGE_URL = process.env.NEXTAUTH_URL ?? "https://getfire.bot"
+
 export const defaultSeoConfig: DefaultSeoProps = {
   titleTemplate: "%s | Fire",
   defaultTitle: "Fire",
@@ -39,11 +41,11 @@ export const defaultSeoConfig: DefaultSeoProps = {
   },
   openGraph: {
     type: "website",
-    url: "https://getfire.bot/",
+    url: PAGE_URL,
     title: "Fire",
     images: [
       {
-        url: "https://getfire.bot/img/avatar",
+        url: `${PAGE_URL}/img/avatar`,
         width: 1024,
         height: 1024,
         alt: "A white Fire logo with a red background, the logo used as the bot's profile picture.",
