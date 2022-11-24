@@ -174,6 +174,12 @@ export const flags: DiscordFlag[] = [
     name: "Bug Hunter Level 1",
   },
   {
+    key: "earlySupporter",
+    value: 1 << 9,
+    name: "Early Supporter",
+    // width: 28,
+  },
+  {
     key: "bugHunterTwo",
     value: 1 << 14,
     name: "Bug Hunter Level 2",
@@ -184,10 +190,9 @@ export const flags: DiscordFlag[] = [
     name: "Early Verified Bot Developer",
   },
   {
-    key: "earlySupporter",
-    value: 1 << 9,
-    name: "Early Supporter",
-    // width: 28,
+    key: "activeDeveloper",
+    value: 1 << 22,
+    name: "Active Developer",
   },
   {
     key: "nitro",
