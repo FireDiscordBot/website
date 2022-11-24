@@ -34,7 +34,7 @@ const ReminderProgressBar = styled(LinearProgress)(({ theme }) => ({
 let toDelete: number[] = []
 
 const Reminders = () => {
-  const [session, loading] = useSession({ redirectTo: "/" })
+  const [session, loading] = useSession({ redirectTo: "login" })
   const [currentTime, setCurrentTime] = useState(0)
   const [futureDate, setFutureDate] = useState<Date | null>(null)
   const [futureText, setFutureText] = useState("")

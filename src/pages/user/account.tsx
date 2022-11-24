@@ -46,7 +46,7 @@ type DataRequestResponse =
     }
 
 const AccountPage = () => {
-  const [session, loading] = useSession({ redirectTo: "/" })
+  const [session, loading] = useSession({ redirectTo: "login" })
   const {
     subscription,
     isLoading: isLoadingSubscription,
