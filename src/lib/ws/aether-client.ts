@@ -315,9 +315,9 @@ export class AetherClient {
     this.configListeners[key] = listener
   }
 
-  handleSubscribe(route: string, extra?: unknown) {
+  handleSubscribe(route: string, extra?: Record<string, unknown>) {
     this.configListeners = {} // these are set inside pages so if we're changing page, we clear it
-    if (route == this.subscribed && (!extra || extra == { shallow: false })) return
+    if (route == this.subscribed && (!extra || (Object.keys(extra).length == 1 && extra.shallow == false))) return
     this.send(new Message(EventType.SUBSCRIBE, { route, extra }))
     this.subscribed = route
   }
@@ -558,14 +558,14 @@ export class AetherClient {
 
   PUSH_ROUTE(data: { route: string; extra?: Record<string, unknown> }) {
     if (data.extra?.forceLogin == true) return this.signIn()
-    this.navigate(data.route)
+    else this.navigate(data.route)
   }
 
   SESSIONS_REPLACE(sessions: SessionInfo[]) {
     this.sessions = sessions
   }
 
-  navigate(route: string, extra?: unknown) {
+  navigate(route: string, extra?: Record<string, unknown>) {
     if (this.router?.route == route) return
     this.router?.push(route).then((pushed) => {
       if (pushed) this.handleSubscribe(route, extra)
