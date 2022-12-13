@@ -13,7 +13,7 @@
         "bootstrap": "^4.5.3",
         "cookie-parser": "^1.4.5",
         "cross-env": "^7.0.2",
-        "express": "^4.17.1",
+        "express": "^4.17.3",
         "next": "^11.1.1",
         "next-cookies": "^2.0.3",
         "react": "17.0.1",
