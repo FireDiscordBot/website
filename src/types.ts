@@ -1,7 +1,6 @@
 // import { NetworkErrorData } from "./utils/fetcher"
 import { Reminder } from "@/interfaces/aether"
 import { AuthSession } from "@/interfaces/auth"
-import { Plan } from "@/interfaces/fire"
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next"
 import { PremiumDiscordGuild } from "./interfaces/discord"
 
@@ -22,8 +21,6 @@ export type ApiErrorResponse = {
 }
 
 export type ApiResponseBody<T = AnyObject> = T | ApiErrorResponse
-
-export type GetSubscriptionsResponse = Plan[]
 
 export type GetSubscriptionResponse =
   | {

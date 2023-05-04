@@ -20,12 +20,8 @@ export const fetchCustomerId = async (accessToken: string) => {
   return json.id
 }
 
-export const createStripeCheckoutSession = async (accessToken: string, servers: number) => {
-  const json = await requestWithAuth<{ sessionId: string }>(
-    accessToken,
-    `stripe/sessions/checkout?servers=${servers}`,
-    "POST",
-  )
+export const createStripeCheckoutSession = async (accessToken: string) => {
+  const json = await requestWithAuth<{ sessionId: string }>(accessToken, `stripe/sessions/checkout`, "POST")
   return json.sessionId
 }
 

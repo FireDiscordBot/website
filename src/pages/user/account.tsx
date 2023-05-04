@@ -1,11 +1,9 @@
 import DiscordFlagImage from "@/components/DiscordFlagImage"
 import Loading from "@/components/loading"
-import SelectPlanCard from "@/components/SelectPlanCard"
 import { stripe as stripeConstants } from "@/constants"
 import useCurrentSubscription from "@/hooks/use-current-subscription"
 import useSession from "@/hooks/use-session"
 import { DiscordGuild } from "@/interfaces/discord"
-import { Plan } from "@/interfaces/fire"
 import UserPageLayout from "@/layouts/user-page"
 import { GetCollectData, PostSubscriptionResponse, PromotionMessage } from "@/types"
 import { parseFlags } from "@/utils/discord"
@@ -23,7 +21,7 @@ import Typography from "@mui/material/Typography"
 import { loadStripe } from "@stripe/stripe-js"
 import Link from "next/link"
 import * as React from "react"
-import useSWR, { mutate } from "swr"
+import useSWR from "swr"
 import { emitter, handler } from "../_app"
 
 type PremiumGuildWithoutPremiumProperties = DiscordGuild & { premium?: undefined; managed?: undefined }
@@ -74,14 +72,6 @@ const AccountPage = () => {
     revalidateOnReconnect: false,
     revalidateOnFocus: false,
   })
-
-  const [plansDialogOpen, setPlansDialogOpen] = React.useState(false)
-
-  React.useEffect(() => {
-    if (!subscription && !isLoadingSubscription) {
-      mutate("/api/stripe/subscriptions", fetcher("/api/stripe/subscriptions"))
-    }
-  }, [subscription, isLoadingSubscription])
 
   React.useEffect(() => {
     setErrorMessage(subscriptionError?.message)
@@ -208,7 +198,7 @@ const AccountPage = () => {
       }, 10000)
     })
 
-  const onClickPlan = async (plan: Plan) => {
+  const onClickSubscribe = async () => {
     const stripe = await stripePromise
 
     if (!stripe) {
@@ -219,7 +209,7 @@ const AccountPage = () => {
     let json: PostSubscriptionResponse
 
     try {
-      json = await fetcher(`/api/user/subscription?servers=${plan.servers}`, {
+      json = await fetcher(`/api/user/subscription`, {
         method: "POST",
       })
     } catch (e: any) {
@@ -235,10 +225,6 @@ const AccountPage = () => {
       setErrorMessage(stripeResponse.error?.message ?? null)
     }
   }
-
-  const onClickSelectPlan = () => setPlansDialogOpen(true)
-
-  const onClosePlansDialog = () => setPlansDialogOpen(false)
 
   return (
     <UserPageLayout title="Account" noindex nofollow>
@@ -315,7 +301,7 @@ const AccountPage = () => {
       </Card>
 
       <Typography variant="h4" gutterBottom>
-        Your plan
+        Your subscription
       </Typography>
 
       <Card>
@@ -326,11 +312,9 @@ const AccountPage = () => {
 
           {!isLoadingSubscription && !subscription && (
             <Typography variant="body1" color="textSecondary" component="span">
-              Premium gives you access to a bunch of extra features to make Fire the best all-in-one bot you&#39;ve ever
-              seen.
-              <br />
-              <br />
-              Get persisted roles, invite tracking, custom short links, and more!
+              Get more from the bot you love with Premium!
+              <br></br>
+              Exclusive commands, custom redirects, improvements to features and more!
             </Typography>
           )}
         </CardContent>
@@ -342,7 +326,7 @@ const AccountPage = () => {
           </CardActions>
         ) : (
           <CardActions>
-            <Button color="primary" onClick={onClickSelectPlan}>
+            <Button color="primary" onClick={onClickSubscribe}>
               Get Premium Now
             </Button>
             <Link href="https://inv.wtf/premium" passHref>
@@ -351,13 +335,6 @@ const AccountPage = () => {
           </CardActions>
         )}
       </Card>
-
-      <SelectPlanCard
-        open={plansDialogOpen}
-        onClose={onClosePlansDialog}
-        onClickPlan={onClickPlan}
-        loadPlans={!subscription && !isLoadingSubscription}
-      />
     </UserPageLayout>
   )
 }

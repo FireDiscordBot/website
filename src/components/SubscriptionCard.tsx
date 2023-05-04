@@ -27,10 +27,10 @@ const DetailLine = ({ title, value }: DetailLineProps) => (
 )
 
 type Props = {
-  onClickSelectPlan: () => void
+  onClickSubscribe: () => void
 }
 
-const SubscriptionCard = ({ onClickSelectPlan }: Props) => {
+const SubscriptionCard = ({ onClickSubscribe }: Props) => {
   const [session, loading] = useSession()
   const { subscription } = useCurrentSubscription(session != null && !loading)
 
@@ -52,6 +52,7 @@ const SubscriptionCard = ({ onClickSelectPlan }: Props) => {
       <>
         <DetailLine title="Status" value={capitalize(status)} />
         <DetailLine title="Started" value={formatDateTime(startDate)} />
+        <DetailLine title="Servers" value={subscription.servers.toString()} />
         <DetailLine
           title={subscription.cancelAtPeriodEnd ? "End of benefits" : "Next invoice"}
           value={formatDateTime(periodEndDate)}
@@ -62,11 +63,9 @@ const SubscriptionCard = ({ onClickSelectPlan }: Props) => {
     details = (
       <>
         <Typography variant="body1" color="textSecondary" component="span">
-          Premium gives you access to a bunch of extra features to make Fire the best all-in-one bot you&#39;ve ever
-          seen.
-          <br />
-          <br />
-          Get persisted roles, invite tracking, custom short links, and more!
+          Get more from the bot you love with Premium!
+          <br></br>
+          Exclusive commands, custom redirects, improvements to features and more!
         </Typography>{" "}
       </>
     )
@@ -76,8 +75,8 @@ const SubscriptionCard = ({ onClickSelectPlan }: Props) => {
       Billing portal
     </Button>
   ) : (
-    <Button color="primary" onClick={onClickSelectPlan}>
-      Select a plan
+    <Button color="primary" onClick={onClickSubscribe}>
+      Subscribe
     </Button>
   )
 

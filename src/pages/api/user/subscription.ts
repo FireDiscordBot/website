@@ -6,6 +6,7 @@ import stripe from "@/api/server-stripe"
 import { createStripeCheckoutSession, fetchCustomerId } from "@/lib/aether"
 import { AuthenticatedApiHandler, GetSubscriptionResponse, PostSubscriptionResponse } from "@/types"
 import { error, withSession } from "@/utils/api-handler-utils"
+import { stripe as stripeConstants } from "@/constants"
 
 const subscriptionComparator = (first: Stripe.Subscription, second: Stripe.Subscription) => {
   const getStatusWeight = (status: Stripe.Subscription.Status) => {
@@ -40,7 +41,6 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _r
 
   const response = await stripe.subscriptions.list({
     customer: customerId,
-    expand: ["data.plan.product"],
   })
 
   const subscriptions = response.data.sort(subscriptionComparator)
@@ -56,18 +56,28 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _r
   }
 
   const subscription = subscriptions[0]
-  // @ts-ignore
-  const product: Stripe.Product = subscription.plan.product
 
-  let servers = parseInt(product.metadata.servers ?? "0", 10)
+  let servers = 1
   if (subscription.metadata?.custom_limit)
     servers = parseInt(subscription.metadata?.custom_limit ?? servers.toString(), 10)
+  else if (
+    subscription.items.data.find(
+      (item) =>
+        item.price.id == stripeConstants.prices.addon_monthly || item.price.id == stripeConstants.prices.addon_yearly,
+    )
+  ) {
+    const additionalServers = subscription.items.data.find(
+      (item) =>
+        item.price.id == stripeConstants.prices.addon_monthly || item.price.id == stripeConstants.prices.addon_yearly,
+    )
+    servers += additionalServers?.quantity ?? 0
+  }
 
   res.json({
     hasSubscription: true,
     subscription: {
       id: subscription.id,
-      name: product.name,
+      name: "Fire Premium",
       status: subscription.status,
       servers,
       start: subscription.start_date * 1000,
@@ -79,22 +89,10 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _r
   })
 }
 
-const post: AuthenticatedApiHandler<PostSubscriptionResponse> = async (session, req, res) => {
-  if (typeof req.query.servers != "string") {
-    error(res, StatusCodes.BAD_REQUEST)
-    return
-  }
-
-  const servers = parseInt(req.query.servers)
-
-  if (![1, 3, 5].includes(servers)) {
-    error(res, StatusCodes.BAD_REQUEST)
-    return
-  }
-
+const post: AuthenticatedApiHandler<PostSubscriptionResponse> = async (session, _, res) => {
   let stripeSessionId: string
   try {
-    stripeSessionId = await createStripeCheckoutSession(session.accessToken, servers)
+    stripeSessionId = await createStripeCheckoutSession(session.accessToken)
   } catch (e: any) {
     const errorResponse = createErrorResponse(e)
     return error(res, errorResponse.code, errorResponse.error)

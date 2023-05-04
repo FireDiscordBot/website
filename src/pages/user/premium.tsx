@@ -1,28 +1,26 @@
+import { Alert, Pagination, TextField } from "@mui/material"
+import Box from "@mui/material/Box"
+import Grid from "@mui/material/Grid"
+import Typography from "@mui/material/Typography"
 import { loadStripe } from "@stripe/stripe-js"
 import * as React from "react"
-import useSWR, { mutate } from "swr"
-import Grid from "@mui/material/Grid"
-import Box from "@mui/material/Box"
-import Typography from "@mui/material/Typography"
-import { Alert, TextField } from "@mui/material"
-import { Pagination } from "@mui/material"
+import useSWR from "swr"
 
 import { emitter, handler } from "../_app"
 
-import { openUrl } from "@/utils/open-url"
-import { discord, stripe as stripeConstants } from "@/constants"
-import fetcher, { createErrorResponse } from "@/utils/fetcher"
-import { PostSubscriptionResponse } from "@/types"
-import { Plan } from "@/interfaces/fire"
-import SelectPlanCard from "@/components/SelectPlanCard"
-import UserPage from "@/layouts/user-page"
 import Loading from "@/components/loading"
-import UserGuildCard from "@/components/UserGuildCard"
+import ServerLimitCard from "@/components/ServerLimitCard"
 import SubscriptionCard from "@/components/SubscriptionCard"
+import TrialWarningCard from "@/components/TrialWarningCard"
+import UserGuildCard from "@/components/UserGuildCard"
+import { discord, stripe as stripeConstants } from "@/constants"
 import useCurrentSubscription from "@/hooks/use-current-subscription"
 import useSession from "@/hooks/use-session"
 import { PremiumDiscordGuild } from "@/interfaces/discord"
-import TrialWarningCard from "@/components/TrialWarningCard"
+import UserPage from "@/layouts/user-page"
+import { PostBillingPortalResponse, PostSubscriptionResponse } from "@/types"
+import fetcher, { createErrorResponse } from "@/utils/fetcher"
+import { openUrl } from "@/utils/open-url"
 
 if (!stripeConstants.publicKey) {
   throw Error("Env variable NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY not defined")
@@ -84,14 +82,8 @@ const PremiumPage = () => {
   )
   const [guilds, setGuilds] = React.useState(sort(initialGuilds))
 
-  const [plansDialogOpen, setPlansDialogOpen] = React.useState(false)
   const [trialWarningDialogGuild, setTrialWarningDialogGuild] = React.useState<PremiumDiscordGuild | null>(null)
-
-  React.useEffect(() => {
-    if (!subscription && !isLoadingSubscription) {
-      mutate("/api/stripe/subscriptions", fetcher("/api/stripe/subscriptions"))
-    }
-  }, [subscription, isLoadingSubscription])
+  const [serverLimitDialogGuild, setServerLimitDialogGuild] = React.useState<PremiumDiscordGuild | null>(null)
 
   React.useEffect(() => {
     const message = subscriptionError?.message ?? guildsError?.message
@@ -140,7 +132,7 @@ const PremiumPage = () => {
     }
 
     if (!guild.premium && premiumGuildsCount >= subscription.servers) {
-      setErrorMessage("Server limit reached")
+      setServerLimitDialogGuild(guild)
       return
     }
 
@@ -152,8 +144,12 @@ const PremiumPage = () => {
       })
     } catch (e: any) {
       const errorResponse = createErrorResponse(e)
-      if (errorResponse.code == 404) {
+      if (
+        errorResponse.code == 404 &&
+        (guild.owner || BigInt(guild.permissions) & 0x08n || BigInt(guild.permissions) & 0x20n)
+      ) {
         openUrl(discord.inviteUrl(guild.id), true)
+      } else if (errorResponse.code == 402 && subscription.servers != 200) {
       } else {
         setErrorMessage(errorResponse.error)
       }
@@ -182,7 +178,7 @@ const PremiumPage = () => {
     mutateGuilds(newInitialGuilds, false)
   }
 
-  const onClickPlan = async (plan: Plan) => {
+  const onClickSubscribe = async () => {
     const stripe = await stripePromise
 
     if (!stripe) {
@@ -193,7 +189,7 @@ const PremiumPage = () => {
     let json: PostSubscriptionResponse
 
     try {
-      json = await fetcher(`/api/user/subscription?servers=${plan.servers}`, {
+      json = await fetcher(`/api/user/subscription`, {
         method: "POST",
       })
     } catch (e: any) {
@@ -210,22 +206,18 @@ const PremiumPage = () => {
     }
   }
 
-  const onClickSelectPlan = () => setPlansDialogOpen(true)
-
-  const onClosePlansDialog = () => setPlansDialogOpen(false)
-
   const shouldShowServers = () => !isValidating && guilds?.length && subscription
 
   return (
     <UserPage title="Premium" noindex nofollow>
       <Typography variant="h4" gutterBottom>
-        Your plan
+        Your subscription
       </Typography>
 
       <Box mb={2}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <SubscriptionCard onClickSelectPlan={onClickSelectPlan} />
+            <SubscriptionCard onClickSubscribe={onClickSubscribe} />
           </Grid>
         </Grid>
       </Box>
@@ -246,7 +238,15 @@ const PremiumPage = () => {
       )}
 
       <Grid container spacing={2}>
+        {!isLoadingSubscription && !subscription && (
+          <Box padding={2} width={"100%"}>
+            <Alert severity="error">
+              You must subscribe to premium before you can manage a server&#39;s premium status.
+            </Alert>
+          </Box>
+        )}
         {isValidating &&
+          subscription &&
           [...Array(8)].map((_, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
               <UserGuildCard onClickToggle={onClickToggle} />
@@ -255,13 +255,6 @@ const PremiumPage = () => {
         {!isValidating && guilds && guilds.length == 0 && (
           <Box padding={2} width={"100%"}>
             <Alert severity="error">No servers found</Alert>
-          </Box>
-        )}
-        {!isValidating && !isLoadingSubscription && !subscription && (
-          <Box padding={2} width={"100%"}>
-            <Alert severity="error">
-              You must subscribe to premium before you can manage a server&#39;s premium status.
-            </Alert>
           </Box>
         )}
         {shouldShowServers() &&
@@ -281,12 +274,6 @@ const PremiumPage = () => {
         />
       )}
 
-      <SelectPlanCard
-        open={plansDialogOpen}
-        onClose={onClosePlansDialog}
-        onClickPlan={onClickPlan}
-        loadPlans={!subscription && !isLoadingSubscription}
-      />
       <TrialWarningCard
         open={!!trialWarningDialogGuild}
         onClose={() => setTrialWarningDialogGuild(null)}
@@ -297,6 +284,21 @@ const PremiumPage = () => {
           setTrialWarningDialogGuild(null)
         }}
         guild={trialWarningDialogGuild}
+      />
+      <ServerLimitCard
+        open={!!serverLimitDialogGuild}
+        onClose={() => setServerLimitDialogGuild(null)}
+        onContinue={async () => {
+          if (serverLimitDialogGuild) {
+            const json: PostBillingPortalResponse = await fetcher("/api/user/billingPortal", {
+              method: "POST",
+            })
+
+            document.location.assign(json.url)
+          }
+          setServerLimitDialogGuild(null)
+        }}
+        guild={serverLimitDialogGuild}
       />
     </UserPage>
   )

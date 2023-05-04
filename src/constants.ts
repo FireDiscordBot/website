@@ -25,6 +25,12 @@ export const discord = {
 export const stripe = {
   publicKey: process.env.NEXT_PUBLIC_STRIPE_API_PUBLIC_KEY,
   secretKey: process.env.STRIPE_API_SECRET_KEY,
+  prices: {
+    premium_monthly: process.env.STRIPE_PRICE_PREMIUM_MONTHLY,
+    premium_yearly: process.env.STRIPE_PRICE_PREMIUM_YEARLY,
+    addon_monthly: process.env.STRIPE_PRICE_ADDON_MONTHLY,
+    addon_yearly: process.env.STRIPE_PRICE_ADDON_YEARLY,
+  },
 }
 
 export const PAGE_URL = process.env.NEXTAUTH_URL ?? "https://getfire.bot"
