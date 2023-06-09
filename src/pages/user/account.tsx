@@ -250,9 +250,13 @@ const AccountPage = () => {
               <Typography variant="body1" component="span" fontWeight={700}>
                 {session.user.name}
               </Typography>
-              <Typography variant="body1" color="textSecondary" component="span">
-                #{session.user.discriminator}
-              </Typography>
+              {session.user.discriminator != "0" ? (
+                <Typography variant="body1" color="textSecondary" component="span">
+                  #{session.user.discriminator}
+                </Typography>
+              ) : (
+                ""
+              )}
             </div>
             <Box
               sx={(theme) => ({

@@ -21,8 +21,7 @@ const FEATURES: Feature[] = [
   {
     title: "Integrations",
     text: `
-    Fire has a few integrations that allow you to retrieve content from external platforms 
-    such as Reddit and even the Google Assistant.
+    Fire has a few integrations that allow you to retrieve content from external platforms, including Google Assistant.
     `.trimStart(),
   },
   {

@@ -6,6 +6,7 @@ import type { AccessTokenResponse, AuthToken, AuthUser } from "@/interfaces/auth
 import type { APIUser } from "@/interfaces/discord"
 import { fetchUser, getBannerImage, getAvatarImage } from "@/utils/discord"
 import { discord, fire } from "@/constants"
+import { formatPomeloUsername } from "@/utils/formatting"
 
 const discordProvider = DiscordProvider({
   authorization: "https://discord.com/oauth2/authorize?scope=identify+email+guilds+guilds.members.read&prompt=none",
@@ -13,7 +14,7 @@ const discordProvider = DiscordProvider({
     id: profile.id,
     name: profile.username,
     discriminator: profile.discriminator,
-    image: getAvatarImage(profile, process.env.USE_MOD_SIX == "true"),
+    image: getAvatarImage(profile),
     banner: getBannerImage(profile),
     email: profile.email,
     publicFlags: profile.public_flags,
@@ -51,7 +52,7 @@ const refreshToken = async (token: AuthToken): Promise<AuthToken> => {
   if (!response.ok) {
     if (fresh[token.refreshToken]) return fresh[token.refreshToken] as AuthToken
     console.log(
-      `[NextAuth] Failed to refresh token for ${token.name}#${token.discriminator} (${token.id}) - ${response.status}`,
+      `[NextAuth] Failed to refresh token for ${formatPomeloUsername(token)} (${token.id}) - ${response.status}`,
       await response.json().catch(() => "Non JSON body"),
     )
     return { ...token, error: "RefreshFailed" }

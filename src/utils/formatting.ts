@@ -1,3 +1,7 @@
+import { AuthUser } from "@/interfaces/auth"
+import { APIUser, APIUserPartial, PartialOAuthUser } from "@/interfaces/discord"
+import { User } from "next-auth"
+
 export const capitalize = (string: string) => string.charAt(0).toUpperCase() + string.slice(1)
 
 export const formatNumber = (
@@ -21,4 +25,10 @@ export const formatBytes = (bytes: number, options?: Intl.NumberFormatOptions, l
   const i = Math.floor(Math.log(bytes) / Math.log(k))
 
   return `${formatNumber(bytes / Math.pow(k, i), options, locale)} ${sizes[i]}`
+}
+
+export const formatPomeloUsername = (user?: AuthUser | User | APIUserPartial | APIUser | PartialOAuthUser) => {
+  if (!user) return "unknown.user"
+  const username = "username" in user ? user.username : user.name
+  return user.discriminator == "0" ? username : `${username}#${user.discriminator}`
 }

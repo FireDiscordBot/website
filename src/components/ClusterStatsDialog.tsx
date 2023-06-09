@@ -1,6 +1,6 @@
 import { ClusterStats } from "@/interfaces/aether"
 import { handler } from "@/pages/_app"
-import { formatBytes, formatNumber } from "@/utils/formatting"
+import { formatBytes, formatNumber, formatPomeloUsername } from "@/utils/formatting"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
@@ -57,7 +57,7 @@ const ClusterStatsDialog = ({ onClose, clusterStats, ...props }: Props) => {
     if (!handler) return
     handler.restartCluster({
       id: clusterStats.id,
-      reason: `Restart requested by ${handler.user?.username}#${handler.user?.discriminator}`,
+      reason: `Restart requested by ${formatPomeloUsername(handler.user)}`,
     })
   }
 

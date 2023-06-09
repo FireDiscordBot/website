@@ -20,10 +20,10 @@ export const fetchUser = async (accessToken: string): Promise<APIUser & { cached
   return user
 }
 
-export const getAvatarImage = (user: APIUser | PartialOAuthUser, useModSix = false) => {
+export const getAvatarImage = (user: APIUser | PartialOAuthUser) => {
   if (user.avatar === null) {
-    const defaultAvatarNumber = useModSix ? parseInt(user.discriminator) % 6 : parseInt(user.discriminator) % 5
-    return `https://cdn.discordapp.com/embed/avatars/${defaultAvatarNumber}.png?ts=${+new Date()}`
+    const defaultAvatarNumber = user.discriminator == "0" ? BigInt(user.id) % 6n : parseInt(user.discriminator) % 5
+    return `https://cdn.discordapp.com/embed/avatars/${defaultAvatarNumber}.png`
   } else {
     const format = user.avatar.startsWith("a_") ? "gif" : "png"
     return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${format}`

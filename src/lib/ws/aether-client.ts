@@ -361,7 +361,7 @@ export class AetherClient {
     this.identified = true // should already be true but just in case
     if (typeof this.auth?.refresh == "function") await this.auth.refresh()
     if (this.auth?.user?.image && data.auth?.user?.avatar && !this.auth?.user?.image.includes(data.auth?.user?.avatar))
-      this.auth.user.image = getAvatarImage(data.auth.user, process.env.USE_MOD_SIX == "true")
+      this.auth.user.image = getAvatarImage(data.auth.user)
     if (this.auth && data.auth?.user?.banner && !this.auth?.user?.banner?.includes(data.auth?.user?.banner))
       this.auth.user.banner = getBannerImage(data.auth.user)
     while (this.queue.length) this.send(this.queue.pop())
@@ -419,7 +419,7 @@ export class AetherClient {
       identified.auth?.user?.avatar &&
       !this.auth?.user?.image.includes(identified.auth?.user?.avatar)
     )
-      this.auth.user.image = getAvatarImage(identified.auth.user, process.env.USE_MOD_SIX == "true")
+      this.auth.user.image = getAvatarImage(identified.auth.user)
     if (this.auth && identified.auth?.user?.banner && !this.auth?.user?.banner?.includes(identified.auth?.user?.banner))
       this.auth.user.banner = getBannerImage(identified.auth.user)
     while (this.queue.length) this.send(this.queue.pop())
