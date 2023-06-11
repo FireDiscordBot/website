@@ -20,7 +20,7 @@ const ServerLimitCard = ({ open, onClose, onContinue, guild }: Props) => {
       <DialogTitle onClose={onClose}>Warning</DialogTitle>
       <DialogContent>
         <Typography variant="body1" gutterBottom>
-          Yoiu have reached the maximum number of servers you can give premium to for your plan.
+          You have reached the maximum number of servers you can give premium to for your plan.
           <br />
           <br />
           You can add additional servers by updating your plan in the billing portal.
