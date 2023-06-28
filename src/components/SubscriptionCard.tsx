@@ -75,9 +75,14 @@ const SubscriptionCard = ({ onClickSubscribe }: Props) => {
       Billing portal
     </Button>
   ) : (
+    <span>
     <Button color="primary" onClick={onClickSubscribe}>
       Subscribe
     </Button>
+    <Button color="primary" onClick={onClickBillingPortal}>
+      Billing portal
+    </Button>
+    </span>
   )
 
   return (
