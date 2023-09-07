@@ -76,7 +76,7 @@ const Reminders = () => {
     if (!reminder.ok)
       emitter.emit("NOTIFICATION", {
         text:
-          reminder.status == StatusCodes.PRECONDITION_FAILED
+          reminder.status == StatusCodes.PRECONDITION_FAILED || reminder.status == StatusCodes.BAD_REQUEST
             ? (
                 await reminder.json().catch(() => {
                   return { error: "Failed to create reminder" }
@@ -155,7 +155,7 @@ const Reminders = () => {
           </Grid>
         </Grid>
         <Grid item xs={12} sm={12}>
-          {!loading && reminders?.length && (
+          {!loading && reminders?.length ? (
             <div>
               {reminders?.map((reminder, index) => (
                 <Box key={index} mb={1}>
@@ -198,7 +198,7 @@ const Reminders = () => {
                 </Box>
               ))}
             </div>
-          )}
+          ) : <div></div>}
         </Grid>
       </Grid>
     </UserPageLayout>
