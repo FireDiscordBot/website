@@ -198,7 +198,9 @@ const Reminders = () => {
                 </Box>
               ))}
             </div>
-          ) : <div></div>}
+          ) : (
+            <div></div>
+          )}
         </Grid>
       </Grid>
     </UserPageLayout>

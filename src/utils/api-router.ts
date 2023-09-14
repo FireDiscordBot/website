@@ -63,10 +63,10 @@ const routeBuilder = (eventHandler: AetherClient) => {
     },
     apply(_: typeof noop, __: unknown, args: string[]): Execute {
       route.push(...args.filter((x) => x != null && !/v\d/g.test(x)))
-      return (new Proxy(noop, handler) as unknown) as Execute
+      return new Proxy(noop, handler) as unknown as Execute
     },
   }
-  return (new Proxy(noop, handler) as unknown) as Execute
+  return new Proxy(noop, handler) as unknown as Execute
 }
 
 export default routeBuilder

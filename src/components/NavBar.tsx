@@ -80,8 +80,7 @@ const NavBar = () => {
     }
     const onClickLogout = (e: React.MouseEvent) => {
       e.preventDefault()
-      if (router.route.startsWith("/user"))
-        router.push("/")
+      if (router.route.startsWith("/user")) router.push("/")
       return signOut()
     }
     const onCloseMenu = () => setAnchorEl(null)
