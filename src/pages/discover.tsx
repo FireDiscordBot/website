@@ -55,6 +55,7 @@ const DiscoverPage = () => {
   const [guilds, setGuilds] = React.useState<DiscoverableGuild[]>([])
   const [initialGuilds, setInitialGuilds] = React.useState<DiscoverableGuild[]>([])
   const [lastSub, setLastSub] = React.useState<string[]>([])
+  const [isShiftHeld, setShiftHeld] = React.useState<boolean>(false)
 
   const [page, setPage] = React.useState(1)
 
@@ -174,6 +175,17 @@ const DiscoverPage = () => {
     setAndSubscribe(getSortedGuilds(filteredGuilds, sortIds ?? [], true))
   }
 
+  if (typeof document !== "undefined") {
+    document?.addEventListener("keydown", (e) => {
+      if (e.shiftKey) setShiftHeld(true)
+      else setShiftHeld(false)
+    })
+
+    document?.addEventListener("keyup", (e) => {
+      if (e.shiftKey) setShiftHeld(false)
+    })
+  }
+
   return (
     <DefaultLayout title="Discover">
       <Container>
@@ -197,7 +209,7 @@ const DiscoverPage = () => {
                   .filter((g) => g.featured)
                   .map((guild, index) => (
                     <Grid item xs={12} sm={6} md={4} key={index}>
-                      <DiscoverableGuildCard guild={guild} />
+                      <DiscoverableGuildCard guild={guild} isShiftHeld={isShiftHeld} />
                     </Grid>
                   ))}
               </Grid>
@@ -232,7 +244,7 @@ const DiscoverPage = () => {
                 9,
               )?.map((guild, index) => (
                 <Grid item xs={12} sm={6} md={4} key={index}>
-                  <DiscoverableGuildCard guild={guild} />
+                  <DiscoverableGuildCard guild={guild} isShiftHeld={isShiftHeld} />
                 </Grid>
               ))}
             </Grid>

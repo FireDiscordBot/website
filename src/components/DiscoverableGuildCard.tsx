@@ -1,17 +1,18 @@
-import * as React from "react"
+import Avatar from "@mui/material/Avatar"
 import Card from "@mui/material/Card"
 import CardActionArea from "@mui/material/CardActionArea"
 import CardContent from "@mui/material/CardContent"
 import CardMedia from "@mui/material/CardMedia"
-import Typography from "@mui/material/Typography"
-import Avatar from "@mui/material/Avatar"
 import Skeleton from "@mui/material/Skeleton"
+import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
+import * as React from "react"
 
 import { DiscoverableGuild } from "@/interfaces/aether"
-import { formatNumber } from "@/utils/formatting"
 import { Invite } from "@/interfaces/discord"
 import { emitter, handler } from "@/pages/_app"
+import { formatNumber } from "@/utils/formatting"
+import DiscoverableGuildAdminMenu from "./DiscoverableGuildAdminMenu"
 
 const StyledCard = styled(Card)({
   height: "100%",
@@ -33,6 +34,7 @@ const CardText = styled("div")(({ theme }) => ({
 
 type Props = {
   guild?: DiscoverableGuild
+  isShiftHeld: boolean
 }
 
 type JoinRequestResponse = { error: string; code: number } | { error: null; invite: Invite }
@@ -40,7 +42,9 @@ type JoinRequestResponse = { error: string; code: number } | { error: null; invi
 const domain =
   process.env.NODE_ENV == "development" ? "http://localhost:1338/v2/discoverable/join" : "https://discover-v2.inv.wtf"
 
-const DiscoverableGuildCard = ({ guild }: Props) => {
+const DiscoverableGuildCard = ({ guild, isShiftHeld }: Props) => {
+  const [isMenuOpen, setMenuOpen] = React.useState(false)
+
   if (!guild) {
     return (
       <Skeleton animation="wave">
@@ -63,9 +67,13 @@ const DiscoverableGuildCard = ({ guild }: Props) => {
   }
 
   return (
-    <StyledCard>
+    <StyledCard id={`discoverable-card-${guild.id}`}>
       <CardActionArea
         onClick={async () => {
+          if (isShiftHeld && handler.isSuperuser()) {
+            setMenuOpen(true)
+            return
+          } else if (isMenuOpen) setMenuOpen(false)
           const request = await requestJoin(guild).catch(() => {
             emitter.emit("NOTIFICATION", {
               text: "Failed to fetch invite",
@@ -121,6 +129,61 @@ const DiscoverableGuildCard = ({ guild }: Props) => {
           </CardText>
         </StyledCardContent>
       </CardActionArea>
+      <DiscoverableGuildAdminMenu
+        anchorEl={document?.getElementById(`discoverable-card-${guild.id}`)}
+        open={isMenuOpen}
+        onClose={() => setMenuOpen(false)}
+        guild={guild}
+        onClickFeature={() => {
+          setMenuOpen(false)
+          handler.featureGuild(guild)
+        }}
+        onClickRemove={() => {
+          setMenuOpen(false)
+          handler.removeDiscoverableGuild(guild)
+        }}
+        onClickCopyInvite={async () => {
+          setMenuOpen(false)
+          const joinRequest = await requestJoin(guild).catch(() => {
+            emitter.emit("NOTIFICATION", {
+              text: "Failed to fetch invite",
+              severity: "error",
+              horizontal: "right",
+              vertical: "top",
+              autoHideDuration: 5000,
+            })
+            return null
+          })
+          if (!joinRequest) return
+          if (joinRequest.error != null) {
+            if (joinRequest.code == 403 && joinRequest.error == "FORBIDDEN")
+              emitter.emit("NOTIFICATION", {
+                text: "You cannot join this server",
+                severity: "error",
+                horizontal: "right",
+                vertical: "top",
+                autoHideDuration: 5000,
+              })
+            else
+              emitter.emit("NOTIFICATION", {
+                text: joinRequest.error,
+                severity: "error",
+                horizontal: "right",
+                vertical: "top",
+                autoHideDuration: 5000,
+              })
+          } else if (joinRequest.invite && typeof navigator != "undefined") {
+            navigator.clipboard.writeText(`https://discord.com/invite/${joinRequest.invite.code}`)
+            emitter.emit("NOTIFICATION", {
+              text: "Copied invite to clipboard",
+              severity: "success",
+              horizontal: "right",
+              vertical: "top",
+              autoHideDuration: 5000,
+            })
+          }
+        }}
+      />
     </StyledCard>
   )
 }

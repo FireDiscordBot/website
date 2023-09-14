@@ -142,6 +142,9 @@ export enum EventType {
   SESSIONS_REPLACE,
   RESTART_CLUSTER,
   CREATE_VANITY,
+  DELETE_VANITY,
+  FEATURE_GUILD_ON_DISCOVER,
+  REMOVE_FROM_DISCOVERY,
 }
 
 export type Notification = {

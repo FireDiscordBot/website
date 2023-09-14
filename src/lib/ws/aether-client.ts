@@ -1,5 +1,6 @@
 import {
   Command,
+  DiscoverableGuild,
   EventType,
   ExperimentConfig,
   IdentifyResponse,
@@ -519,6 +520,16 @@ export class AetherClient {
   createVanity(code: string, invite: any) {
     if (!this.isSuperuser()) return
     this.send(new Message(EventType.CREATE_VANITY, { code, invite }))
+  }
+
+  featureGuild(guild: DiscoverableGuild) {
+    if (!this.isSuperuser()) return
+    this.send(new Message(EventType.FEATURE_GUILD_ON_DISCOVER, { id: guild.id }))
+  }
+
+  removeDiscoverableGuild(guild: DiscoverableGuild) {
+    if (!this.isSuperuser()) return
+    this.send(new Message(EventType.REMOVE_FROM_DISCOVERY, { id: guild.id }))
   }
 
   CONFIG_UPDATE(data: { name: string; value: unknown }) {
