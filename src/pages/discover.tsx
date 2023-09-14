@@ -109,12 +109,16 @@ const DiscoverPage = () => {
       } else if (guilds && updated.guilds.length) {
         switch (updated.op) {
           case DiscoveryUpdateOp.SYNC: {
-            const newGuilds = [...guilds]
+            const newGuilds = [...guilds],
+              newInitialGuilds = [...initialGuilds]
             for (const guild of updated.guilds) {
               const index = newGuilds?.findIndex((g) => g.id == guild.id)
               if (typeof index == "number") newGuilds[index] = guild
+              const initialIndex = newInitialGuilds?.findIndex((g) => g.id == guild.id)
+              if (typeof initialIndex == "number") newInitialGuilds[initialIndex] = guild
             }
             setAndSubscribe(newGuilds)
+            setInitialGuilds(newInitialGuilds)
             break
           }
           case DiscoveryUpdateOp.ADD: {
@@ -145,7 +149,8 @@ const DiscoverPage = () => {
               if (newGuilds.find((g) => g.id == guild.id)) {
                 const index = newGuilds.findIndex((g) => g.id == guild.id)
                 if (typeof index == "number") newGuilds[index] = guild
-              } else if (newInitialGuilds.find((g) => g.id == guild.id)) {
+              }
+              if (newInitialGuilds.find((g) => g.id == guild.id)) {
                 const initialIndex = newInitialGuilds.findIndex((g) => g.id == guild.id)
                 if (typeof initialIndex == "number") newInitialGuilds[initialIndex] = guild
               } else {
