@@ -145,6 +145,7 @@ export enum EventType {
   DELETE_VANITY,
   FEATURE_GUILD_ON_DISCOVER,
   REMOVE_FROM_DISCOVERY,
+  UPDATE_REMINDER_TZ_OFFSET,
 }
 
 export type Notification = {
