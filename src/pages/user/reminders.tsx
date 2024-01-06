@@ -108,7 +108,7 @@ const Reminders = () => {
         autoHideDuration: 5000,
       })
     } else toDelete = toDelete.filter((timestamp) => timestamp != reminder.timestamp)
-    const deleted = await fetch(`/api/user/reminders/${reminder.timestamp}`, {
+    const deleted = await fetch(`/api/user/reminders/${reminder.timestamp}/${reminder.link.split("/").at(-1)}`, {
       method: "DELETE",
     })
     if (!deleted.ok)

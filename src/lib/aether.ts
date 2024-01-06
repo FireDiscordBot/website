@@ -61,8 +61,8 @@ export const createUserReminder = async (accessToken: string, body: { reminder: 
   return await requestWithAuth<unknown>(accessToken, `user/reminders`, "POST", body)
 }
 
-export const deleteUserReminder = async (accessToken: string, timestamp: string) => {
-  return await requestWithAuth<unknown>(accessToken, `user/reminders/${timestamp}`, "DELETE")
+export const deleteUserReminder = async (accessToken: string, timestamp: string, id: string) => {
+  return await requestWithAuth<unknown>(accessToken, `user/reminders/${timestamp}/${id}`, "DELETE")
 }
 
 export const getBuildOverrides = async (accessToken: string) => {
