@@ -402,8 +402,6 @@ export class AetherClient {
     })
     if (!identified) return
     this.config = { ...this.config, ...identified.config }
-    if (this.config["reminders.timezone.waiting"]) this.updateTimezoneOffset()
-    this.registerConfigListener("reminders.timezone.waiting", () => this.updateTimezoneOffset())
     this.sessions = identified.sessions
     for (const [key, value] of Object.entries(this.config))
       if (key in this.configListeners) this.configListeners[key](value)
@@ -444,6 +442,7 @@ export class AetherClient {
         device: { mobile: null, model: null },
         userAgent: navigator?.userAgent,
         language: navigator?.language,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
       } as any
       if (navigator?.userAgent) {
         const userAgentData = new UAParser(navigator?.userAgent ?? "")
@@ -532,12 +531,6 @@ export class AetherClient {
   removeDiscoverableGuild(guild: DiscoverableGuild) {
     if (!this.isSuperuser()) return
     this.send(new Message(EventType.REMOVE_FROM_DISCOVERY, { id: guild.id }))
-  }
-
-  updateTimezoneOffset() {
-    if (typeof window == "undefined") return
-    const offset = new Date().getTimezoneOffset()
-    this.send(new Message(EventType.UPDATE_REMINDER_TZ_OFFSET, { offset }))
   }
 
   CONFIG_UPDATE(data: { name: string; value: unknown }) {
