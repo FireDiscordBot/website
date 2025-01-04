@@ -601,9 +601,9 @@ export class AetherClient {
     this.send(new Message(EventType.REMOVE_FROM_DISCOVERY, { id: guild.id }))
   }
 
-  CONFIG_UPDATE(data: { name: string; value: unknown }) {
+  CONFIG_UPDATE(data: { name: string; value?: unknown }) {
     if (!this.config) return
-    if (data.value == "deleteSetting") return delete this.config[data.name]
+    if (data.value == "deleteSetting" || !("value" in data)) return delete this.config[data.name]
     this.config[data.name] = data.value
     if (data.name in this.configListeners) this.configListeners[data.name](data.value)
   }
