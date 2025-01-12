@@ -42,7 +42,7 @@ export class Websocket extends WebSocket {
           )
         this.aether.emitter.emit(EventType[message.op], message.d)
         // @ts-expect-error This is needed to ensure this[string] works
-        if (EventType[message.op] in this.aether) this.aether[EventType[message.op]](message.d)
+        if (EventType[message.op] in this.aether) this.aether[EventType[message.op]](message.d, message.n)
       }
       if (message.n && this.handlers.has(message.n)) {
         const handler = this.handlers.get(message.n)
