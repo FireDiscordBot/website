@@ -390,7 +390,7 @@ export class AetherClient {
         return this.websocket?.close(4004, "Did not receive heartbeat ack")
       }
       this.acked = false
-      this.send(new Message(EventType.HEARTBEAT, this.seq || null))
+      this.send(new Message(EventType.HEARTBEAT, this.seq || null, (+new Date()).toString()))
     }, data.interval)
     this.session = data.sessionId
     this.sessionPromiseResolver?.(this.session)
