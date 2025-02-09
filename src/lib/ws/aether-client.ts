@@ -135,6 +135,7 @@ export class AetherClient {
 
   get awaitVisible(): Promise<void> {
     return new Promise((resolve) => {
+      if (document.visibilityState == "visible") resolve()
       document.addEventListener(
         "visibilitychange",
         () => {
@@ -343,6 +344,7 @@ export class AetherClient {
           "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
           "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         )
+        await this.awaitVisible
         if (!this.websocket) throw new Error("what the fuck")
         const ws = new Websocket(
           this.session
@@ -670,13 +672,14 @@ IT'S BEST TO JUST CLOSE THIS WINDOW AND PRETEND IT DOES NOT EXIST.`,
   }
 
   private send(message?: Message) {
-    if (
+    const cannotSend =
       !message ||
       !this.websocket ||
       this.websocket.readyState != this.websocket.OPEN ||
       (message.type != EventType.IDENTIFY_CLIENT && !this.identified)
-    )
-      return message && this.queue.push(message)
+    if (cannotSend && message?.type != EventType.HEARTBEAT) return message && this.queue.push(message)
+    else if (cannotSend) return
+
     if (process.env.NODE_ENV == "development" || this.isSuperuser())
       // easy access for debugging
       (globalThis as { [key: string]: unknown }).aether = this
@@ -690,6 +693,6 @@ IT'S BEST TO JUST CLOSE THIS WINDOW AND PRETEND IT DOES NOT EXIST.`,
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         message.toJSON(),
       )
-    this.websocket.send(MessageUtil.encode(message))
+    this.websocket?.send(MessageUtil.encode(message))
   }
 }
