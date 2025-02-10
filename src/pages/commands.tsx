@@ -91,7 +91,7 @@ const CommandsPage = () => {
       setSelectedCategoryIndex(preFilterCategoryIndex)
       setPreFilterCategoryIndex(0)
     }
-    setFilter(f)
+    setFilter(f.trim())
     if (!filter) {
       setPreFilterCategoryIndex(selectedCategoryIndex)
       setSelectedCategoryIndex(0)
