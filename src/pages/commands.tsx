@@ -1,23 +1,23 @@
-import * as React from "react"
-import { useRouter } from "next/router"
-import Paper from "@mui/material/Paper"
-import Container from "@mui/material/Container"
-import Tabs, { TabsProps, tabsClasses } from "@mui/material/Tabs"
-import Tab from "@mui/material/Tab"
+import { Alert, TextField } from "@mui/material"
 import Box from "@mui/material/Box"
-import Grid from "@mui/material/Grid"
-import useMediaQuery from "@mui/material/useMediaQuery"
-import { Theme, styled } from "@mui/material/styles"
-import { TextField } from "@mui/material"
 import { red } from "@mui/material/colors"
+import Container from "@mui/material/Container"
+import Grid from "@mui/material/Grid"
+import Paper from "@mui/material/Paper"
+import { Theme, styled } from "@mui/material/styles"
+import Tab from "@mui/material/Tab"
+import Tabs, { TabsProps, tabsClasses } from "@mui/material/Tabs"
+import useMediaQuery from "@mui/material/useMediaQuery"
+import { useRouter } from "next/router"
+import * as React from "react"
 
 import { emitter, handler } from "./_app"
 
+import CommandAccordion from "@/components/CommandAccordion"
+import Loading from "@/components/loading"
 import { fire } from "@/constants"
 import { Command } from "@/interfaces/aether"
 import DefaultLayout from "@/layouts/default"
-import CommandAccordion from "@/components/CommandAccordion"
-import Loading from "@/components/loading"
 
 interface CategoriesTabsProps extends TabsProps {
   isMobile: boolean
@@ -167,6 +167,12 @@ const CommandsPage = () => {
                 commands
                   .filter((command) => !!command.description)
                   .map((command, index) => <CommandAccordion command={command} prefix={prefix} key={index} />)
+              ) : filter ? (
+                <Box padding={2} width={"100%"}>
+                  <Alert severity="error">
+                    No commands found with the query <strong>{filter}</strong>
+                  </Alert>
+                </Box>
               ) : (
                 <Loading />
               )}
