@@ -170,7 +170,7 @@ const CommandsPage = () => {
               ) : filter ? (
                 <Box padding={2} width={"100%"}>
                   <Alert severity="error">
-                    No commands found with the query <strong>{filter}</strong>
+                    No commands found. Try a different search term or clear the search box to view all commands.
                   </Alert>
                 </Box>
               ) : (
