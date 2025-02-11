@@ -564,8 +564,8 @@ export class AetherClient {
     })
   }
 
-  sendGuildJoinRequest(id: string, nonce: string) {
-    this.send(new Message(EventType.GUILD_JOIN_REQUEST, { id }, nonce))
+  sendGuildJoinRequest(id: string, inviteOnly: boolean, nonce: string) {
+    this.send(new Message(EventType.GUILD_JOIN_REQUEST, { id, inviteOnly }, nonce))
   }
 
   requestData(nonce: string) {

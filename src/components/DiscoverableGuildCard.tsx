@@ -146,7 +146,7 @@ const DiscoverableGuildCard = ({ guild, isShiftHeld }: Props) => {
         }}
         onClickCopyInvite={async () => {
           setMenuOpen(false)
-          const joinRequest = await requestJoin(guild).catch(() => {
+          const joinRequest = await requestJoin(guild, true).catch(() => {
             emitter.emit("NOTIFICATION", {
               text: "Failed to fetch invite",
               severity: "error",
@@ -190,12 +190,12 @@ const DiscoverableGuildCard = ({ guild, isShiftHeld }: Props) => {
   )
 }
 
-const requestJoin = async (guild: DiscoverableGuild): Promise<JoinRequestResponse> =>
+const requestJoin = async (guild: DiscoverableGuild, inviteOnly = false): Promise<JoinRequestResponse> =>
   new Promise((resolve, reject) => {
     if (!handler) return resolve({ error: "NO_HANDLER", code: 500 })
     const nonce = (+new Date()).toString()
     handler.websocket?.handlers.set(nonce, resolve)
-    handler.sendGuildJoinRequest(guild.id, nonce)
+    handler.sendGuildJoinRequest(guild.id, inviteOnly, nonce)
 
     setTimeout(() => {
       if (handler.websocket?.handlers.has(nonce)) {
