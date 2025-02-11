@@ -1,12 +1,11 @@
 import { StatusCodes } from "http-status-codes"
 import { Stripe } from "stripe"
 
-import { createErrorResponse } from "@/utils/fetcher"
 import stripe from "@/api/server-stripe"
 import { createStripeCheckoutSession, fetchCustomerId } from "@/lib/aether"
 import { AuthenticatedApiHandler, GetSubscriptionResponse, PostSubscriptionResponse } from "@/types"
 import { error, withSession } from "@/utils/api-handler-utils"
-import { stripe as stripeConstants } from "@/constants"
+import { createErrorResponse } from "@/utils/fetcher"
 
 const subscriptionComparator = (first: Stripe.Subscription, second: Stripe.Subscription) => {
   const getStatusWeight = (status: Stripe.Subscription.Status) => {
@@ -57,19 +56,17 @@ const get: AuthenticatedApiHandler<GetSubscriptionResponse> = async (session, _r
 
   const subscription = subscriptions[0]
 
-  let servers = 1
+  let servers = 1,
+    additionalServers: Stripe.SubscriptionItem | undefined
   if (subscription.metadata?.custom_limit)
     servers = parseInt(subscription.metadata?.custom_limit ?? servers.toString(), 10)
   else if (
-    subscription.items.data.find(
+    (additionalServers = subscription.items.data.find(
       (item) =>
-        item.price.id == stripeConstants.prices.addon_monthly || item.price.id == stripeConstants.prices.addon_yearly,
-    )
+        item.price.lookup_key == "addon_premiumservers_monthly" ||
+        item.price.lookup_key == "addon_premiumservers_yearly",
+    ))
   ) {
-    const additionalServers = subscription.items.data.find(
-      (item) =>
-        item.price.id == stripeConstants.prices.addon_monthly || item.price.id == stripeConstants.prices.addon_yearly,
-    )
     servers += additionalServers?.quantity ?? 0
   }
 
