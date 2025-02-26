@@ -41,6 +41,7 @@ const getReconnectTime = (code: number) => {
 export class AetherClient {
   private sessionPromiseResolver?: (session: string | PromiseLike<string>) => void
   configListeners: Record<string, (value: unknown) => void>
+  ignoreCloseOnInvisible?: boolean = false
   refreshTokenPromise?: Promise<AuthToken>
   private _auth: AuthSession | undefined
   identified: "identifying" | boolean
@@ -148,6 +149,11 @@ export class AetherClient {
   }
 
   private closeOnInvisible() {
+    if (this.ignoreCloseOnInvisible) {
+      this.ignoreCloseOnInvisible = false
+      return
+    }
+
     // Always remove to try avoid duplicate calls
     document.removeEventListener("visibilitychange", this.closeOnInvisible.bind(this))
     if (document.visibilityState == "hidden") this.websocket?.close(4010, "Inactive Session")

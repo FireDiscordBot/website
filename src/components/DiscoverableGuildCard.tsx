@@ -96,9 +96,10 @@ const DiscoverableGuildCard = ({ guild, isShiftHeld }: Props) => {
                 vertical: "top",
                 autoHideDuration: 5000,
               })
-            else if (request.code == 401 && typeof window != "undefined")
+            else if (request.code == 401 && typeof window != "undefined") {
+              handler.ignoreCloseOnInvisible = true
               window.open(`${domain}/${guild.id}/${handler?.session}`, "_blank")
-            else
+            } else
               emitter.emit("NOTIFICATION", {
                 text: request.error,
                 severity: "error",
@@ -106,9 +107,10 @@ const DiscoverableGuildCard = ({ guild, isShiftHeld }: Props) => {
                 vertical: "top",
                 autoHideDuration: 5000,
               })
-          } else if (request.invite && typeof window != "undefined")
+          } else if (request.invite && typeof window != "undefined") {
+            handler.ignoreCloseOnInvisible = true
             window.open(`https://discord.com/invite/${request.invite.code}`, "_blank")
-          else
+          } else
             emitter.emit("NOTIFICATION", {
               text: "An unknown error occurred",
               severity: "error",
