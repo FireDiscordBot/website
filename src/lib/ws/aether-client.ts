@@ -406,7 +406,7 @@ export class AetherClient {
     this.commandCategories = data.commandCategories
     this.commands = [...this.commands, ...data.firstCategory] // prevent clearing commands when reconnecting
     this.commands = this.commands.filter((c, index) => this.commands.findIndex((c2) => c2.name === c.name) === index)
-    if (this.auth?.accessToken) this.identify()
+    this.identify()
   }
 
   async RESUME_CLIENT(data: ResumeResponse) {
