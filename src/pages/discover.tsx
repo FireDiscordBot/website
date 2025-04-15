@@ -1,16 +1,15 @@
-import * as React from "react"
+import { Alert, Pagination, TextField, Typography } from "@mui/material"
+import Box from "@mui/material/Box"
 import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
-import Box from "@mui/material/Box"
-import { Alert, TextField, Typography } from "@mui/material"
-import { Pagination } from "@mui/material"
+import * as React from "react"
 
 import { emitter, handler } from "./_app"
 
-import DefaultLayout from "@/layouts/default"
 import DiscoverableGuildCard from "@/components/DiscoverableGuildCard"
-import { DiscoverableGuild, DiscoveryUpdateOp } from "@/interfaces/aether"
 import Loading from "@/components/loading"
+import { DiscoverableGuild, DiscoveryUpdateOp } from "@/interfaces/aether"
+import DefaultLayout from "@/layouts/default"
 
 interface DiscoverySync {
   op: DiscoveryUpdateOp
@@ -55,6 +54,7 @@ const DiscoverPage = () => {
   const [guilds, setGuilds] = React.useState<DiscoverableGuild[]>([])
   const [initialGuilds, setInitialGuilds] = React.useState<DiscoverableGuild[]>([])
   const [lastSub, setLastSub] = React.useState<string[]>([])
+  const [query, setQuery] = React.useState<string>("")
   const [isShiftHeld, setShiftHeld] = React.useState<boolean>(false)
 
   const [page, setPage] = React.useState(1)
@@ -105,7 +105,7 @@ const DiscoverPage = () => {
         // if a filter is currently applied, this will reset the list to be unfiltered
         // so we reset the textbox value too
         if (typeof document != "undefined" && document.getElementById("guild-filter") != null)
-          (document.getElementById("guild-filter") as HTMLInputElement).value = ""
+          ((document.getElementById("guild-filter") as HTMLInputElement).value = ""), setQuery("")
       } else if (guilds && updated.guilds.length) {
         switch (updated.op) {
           case DiscoveryUpdateOp.SYNC: {
@@ -172,6 +172,7 @@ const DiscoverPage = () => {
   }, [guilds, initialGuilds, page, setAndSubscribe, sortIds])
 
   const handleTextChange = (value: string | null | undefined) => {
+    setQuery(value ?? "")
     if (!value) return setAndSubscribe(getSortedGuilds(initialGuilds, sortIds ?? [], true))
 
     const filteredGuilds =
@@ -203,38 +204,35 @@ const DiscoverPage = () => {
             placeholder={"Find a server..."}
           />
         </Box>
-        {guilds.filter((g) => g.featured).length > 0 &&
-          !(document.getElementById("guild-filter") as HTMLInputElement)?.value.length && (
-            <Box mb={2}>
-              <Typography variant="h4" gutterBottom>
-                Featured Servers
-              </Typography>
-              <Grid container spacing={4}>
-                {guilds
-                  .filter((g) => g.featured)
-                  .map((guild, index) => (
-                    <Grid item xs={12} sm={6} md={4} key={index}>
-                      <DiscoverableGuildCard guild={guild} isShiftHeld={isShiftHeld} />
-                    </Grid>
-                  ))}
-              </Grid>
-            </Box>
-          )}
+        {guilds.filter((g) => g.featured).length > 0 && !query.length && (
+          <Box mb={2}>
+            <Typography variant="h4" gutterBottom>
+              Featured Servers
+            </Typography>
+            <Grid container spacing={4}>
+              {guilds
+                .filter((g) => g.featured)
+                .map((guild, index) => (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                    <DiscoverableGuildCard guild={guild} isShiftHeld={isShiftHeld} />
+                  </Grid>
+                ))}
+            </Grid>
+          </Box>
+        )}
         {sortIds == null ? (
           <Loading />
         ) : (
           <Box mb={2}>
             {guilds.length > 0 ? (
               <Typography variant="h4" gutterBottom>
-                {(document.getElementById("guild-filter") as HTMLInputElement)?.value.length
-                  ? "Matching Servers"
-                  : "All Servers"}
+                {query.length ? "Matching Servers" : "All Servers"}
               </Typography>
             ) : (
               <Box padding={2} width={"100%"}>
                 <Alert severity="error">
                   No servers found.{" "}
-                  {(document.getElementById("guild-filter") as HTMLInputElement)?.value.length
+                  {query.length
                     ? "Try a different search term."
                     : "There may be an ongoing outage affecting Fire, please check back later."}
                 </Alert>
@@ -242,9 +240,7 @@ const DiscoverPage = () => {
             )}
             <Grid container spacing={4}>
               {paginate(
-                guilds.filter((g) =>
-                  (document.getElementById("guild-filter") as HTMLInputElement)?.value.length ? true : !g.featured,
-                ),
+                guilds.filter((g) => (query.length ? true : !g.featured)),
                 page,
                 9,
               )?.map((guild, index) => (
