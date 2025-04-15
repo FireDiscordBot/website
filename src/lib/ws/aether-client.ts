@@ -60,6 +60,7 @@ export class AetherClient {
   router?: RouterType
   commands: Command[]
   subscribed: string
+  subscribeExtra: Record<string, unknown>
   session?: string
   queue: Message[]
   acked?: boolean
@@ -71,6 +72,7 @@ export class AetherClient {
       this.auth.refresh = this.getSession.bind(this)
     } else this.getSession()
     this.subscribed = typeof window != "undefined" ? window.location.pathname : "/"
+    this.subscribeExtra = {}
     this.commandCategories = []
     this.configListeners = {}
     this.identified = false
@@ -377,10 +379,10 @@ export class AetherClient {
   }
 
   handleSubscribe(route: string, extra?: Record<string, unknown>) {
-    this.configListeners = {} // these are set inside pages so if we're changing page, we clear it
     if (route == this.subscribed && (!extra || (Object.keys(extra).length == 1 && extra.shallow == false))) return
+    this.configListeners = {} // these are set inside pages so if we're changing page, we clear it
     this.send(new Message(EventType.SUBSCRIBE, { route, extra }))
-    this.subscribed = route
+    ;(this.subscribed = route), (this.subscribeExtra = extra ?? {})
   }
 
   HELLO(data: {
@@ -542,7 +544,7 @@ export class AetherClient {
           EventType.IDENTIFY_CLIENT,
           {
             config: {
-              subscribed: this.subscribed ?? window.location.pathname,
+              subscribe: { subscribed: this.subscribed ?? window.location.pathname, extra: this.subscribeExtra },
               session: {
                 accessToken: this.auth?.accessToken,
                 refreshToken: this.auth?.refreshToken,
