@@ -116,6 +116,7 @@ const CommandsPage = () => {
 
     emitter.removeAllListeners("COMMANDS_UPDATE")
     emitter.on("COMMANDS_UPDATE", (update) => {
+      if (!update.commands.length) return
       setCommands(update.commands)
       if (update.full && update.commands[0].category && !cachedCategories.includes(update.commands[0].category))
         setCachedCategories([...cachedCategories, update.commands[0].category])

@@ -81,6 +81,92 @@ export type Category = {
   Note?: string
 }
 
+declare enum Locale {
+  Indonesian = "id",
+  EnglishUS = "en-US",
+  EnglishGB = "en-GB",
+  Bulgarian = "bg",
+  ChineseCN = "zh-CN",
+  ChineseTW = "zh-TW",
+  Croatian = "hr",
+  Czech = "cs",
+  Danish = "da",
+  Dutch = "nl",
+  Finnish = "fi",
+  French = "fr",
+  German = "de",
+  Greek = "el",
+  Hindi = "hi",
+  Hungarian = "hu",
+  Italian = "it",
+  Japanese = "ja",
+  Korean = "ko",
+  Lithuanian = "lt",
+  Norwegian = "no",
+  Polish = "pl",
+  PortugueseBR = "pt-BR",
+  Romanian = "ro",
+  Russian = "ru",
+  SpanishES = "es-ES",
+  SpanishLATAM = "es-419",
+  Swedish = "sv-SE",
+  Thai = "th",
+  Turkish = "tr",
+  Ukrainian = "uk",
+  Vietnamese = "vi",
+}
+
+type LocalizationMap = Partial<Record<Locale, string | null>>
+
+interface APIApplicationCommandOptionChoice<ValueType = number | string> {
+  name: string
+  name_localizations?: LocalizationMap | null
+  value: ValueType
+}
+
+export interface CommandsV2Command {
+  id: `${string}/${string}` // command id (`Category/id`)
+  name: string // command name
+  category: string // category name
+  description: string // description in default lang (en-US)
+  localisedDescription: {
+    [k: string]: string
+  } // descriptions for all langs
+  arguments: {
+    name: string
+    description: string
+    localisedDescription: {
+      [k: string]: string
+    }
+    type: "String" | "Integer" | "Boolean" | "User" | "Channel" | "Role" | "Mentionable" | "Number" | "Attachment"
+    required: boolean
+    default: any
+    autocomplete: boolean
+    choices: APIApplicationCommandOptionChoice[]
+  }[] // command arguments
+  guilds: string[] // guilds where the command is registered
+  channel: "guild" | "dm" | null // where the command can be used
+  availableViaSlash: boolean // available via slash command
+  ownerOnly: boolean // geek only
+  superuserOnly: boolean // requires superuser
+  moderatorOnly: boolean // requires moderator
+  requiresExperiment: { id: number; bucket: number } | null // experiment id and bucket
+  hidden: boolean // hidden to non-superusers
+  premium: boolean // requires premium
+  slashOnly: boolean // slash command only
+  ephemeral: boolean // respond as ephemeral
+  slashId: string // main slash command id
+  slashIds: Record<string, string> // guild-specific slash command ids
+  context: string[] // names of context menu cmds
+}
+
+export type CommandsUpdateResponse = {
+  commands: Command[]
+  categories?: string[]
+  commandsV2: CommandsV2Command[]
+  full: boolean
+}
+
 type BadgeType = null | "PARTNERED" | "VERIFIED" | "BOOST_FRIENDS" | "BOOST_GROUPS" | "BOOST_COMMUNITIES"
 
 export interface DiscoverableGuild {
@@ -180,6 +266,7 @@ export type IdentifyResponse = {
   config?: Record<string, unknown>
   experiments: UserExperimentBasicData[]
   guildExperiments: GuildExperimentBasicData[]
+  commandCategoriesV2: string[]
   rateLimit: WSRateLimit
   session: string
   sessions: SessionInfo[]
@@ -190,6 +277,7 @@ export type ResumeResponse = {
   config?: Record<string, unknown>
   experiments: UserExperimentBasicData[]
   guildExperiments: GuildExperimentBasicData[]
+  commandCategoriesV2: string[]
   rateLimit: WSRateLimit
   replayed: number
   session: string

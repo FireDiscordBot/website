@@ -2,7 +2,7 @@ import { EventEmitter } from "events"
 
 import {
   ClusterStats,
-  Command,
+  CommandsUpdateResponse,
   DiscoverableGuild,
   GuildSyncResponse,
   IdentifyResponse,
@@ -19,7 +19,7 @@ interface EmitterEvents {
   REALTIME_STATS: (stats: ClusterStats | InitialStats) => void
   SUBSCRIBE: (route: string, extra?: unknown) => void
   HELLO: (hello: { interval: number }) => void
-  COMMANDS_UPDATE: (update: { commands: Command[]; full: boolean }) => void
+  COMMANDS_UPDATE: (update: CommandsUpdateResponse) => void
   DISCOVERY_UPDATE: (guilds: DiscoverableGuild[]) => void
   NOTIFICATION: (notification?: Notification) => void
   REMINDERS_UPDATE: (reminders: Reminder[]) => void

@@ -405,9 +405,9 @@ export class AetherClient {
     this.session = data.sessionId
     this.sessionPromiseResolver?.(this.session)
     this.experiments = [...data.guildExperiments, ...data.userExperiments]
-    this.commandCategories = data.commandCategories
-    this.commands = [...this.commands, ...data.firstCategory] // prevent clearing commands when reconnecting
-    this.commands = this.commands.filter((c, index) => this.commands.findIndex((c2) => c2.name === c.name) === index)
+    // this.commandCategories = data.commandCategories
+    // this.commands = [...this.commands, ...data.firstCategory] // prevent clearing commands when reconnecting
+    // this.commands = this.commands.filter((c, index) => this.commands.findIndex((c2) => c2.name === c.name) === index)
     this.identify()
   }
 
@@ -418,6 +418,7 @@ export class AetherClient {
       return this.websocket?.close(4005, "Invalid Session")
     } else if (this.auth && data.auth) this.oauth = data.auth
     this.identified = true // should already be true but just in case
+    this.commandCategories = data.commandCategoriesV2
     if (typeof this.auth?.refresh == "function") await this.auth.refresh()
     if (this.auth?.user?.image && data.auth?.user?.avatar && !this.auth?.user?.image.includes(data.auth?.user?.avatar))
       this.auth.user.image = getAvatarImage(data.auth.user)
@@ -469,6 +470,7 @@ export class AetherClient {
     })
     if (!identified) return
     this.config = { ...this.config, ...identified.config }
+    this.commandCategories = identified.commandCategoriesV2
     this.sessions = identified.sessions
     for (const [key, value] of Object.entries(this.config))
       if (key in this.configListeners) this.configListeners[key](value)
