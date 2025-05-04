@@ -482,7 +482,12 @@ export class AetherClient {
     if (this.auth && this.auth?.user?.id != identified.auth?.user?.id)
       this.websocket?.close(4001, "Mismatched identities")
     this.identified = true
-    if (this.auth?.user?.id) this.send(new Message(EventType.GUILD_SYNC, {}))
+    if (this.auth?.user?.id)
+      this.send(
+        new Message(EventType.GUILD_SYNC, {
+          existing: this.guilds.filter((guild) => !("unavailable" in guild)),
+        }),
+      )
     if (typeof this.auth?.refresh == "function") await this.auth.refresh()
     if (
       this.auth?.user?.image &&
@@ -644,11 +649,14 @@ export class AetherClient {
         "background: #353A47; color: white; border-radius: 0 3px 3px 0",
         data,
       )
-    } else if (data.success) this.logIgnore.push(...[EventType.GUILD_CREATE, EventType.GUILD_DELETE])
-    else
-      this.logIgnore = this.logIgnore.filter(
-        (event) => event != EventType.GUILD_CREATE && event != EventType.GUILD_DELETE,
+    } else if ("guilds" in data && data.guilds.length) {
+      console.log(
+        `%c GUILDS %c Sync %c Syncing ${data.guilds.length} guilds! `,
+        "background: #279AF1; color: white; border-radius: 3px 0 0 3px;",
+        "background: #9CFC97; color: black; border-radius: 0 3px 3px 0",
+        "background: #353A47; color: white; border-radius: 0 3px 3px 0",
       )
+    }
   }
 
   PUSH_ROUTE(data: { route: string; extra?: Record<string, unknown> }) {
